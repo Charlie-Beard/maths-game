@@ -48,13 +48,13 @@ function waft(): void {
 
 // --------------------------------------------------------------------- art
 
-const RAIL = { x0: 330, x1: 920, y: 300 };
+const RAIL = { x0: 270, x1: 990, y: 290 };
 
 /** Daylight high in the tree: the trunk on the left, the rail with its hooks, and Silky's yellow door up on the right. */
 function railBackdrop(): string {
   const r = rng(606);
   const leaves: Node[] = [];
-  for (let i = 0; i < 20; i++) leaves.push(piece(circle(r() * 1180, r() < 0.6 ? r() * 70 - 20 : 470 + r() * 140, 50 + r() * 40), [C.leafDark, C.greenDark, C.leaf][i % 3], { rough: 1.4, shadow: i % 3 === 0 }));
+  for (let i = 0; i < 20; i++) leaves.push(piece(circle(r() * 1180, r() * 70 - 20, 50 + r() * 40), [C.leafDark, C.greenDark, C.leaf][i % 3], { rough: 1.4, shadow: i % 3 === 0 }));
   const hooks: Node[] = [];
   for (let i = 0; i < 9; i++) {
     const x = hookX(i);
@@ -89,7 +89,7 @@ function railBackdrop(): string {
 
 /** Where hook i is: five big pans, a gap, four little ones. */
 function hookX(i: number): number {
-  return i < 5 ? RAIL.x0 + 40 + i * 74 : RAIL.x0 + 40 + 5 * 74 + 20 + (i - 5) * 52;
+  return i < 5 ? RAIL.x0 + 50 + i * 86 : RAIL.x0 + 50 + 5 * 86 + 16 + (i - 5) * 62;
 }
 
 /** The rope he slides down on (20 × 400). */
@@ -159,7 +159,7 @@ export default defineStory({
     k.ambient('dust', { count: 14 });
     k.music('adventure');
 
-    const hero = k.character('hero', { x: 930, y: 400, w: 230, z: 20, flip: true });
+    const hero = k.character('hero', { x: 950, y: 400, w: 220, z: 20, flip: true });
     const rp = k.add(rope(), { x: 200, y: -60, w: 20, h: 460, z: 9 });
     const man = k.character('saucepan', { x: 50, y: 360, w: 290, z: 18 });
     const pots = k.part(man, 'pots');
@@ -187,7 +187,7 @@ export default defineStory({
     const q = k.add(huh(), { x: 260, y: 300, w: 64, z: 26 });
     void k.appear(q, 0.3).then(() => k.wait(900)).then(() => k.vanish(q));
     const pans = Array.from({ length: 9 }, (_, i) => {
-      const w = i < 5 ? 84 : 58;
+      const w = i < 5 ? 100 : 70;
       const el = k.prop('saucepan', { x: hookX(i) - w / 2 + 4, y: RAIL.y + 26, w, z: 14 });
       k.set(el, { opacity: 0 });
       return el;
@@ -212,14 +212,14 @@ export default defineStory({
     const tags: HTMLElement[] = [];
     const count = async () => {
       for (let i = 0; i < 9; i++) {
-        const w = i < 5 ? 50 : 44;
-        const t = k.add(tag(i + 1, i < 5 ? C.cream : C.goldLight), { x: hookX(i) - w / 2 + 4, y: RAIL.y + (i < 5 ? 110 : 96), w, z: 16 });
+        const w = i < 5 ? 54 : 48;
+        const t = k.add(tag(i + 1, i < 5 ? C.cream : C.goldLight), { x: hookX(i) - w / 2 + 4, y: RAIL.y + (i < 5 ? 130 : 108), w, z: 16 });
         tags.push(t);
         ring(i);
         void k.appear(t, 0.2);
         await k.wait(i < 5 ? 160 : 330);
       }
-      const card = k.add(sumCard('5 + 4 = 9'), { x: 470, y: 470, w: 300, z: 26 });
+      const card = k.add(sumCard('5 + 4 = 9'), { x: 460, y: 490, w: 300, z: 26 });
       tags.push(card);
       k.sfx.sparkle();
       await k.appear(card, 0.35);
