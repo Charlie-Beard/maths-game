@@ -249,7 +249,7 @@ export default defineStory({
       k.set(gift, { x: 110, y: 200 });
       await k.appear(gift, 0.4);
       await k.to(gift, 0.9, { x: 0, y: 0, ease: 'sine.out' });
-      k.light(595, 405, 140, { color: '#ffe7a8', strength: 0.6, flicker: true });
+      k.light(595, 405, 150, { color: '#ffe7a8', strength: 0.7, flicker: true, z: 21 });
       k.sparkle(595, 400, 14, 120);
       k.float(gift, 6, 2);
       await k.wait(500);

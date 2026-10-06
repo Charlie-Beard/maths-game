@@ -228,7 +228,7 @@ export default defineStory({
       k.set(special, { opacity: 1, x: 300, y: -300, rotation: 90 });
       k.fx.twinkle();
       await k.to(special, 1.2, { x: 0, y: 0, rotation: 0, ease: 'sine.out' });
-      k.light(635, 295, 150, { color: '#fff2b0', strength: 0.85, flicker: true });
+      k.light(635, 295, 160, { color: '#fff2b0', strength: 0.8, flicker: true, z: 21 });
       k.sparkle(635, 290, 14, 130);
       k.float(special, 6, 2);
     };
@@ -239,7 +239,7 @@ export default defineStory({
     // ---- Way up: the pixie's window, with its red shutter.
     const peek = async () => {
       await k.wait(600);
-      await k.camera({ zoom: 1.9, x: 980, y: 180 }, 1.6);
+      await k.camera({ zoom: 1.6, x: 980, y: 200 }, 1.6);
       const shutter = k.add(svg({ w: 40, h: 90, name: 'l1c2-shutter', boil: false }, [piece(rect(4, 4, 30, 82, 6), C.red, { rough: 0.8 })]), { x: 1084, y: 70, w: 30, z: 5 });
       gsap.set(shutter, { transformOrigin: '0% 50%' });
       k.fx.creak();
