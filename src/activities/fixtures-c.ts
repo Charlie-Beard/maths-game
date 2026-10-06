@@ -7,24 +7,10 @@
  * `choose` problem per Visual kind (so ?scene=fixtures&kind=choose, or no
  * kind at all, shows every picture visual.ts can draw).
  *
- * The answer conventions the activities understand (for the generators):
- *
- *   clock  read: `choices` are time strings ("half past 3" or "3:30");
- *               the answer is one of them. The visual is the time shown.
- *          set:  no `choices`. The answer is the time to set, as words
- *               ("quarter to 4") or "H:MM"; the visual is where the hands
- *               start (12 o'clock is fine).
- *   coins  count: `choices` are amounts in pence (numbers, shown as "12p")
- *               or money strings ("12p", "£1"); visual.coins are the coins.
- *          know: visual.coins is empty and every choice is a coin value:
- *               the choices are drawn as coins ("tap the 50p").
- *          pay:  visual.target is the price and there are no `choices`;
- *               visual.coins are the coins in the purse (one of each,
- *               unlimited). The answer is the amount (number or "15p").
- *   shape  name: visual is the shape; `choices` are ShapeIds.
- *          find: visual is not a shape (use 'none'); `choices` are ShapeIds,
- *               drawn as shapes; the answer is the one to tap.
- *          sides: visual is the shape and the answer is a number.
+ * They follow the generators' conventions (header of core/generators/more.ts):
+ * times are timeWords strings and `hour` is the hour it is now; money is
+ * pence as numbers; a coins `target` means pay from the purse in
+ * visual.coins. See the header of each activity for how it picks its mode.
  */
 import type { Answer, Problem, Visual } from '../core/problem';
 import type { SkillId } from '../core/skills';
@@ -52,10 +38,10 @@ const ACTIVITIES: Problem[] = [
   fx('time', 'clock', 'Set the clock to quarter past 9.', '9:15', { type: 'clock', hour: 12, minute: 0 }, { tier: 3, text: 'quarter past 9' }),
   fx('time', 'clock', 'Set the clock to 20 past 5.', '20 past 5', { type: 'clock', hour: 12, minute: 0 }, { tier: 5, text: '20 past 5' }),
 
-  fx('coins', 'coins', 'Which coin is the 50p?', 50, { type: 'coins', coins: [] }, { choices: [10, 50, 20, 2] }),
+  fx('coins', 'coins', 'Can you find the 50p coin?', 50, { type: 'coins', coins: [50, 20, 10, 2] }, { choices: [10, 50, 20, 2] }),
   fx('coins', 'coins', 'How much money is here?', 8, { type: 'coins', coins: [5, 2, 1] }, { tier: 2, choices: [3, 7, 8, 9] }),
   fx('coins', 'coins', 'How much money is here?', '60p', { type: 'coins', coins: [20, 20, 10, 10] }, { tier: 4, choices: ['40p', '50p', '60p', '70p'] }),
-  fx('coins', 'coins', 'The toy soldier costs 13p. Pay for it.', 13, { type: 'coins', coins: [1, 2, 5, 10], target: 13 }, { tier: 3 }),
+  fx('coins', 'coins', 'The kite costs 13p. Tap the coins to pay exactly 13p.', 13, { type: 'coins', coins: [10, 5, 2, 1, 1], target: 13 }, { tier: 3, choices: [12, 13, 14] }),
   fx('coins', 'coins', 'The teddy costs 80p. Pay for it.', '80p', { type: 'coins', coins: [10, 20, 50], target: 80 }, { tier: 4 }),
   fx('coins', 'coins', 'How much money is here?', '£3.50', { type: 'coins', coins: [200, 100, 50] }, { tier: 4, choices: ['£3', '£3.50', '£2.50'] }),
 
@@ -76,6 +62,8 @@ const VISUALS: Problem[] = [
   fx('subitise', 'choose', 'How many dots?', 7, { type: 'dots', count: 7, pattern: 'frame' }, { choices: [6, 7, 8] }),
   fx('add-10', 'choose', 'How many now?', 8, { type: 'tenFrame', frames: [6], add: 2, prop: 'popBiscuit' }, { text: '6 + 2 = ?', choices: [7, 8, 9] }),
   fx('add-20', 'choose', 'How many?', 14, { type: 'tenFrame', frames: [10, 4] }, { choices: [13, 14, 15] }),
+  fx('bridge-add', 'choose', '8 add 5?', 13, { type: 'tenFrame', frames: [8, 0], add: 5 }, { text: '8 + 5 = ?', choices: [12, 13, 14] }),
+  fx('bridge-sub', 'choose', '13 take away 5?', 8, { type: 'tenFrame', frames: [10, 3], remove: 5 }, { text: '13 − 5 = ?', choices: [7, 8, 9] }),
   fx('sub-10', 'choose', 'How many left?', 4, { type: 'tenFrame', frames: [7], remove: 3 }, { text: '7 − 3 = ?', choices: [3, 4, 5] }),
   fx('one-more', 'choose', 'One more than 6?', 7, { type: 'numberLine', from: 0, to: 10, start: 6, marks: [7] }, { choices: [5, 7, 8] }),
   fx('count-10s', 'choose', 'What comes after 40?', 50, { type: 'numberLine', from: 0, to: 100, start: 40, step: 10 }, { choices: [41, 50, 60] }),
@@ -85,6 +73,8 @@ const VISUALS: Problem[] = [
   fx('compare-10', 'choose', 'Which side has more?', 'left', { type: 'compare', left: 7, right: 4, asObjects: 'saucepan' }, { choices: ['left', 'right'] }),
   fx('compare-100', 'choose', 'Which sign goes in the middle?', '>', { type: 'compare', left: 42, right: 24 }, { choices: ['<', '>', '='] }),
   fx('tens-ones', 'choose', 'What number is this?', 34, { type: 'tensOnes', tens: 3, ones: 4 }, { choices: [34, 43, 7] }),
+  fx('tens-ones', 'choose', 'Build 23.', 23, { type: 'tensOnes', tens: 0, ones: 0 }, { choices: [23, 32] }),
+  fx('compare-100', 'choose', 'Which is more?', 'left', { type: 'compare', left: 34, right: 27, asObjects: 'stick' }, { choices: ['left', 'right'] }),
   fx('tens-ones', 'choose', 'What number is this?', 97, { type: 'tensOnes', tens: 9, ones: 7 }, { choices: [97, 79, 16] }),
   fx('groups', 'choose', 'How many soldiers?', 6, { type: 'groups', groups: 3, each: 2, layout: 'groups', prop: 'soldier' }, { text: '2 + 2 + 2 = ?', choices: [5, 6, 8] }),
   fx('arrays', 'choose', 'How many cushions?', 15, { type: 'groups', groups: 3, each: 5, layout: 'array', prop: 'cushion' }, { text: '3 × 5 = ?', choices: [12, 15, 18] }),
@@ -96,10 +86,10 @@ const VISUALS: Problem[] = [
   fx('coins', 'choose', 'How much?', 17, { type: 'coins', coins: [10, 5, 2] }, { choices: [15, 17, 19] }),
   fx('coins', 'choose', 'Which coins pay 7p?', 7, { type: 'coins', coins: [5, 2], target: 7 }, { choices: [6, 7] }),
   fx('shapes-2d', 'choose', 'How many sides?', 6, { type: 'shape', shape: 'hexagon', turned: 15 }, { choices: [5, 6, 8] }),
-  fx('measure-length', 'choose', 'Which ribbon is longer?', 'red', { type: 'length', lengths: [7, 4], unit: 'footsteps' }, { choices: ['red', 'blue'] }),
+  fx('measure-length', 'choose', 'Is the red ribbon longer or shorter?', 'longer', { type: 'length', lengths: [7, 4], unit: 'footsteps' }, { choices: ['longer', 'shorter', 'the same'] }),
   fx('measure-length', 'choose', 'How many footsteps long?', 5, { type: 'length', lengths: [5], unit: 'footsteps' }, { choices: [4, 5, 6] }),
   fx('measure-length', 'choose', 'How long is the ribbon?', 9, { type: 'length', lengths: [9], unit: 'cm' }, { choices: [8, 9, 10] }),
-  fx('measure-length', 'choose', 'How much longer is red than blue?', 4, { type: 'length', lengths: [10, 6], unit: 'cm' }, { choices: [3, 4, 6] }),
+  fx('measure-length', 'choose', 'Is the red ribbon longer or shorter?', 'shorter', { type: 'length', lengths: [6, 10], unit: 'cm' }, { choices: ['longer', 'shorter', 'the same'] }),
 ];
 
 export const FIXTURES_C: Problem[] = [...ACTIVITIES, ...VISUALS];

@@ -118,7 +118,7 @@ export function shape(p: Problem, ctx: ActivityContext): Activity {
     const xs = rowX(choices.length, w, mode === 'sides' ? 40 : 20);
     choices.forEach((c, i) => {
       const text = isShape(c) ? SHAPE_NAMES[c] : String(c);
-      const card = answerCard(text, c, xs[i], 600, w, 150, { size: isShape(c) ? 40 : undefined });
+      const card = answerCard(text, c, xs[i], 600, w, 150, { size: isShape(c) ? (text.length > 8 ? 36 : 40) : undefined });
       kit.tap(card, () => {
         ctx.sfx('tap');
         ctx.answer(c);

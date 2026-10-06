@@ -20,6 +20,7 @@ import { prop } from '../art/props';
 import { circle, curve, ellipse, hashString, ink, piece, poly, raw, rect, rng, svg, type Node, type Pt } from '../art/paper';
 import type { PropId, ShapeId, Visual } from '../core/problem';
 import { h } from '../ui/dom';
+import { timeWords } from '../core/generators/more';
 
 // ---------------------------------------------------------------------------
 // Small shared helpers
@@ -198,8 +199,8 @@ export function drawClock(hour: number, minute: number, size: number, o: ClockOp
     };
     nodes.push(piece(half(0), 'rgba(111,154,90,0.28)', { edge: 'clean', shadow: false }));
     nodes.push(piece(half(180), 'rgba(79,120,168,0.22)', { edge: 'clean', shadow: false }));
-    nodes.push(label(c + face * 0.42, c + face * 0.02, 'past', face * 0.13, C.greenDeep, { opacity: 0.8 }));
-    nodes.push(label(c - face * 0.42, c + face * 0.02, 'to', face * 0.13, C.blueDark, { opacity: 0.8 }));
+    nodes.push(label(c + face * 0.3, c + face * 0.36, 'past', face * 0.15, C.greenDeep, { opacity: 0.85 }));
+    nodes.push(label(c - face * 0.3, c + face * 0.36, 'to', face * 0.15, C.blueDark, { opacity: 0.85 }));
   }
   for (let i = 0; i < 60; i++) {
     const a = (i * 6 * Math.PI) / 180;
@@ -247,15 +248,15 @@ export function setClockHands(root: Element, hour: number, minute: number, size:
   root.querySelector('[data-hand="minute"]')?.setAttribute('transform', `rotate(${a.minute.toFixed(2)} ${c} ${c})`);
 }
 
-/** "3 o'clock", "half past 3", "quarter to 4", "20 past 3", "25 to 4". */
-export function timeWords(hour: number, minute: number): string {
-  const hr = ((hour - 1 + 12) % 12) + 1;
-  const next = (hr % 12) + 1;
-  if (minute === 0) return `${hr} o’clock`;
-  if (minute === 30) return `half past ${hr}`;
-  if (minute === 15) return `quarter past ${hr}`;
-  if (minute === 45) return `quarter to ${next}`;
-  return minute < 30 ? `${minute} past ${hr}` : `${60 - minute} to ${next}`;
+/** "3 o’clock", "half past 3", "quarter to 4": the same words the generators answer with. */
+export { timeWords };
+
+/**
+ * A written fraction as stacked numerals (HTML), for when ½ ¼ ⅓ won't do:
+ * the Andika latin subset has ½ and ¼ but no ⅓.
+ */
+export function stackedFraction(num: number, den: number, size = 64): string {
+  return `<span class="c-frac" style="font-size:${size}px"><span>${num}</span><span>${den}</span></span>`;
 }
 
 // ---------------------------------------------------------------------------
@@ -481,13 +482,16 @@ function drawLengths(lengths: number[], unit: 'footsteps' | 'cm', w: number, hgt
   const x0 = unit === 'cm' ? 60 : 50;
   const scale = (w - x0 - 50) / max;
   const rowH = hgt / lengths.length;
+  if (unit === 'cm' && lengths.length > 1) nodes.push(line(x0 - 4, 10, x0 - 4, hgt - 10, C.ink, 5, ' stroke-dasharray="12 10"'));
   lengths.forEach((len, i) => {
     const top = i * rowH;
     const ribbonH = Math.min(46, rowH * 0.3);
     const ry = top + rowH * (unit === 'cm' ? 0.18 : 0.22);
     nodes.push(piece(rect(x0, ry, len * scale, ribbonH, 4), RIBBONS[i % RIBBONS.length], { rough: 0.8 }));
     nodes.push(piece(rect(x0 + 6, ry + ribbonH * 0.42, len * scale - 12, ribbonH * 0.12), 'rgba(255,255,255,0.28)', { edge: 'clean', shadow: false }));
-    if (unit === 'cm') nodes.push(...drawRuler(x0, ry + ribbonH + 6, max, scale, Math.min(56, rowH * 0.4)));
+    // One length gets a ruler to measure it; two or more are just compared,
+    // lined up against a start line.
+    if (unit === 'cm' && lengths.length === 1) nodes.push(...drawRuler(x0, ry + ribbonH + 6, max, scale, Math.min(56, rowH * 0.4)));
     else for (let s = 0; s < len; s++) nodes.push(...footprint(x0 + s * scale + scale * 0.05, ry + ribbonH + rowH * 0.28, scale * 0.9, s % 2 === 0));
   });
   return nodes;
@@ -572,6 +576,45 @@ export function bundleNodes(x: number, y: number, len: number, w = 12): Node[] {
 }
 
 export const bundleWidth = (w = 12): number => w * 0.62 * 9 + w;
+
+/** Bundles then single sticks, centred in a box, shrunk to fit if need be. */
+export function tensOnesNodes(tens: number, ones: number, bx: number, by: number, w: number, hgt: number): Node[] {
+  const nodes: Node[] = [];
+  const len0 = Math.min(240, hgt - 80);
+  const sw = 13;
+  const bw = bundleWidth(sw);
+  const gapB = 22;
+  const gapS = 16;
+  const widthNeeded = tens * (bw + gapB) - (tens && !ones ? gapB : 0) + (tens && ones ? 50 : 0) + ones * (sw + gapS) - (ones ? gapS : 0);
+  const k = Math.min(1, (w - 20) / Math.max(1, widthNeeded));
+  const len = len0 * Math.max(0.6, k);
+  let x = bx + (w - widthNeeded * k) / 2;
+  const y = by + (hgt - len) / 2;
+  const s = (n: number) => n * k;
+  for (let i = 0; i < tens; i++) {
+    nodes.push(...bundleNodes(x, y, len, s(sw)));
+    x += s(bw + gapB);
+  }
+  if (tens && ones) x += s(50);
+  for (let i = 0; i < ones; i++) {
+    nodes.push(...stickNodes(x, y, len, s(sw)));
+    x += s(sw + gapS);
+  }
+  return nodes;
+}
+
+/** An empty place-value mat ("build it"): a tens side and a ones side. */
+export function emptyMat(w: number, hgt: number): Node[] {
+  const mw = Math.min(760, w - 40);
+  const mx = (w - mw) / 2;
+  const my = 20;
+  const mh = hgt - 40;
+  const side = (x: number, ww: number, text: string): Node[] => [
+    raw(`<rect x="${x}" y="${my + 50}" width="${ww}" height="${mh - 70}" rx="12" fill="none" stroke="${C.cream}" stroke-width="4" stroke-dasharray="14 10"/>`),
+    label(x + ww / 2, my + 28, text, 32, C.cream),
+  ];
+  return [piece(rect(mx, my, mw, mh, 14), C.greenDark), ...side(mx + 24, mw * 0.6 - 36, 'tens'), ...side(mx + mw * 0.6, mw * 0.4 - 24, 'ones')];
+}
 
 // ---------------------------------------------------------------------------
 // Objects (HTML, so count can make them tappable)
@@ -699,9 +742,24 @@ export function renderVisual(v: Visual, w: number, hgt: number): HTMLElement {
       const fs = tenFrameSize(cell);
       const gap = 40;
       const x0 = (w - n * fs.w - (n - 1) * gap) / 2;
+      // Adding fills the frames in order (finish the first ten, then the
+      // next); taking away starts from the last filled cells.
+      const adds = v.frames.map(() => 0);
+      let toAdd = v.add ?? 0;
       v.frames.forEach((filled, i) => {
-        const last = i === n - 1;
-        nodes.push(...drawTenFrame(filled, x0 + i * (fs.w + gap), (hgt - fs.h) / 2, cell, { prop: v.prop, add: last ? v.add : undefined, remove: last ? v.remove : undefined }));
+        const take = Math.min(toAdd, 10 - filled);
+        adds[i] = take;
+        toAdd -= take;
+      });
+      const removes = v.frames.map(() => 0);
+      let toRemove = v.remove ?? 0;
+      for (let i = n - 1; i >= 0; i--) {
+        const take = Math.min(toRemove, v.frames[i]);
+        removes[i] = take;
+        toRemove -= take;
+      }
+      v.frames.forEach((filled, i) => {
+        nodes.push(...drawTenFrame(filled, x0 + i * (fs.w + gap), (hgt - fs.h) / 2, cell, { prop: v.prop, add: adds[i] || undefined, remove: removes[i] || undefined }));
       });
       break;
     }
@@ -772,7 +830,11 @@ export function renderVisual(v: Visual, w: number, hgt: number): HTMLElement {
     }
     case 'compare': {
       const half = w / 2;
-      if (v.asObjects) {
+      if (v.asObjects === 'stick') {
+        // Bundles of ten and single sticks on each side.
+        nodes.push(...tensOnesNodes(Math.floor(v.left / 10), v.left % 10, 10, 10, half - 70, hgt - 20));
+        nodes.push(...tensOnesNodes(Math.floor(v.right / 10), v.right % 10, half + 60, 10, half - 70, hgt - 20));
+      } else if (v.asObjects) {
         const cols = 5;
         const maxN = Math.max(v.left, v.right, 1);
         const rows = Math.ceil(maxN / cols);
@@ -795,28 +857,9 @@ export function renderVisual(v: Visual, w: number, hgt: number): HTMLElement {
       nodes.push(piece(circle(half, hgt / 2, 36), C.goldLight, { edge: 'cut' }), label(half, hgt / 2 + 2, '?', 46, C.ink));
       break;
     }
-    case 'tensOnes': {
-      const len = Math.min(240, hgt - 80);
-      const sw = 13;
-      const bw = bundleWidth(sw);
-      const gapB = 22;
-      const gapS = 16;
-      const widthNeeded = v.tens * (bw + gapB) + (v.tens && v.ones ? 50 : 0) + v.ones * (sw + gapS);
-      const k = Math.min(1, (w - 40) / Math.max(1, widthNeeded));
-      let x = (w - widthNeeded * k) / 2;
-      const y = (hgt - len) / 2;
-      const s = (n: number) => n * k;
-      for (let i = 0; i < v.tens; i++) {
-        nodes.push(...bundleNodes(x, y, len, s(sw)));
-        x += s(bw + gapB);
-      }
-      if (v.tens && v.ones) x += s(50);
-      for (let i = 0; i < v.ones; i++) {
-        nodes.push(...stickNodes(x, y, len, s(sw)));
-        x += s(sw + gapS);
-      }
+    case 'tensOnes':
+      nodes.push(...(v.tens || v.ones ? tensOnesNodes(v.tens, v.ones, 0, 0, w, hgt) : emptyMat(w, hgt)));
       break;
-    }
     case 'groups': {
       if (v.layout === 'array') {
         nodes.push(...propGrid(v.prop, v.groups * v.each, 40, 10, w - 80, hgt - 20, v.each, 80));

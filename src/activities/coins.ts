@@ -6,13 +6,15 @@
  *   - **Count** (`choices`, and coins to count in the visual): the coins
  *     are shown and he chooses how much they make. Number choices are
  *     amounts in pence, shown as money ("12p", "£1").
- *   - **Know the coins** (`choices` that are all coin values, no coins in
- *     the visual): the choices are drawn as coins, and he taps the one
- *     asked for ("Which is the 50p?").
- *   - **Pay** (`visual.target`, no `choices`): a price tag, an empty shop
- *     counter and a purse of coins (one of each kind in `visual.coins`, as
- *     many as he likes). He taps purse coins onto the counter, taps a coin
- *     on the counter to take it back, then taps OK. The amount is answered
+ *   - **Know the coins** (`choices` that are all coin values and are the
+ *     coins in the visual, or no coins in the visual): the choices are
+ *     drawn as coins, and he taps the one asked for ("Find the 50p").
+ *   - **Pay** (`visual.target`; any `choices` are ignored): a price tag, an
+ *     empty shop counter and a purse holding the coins in `visual.coins`.
+ *     He taps purse coins onto the counter, taps a coin on the counter to
+ *     put it back in the purse, then taps OK. (With no coins given, the
+ *     purse has one of each kind up to the price, as many as he likes.)
+ *     The amount is answered
  *     in the same form as the problem's answer (15 or "15p").
  *
  * Help: 1 the coins (or the price) glow; 2 the coins line up biggest first
@@ -29,19 +31,36 @@ import type { Activity, ActivityContext } from './types';
 import { COIN_VALUES, coinMm, coinNodes, drawCoin, label, moneyText, priceTag, renderVisual } from './visual';
 
 const isCoin = (a: Answer): boolean => typeof a === 'number' && (COIN_VALUES as readonly number[]).includes(a);
+/** The choices are the coins on the table: "find the 50p". */
+const sameCoins = (a: number[], b: number[]): boolean => a.length === b.length && [...a].sort().join() === [...b].sort().join();
 const moneyLabel = (a: Answer): string => (typeof a === 'number' ? moneyText(a) : a);
 
-/** Biggest coins first: the fewest coins that make the amount. */
-export function payWith(amount: number, purse: number[]): number[] {
-  const out: number[] = [];
-  let left = amount;
-  for (const c of [...purse].sort((a, b) => b - a)) {
-    while (c <= left) {
-      out.push(c);
-      left -= c;
+/**
+ * Biggest coins first: the fewest coins that make the amount. With
+ * `limited`, only the coins in it can be used (each once); with a search
+ * when greedy gets stuck (e.g. 6p from 5p, 2p, 2p, 2p).
+ */
+export function payWith(amount: number, kinds: number[], limited?: number[]): number[] {
+  if (!limited) {
+    const out: number[] = [];
+    let left = amount;
+    for (const c of [...kinds].sort((a, b) => b - a)) {
+      while (c <= left) {
+        out.push(c);
+        left -= c;
+      }
     }
+    return left === 0 ? out : [];
   }
-  return left === 0 ? out : [];
+  const coins = [...limited].sort((a, b) => b - a);
+  const search = (i: number, left: number): number[] | null => {
+    if (left === 0) return [];
+    if (i >= coins.length || left < 0) return null;
+    const take = search(i + 1, left - coins[i]);
+    if (take) return [coins[i], ...take];
+    return search(i + 1, left);
+  };
+  return search(0, amount) ?? [];
 }
 
 /** The coins in a row, biggest first, with the running total under each. */
@@ -55,7 +74,7 @@ function countingOn(coins: number[], w: number, hgt: number): string {
     total += sorted[i];
     const cx = x0 + i * cell + cell / 2;
     nodes.push(...coinNodes(sorted[i], cx, hgt * 0.4, (cell * 0.92 * coinMm(sorted[i])) / 28.4));
-    nodes.push(label(cx, hgt * 0.84, moneyText(total), Math.min(40, cell * 0.36), i === sorted.length - 1 ? C.red : C.ink));
+    nodes.push(label(cx, hgt * 0.84, moneyText(total), Math.min(44, cell * 0.36), C.ink));
   }
   return svg({ w, h: hgt, name: 'counting-on', boil: false }, nodes);
 }
@@ -65,7 +84,7 @@ export function coins(p: Problem, ctx: ActivityContext): Activity {
   const el = kit.el;
   const v = p.visual.type === 'coins' ? p.visual : { type: 'coins' as const, coins: [] as number[], target: undefined };
   const choices = p.choices ?? [];
-  const mode: 'count' | 'know' | 'pay' = !choices.length && v.target !== undefined ? 'pay' : !v.coins.length && choices.length && choices.every(isCoin) ? 'know' : 'count';
+  const mode: 'count' | 'know' | 'pay' = v.target !== undefined ? 'pay' : choices.length && choices.every(isCoin) && (!v.coins.length || sameCoins(choices as number[], v.coins)) ? 'know' : 'count';
 
   const cards = new Map<string, HTMLElement>();
   let picture: HTMLElement | null = null;
@@ -77,8 +96,8 @@ export function coins(p: Problem, ctx: ActivityContext): Activity {
     picture = place(renderVisual(v, 860, 360), 160, 110, 860, 360);
     el.append(picture);
     const long = choices.some((c) => moneyLabel(c).length > 3);
-    const w = long ? 220 : choices.length > 3 ? 180 : 200;
-    const xs = rowX(choices.length, w, long ? 24 : 30);
+    const w = long ? (choices.length > 3 ? 200 : 220) : choices.length > 3 ? 180 : 200;
+    const xs = rowX(choices.length, w, long ? 20 : 30);
     choices.forEach((c, i) => {
       const card = answerCard(moneyLabel(c), c, xs[i], 600, w, 150);
       kit.tap(card, () => {
@@ -113,8 +132,13 @@ export function coins(p: Problem, ctx: ActivityContext): Activity {
   }
 
   // ---- Pay ----
+  // The purse is the coins in visual.coins, each a real coin that moves to
+  // the counter and back. With no coins given, it holds one of each kind
+  // up to the price, as many as he likes.
   const target = v.target ?? 0;
-  const purse = v.coins.length ? [...new Set(v.coins)].sort((a, b) => a - b) : COIN_VALUES.filter((c) => c <= Math.max(1, target)).slice(-6);
+  const unlimited = !v.coins.length;
+  const purse = unlimited ? COIN_VALUES.filter((c) => c <= Math.max(1, target)).slice(-6) : [...v.coins].sort((a, b) => b - a);
+  /** Purse indexes on the counter, in the order he put them there. */
   const onCounter: number[] = [];
   const CELL = 104;
   const COUNTER = { x: 470, y: 108, w: 550, h: 360 };
@@ -123,26 +147,29 @@ export function coins(p: Problem, ctx: ActivityContext): Activity {
   let totalTag: HTMLElement | null = null;
   let ghostBox: HTMLElement | null = null;
   let priceEl: HTMLElement | null = null;
-  const purseBtns = new Map<number, HTMLElement>();
+  const purseBtns: HTMLElement[] = [];
   let ok: HTMLElement | null = null;
 
-  const total = () => onCounter.reduce((a, b) => a + b, 0);
+  const total = () => onCounter.reduce((a, i) => a + purse[i], 0);
   const slot = (i: number) => ({ x: 22 + (i % 5) * CELL, y: 52 + Math.floor(i / 5) * CELL });
 
   const drawCounter = () => {
     if (!counterBox) return;
     counterBox.querySelectorAll('.c-counter-coin').forEach((c) => c.remove());
-    onCounter.forEach((c, i) => {
-      const s = slot(i);
+    onCounter.forEach((pi, k) => {
+      const c = purse[pi];
+      const s = slot(k);
       const btn = h('button', { class: 'c-coin c-counter-coin', 'aria-label': `Take back ${moneyText(c)}`, 'data-coin': String(c), html: drawCoin(c, CELL) });
       place(btn, s.x, s.y, CELL, CELL);
       kit.tap(btn, () => {
-        onCounter.splice(i, 1);
+        onCounter.splice(k, 1);
         ctx.sfx('lift');
         drawCounter();
       });
       counterBox?.append(btn);
     });
+    // A coin on the counter has left the purse (unless the purse never runs out).
+    purseBtns.forEach((btn, i) => btn.classList.toggle('c-spent', !unlimited && onCounter.includes(i)));
     counterBox.dataset.total = String(total());
     if (totalTag) totalTag.textContent = moneyText(total());
   };
@@ -166,7 +193,8 @@ export function coins(p: Problem, ctx: ActivityContext): Activity {
     );
     el.append(counterBox);
 
-    const pw = Math.min(124, 660 / purse.length);
+    const pw = Math.min(124, 640 / purse.length);
+    const bs = Math.max(76, pw - 6);
     const purseW = purse.length * pw + 40;
     const purseX = Math.max(160, 520 - purseW / 2);
     el.append(
@@ -179,20 +207,21 @@ export function coins(p: Problem, ctx: ActivityContext): Activity {
       ),
     );
     purse.forEach((c, i) => {
-      const btn = h('button', { class: 'c-coin c-purse-coin', 'aria-label': moneyText(c), 'data-value': String(c), html: drawCoin(c, Math.max(96, pw - 6)) });
-      place(btn, purseX + 20 + i * pw + (pw - Math.max(96, pw - 6)) / 2, 618, Math.max(96, pw - 6), Math.max(96, pw - 6));
+      const btn = h('button', { class: 'c-coin c-purse-coin', 'aria-label': moneyText(c), 'data-value': String(c), html: drawCoin(c, bs) });
+      place(btn, purseX + 20 + i * pw + (pw - bs) / 2, 674 - bs / 2, bs, bs);
       kit.tap(btn, () => {
-        if (onCounter.length >= MAX_ON_COUNTER) {
+        if (onCounter.length >= MAX_ON_COUNTER || (!unlimited && onCounter.includes(i))) {
           void wobble(btn);
           return;
         }
-        onCounter.push(c);
+        onCounter.push(i);
         ctx.sfx('place');
         drawCounter();
-        const placed = counterBox?.querySelector<HTMLElement>('.c-counter-coin:last-of-type');
-        if (placed && !ctx.calm) void pop(placed, 1.15);
+        const placed = counterBox?.querySelectorAll<HTMLElement>('.c-counter-coin');
+        const last = placed?.[placed.length - 1];
+        if (last && !ctx.calm) void pop(last, 1.15);
       });
-      purseBtns.set(c, btn);
+      purseBtns.push(btn);
       el.append(btn);
     });
     ok = okButton(890, 620, 120);
@@ -206,7 +235,7 @@ export function coins(p: Problem, ctx: ActivityContext): Activity {
       ctx.answer(typeof p.answer === 'number' ? t : moneyText(t));
     });
     el.append(ok);
-    enterEls.push(...purseBtns.values(), ok);
+    enterEls.push(...purseBtns, ok);
     drawCounter();
   }
 
@@ -247,15 +276,20 @@ export function coins(p: Problem, ctx: ActivityContext): Activity {
       }
       // Faint coins on the counter show what to pay with; he taps them in.
       const amount = typeof p.answer === 'number' ? p.answer : target;
-      const plan = payWith(amount, purse);
+      const plan = payWith(amount, unlimited ? purse : [...new Set(purse)], unlimited ? undefined : purse);
       onCounter.length = 0;
       drawCounter();
       ghostBox?.remove();
       ghostBox = h('div', { class: 'c-ghosts' });
-      plan.forEach((c, i) => {
-        const s = slot(i);
+      const used = new Set<number>();
+      plan.forEach((c, k) => {
+        const s = slot(k);
         ghostBox?.append(place(h('div', { class: 'c-ghost', html: drawCoin(c, CELL) }), s.x, s.y, CELL, CELL));
-        purseBtns.get(c)?.classList.add('hint-answer');
+        const i = purse.findIndex((pc, j) => pc === c && !used.has(j));
+        if (i >= 0) {
+          if (!unlimited) used.add(i);
+          purseBtns[i]?.classList.add('hint-answer');
+        }
       });
       counterBox?.insertBefore(ghostBox, counterBox.querySelector('.c-counter-coin'));
     },
