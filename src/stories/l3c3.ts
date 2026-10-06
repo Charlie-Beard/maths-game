@@ -147,7 +147,7 @@ export default defineStory({
     const pal = k.character(buddy(k, k.chapter!.host, 'joe'), { x: 900, y: 384, z: 20 });
     const plateL = k.add(plate('l'), { x: 290, y: 540, w: 300, h: 104, z: 6 });
     const plateR = k.add(plate('r'), { x: 630, y: 540, w: 300, h: 104, z: 6 });
-    const tin = k.keepsake(k.chapter!.keepsake, { x: 500, y: 330, w: 180, z: 7 });
+    const tin = k.keepsake(k.chapter!.keepsake, { x: 480, y: 290, w: 220, z: 7 });
     k.set([hero, pal, plateL, plateR], { opacity: 0 });
 
     await k.camera({ zoom: 1.3, x: 590, y: 460 }, 0.01);
@@ -158,7 +158,7 @@ export default defineStory({
     await k.all(k.enter(hero, 'left'), k.enter(pal, 'right'), k.appear(plateL, 0.4), k.appear(plateR, 0.4));
 
     // Ten biscuits hop out: eight to the left plate, two to the right.
-    const bis = Array.from({ length: 10 }, (_, i) => k.prop('popBiscuit', { x: 555, y: 360, w: 70, z: 10 + i }));
+    const bis = Array.from({ length: 10 }, (_, i) => k.prop('popBiscuit', { x: 555, y: 340, w: 70, z: 10 + i }));
     k.set(bis, { opacity: 0 });
     const spots = [...LEFT, RIGHT[0], RIGHT[1]];
     const hopOut = (async () => {
