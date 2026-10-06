@@ -28,8 +28,8 @@ import { lineWindow } from './a-logic';
 import { choose } from './choose';
 import type { Activity, ActivityContext } from './types';
 
-const X0 = 214;
-const X1 = 966;
+const X0 = 196;
+const X1 = 984;
 const RAIL_Y = 292;
 const TAG_Y = 350;
 const SVGNS = 'http://www.w3.org/2000/svg';

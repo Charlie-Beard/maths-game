@@ -233,12 +233,13 @@ export function lineWindow(from: number, to: number, start: number, answer: numb
   const hi0 = Math.max(from, to);
   if (![start, answer].every((n) => Number.isFinite(n) && n >= lo0 && n <= hi0 && (n - lo0) % unit === 0)) return null;
   // Each number must be a 64 px tap target: fewer rungs for longer numbers.
-  const maxMarks = hi0 >= 100 ? 7 : hi0 > 10 ? 9 : 11;
-  const all = Math.floor((hi0 - lo0) / unit) + 1;
-  if (all <= maxMarks) return { marks: Array.from({ length: all }, (_, i) => lo0 + i * unit), unit };
+  // Two-digit numbers get more room when the hops are short (9 rungs, not 11).
   const lo = Math.min(start, answer);
   const hi = Math.max(start, answer);
   const span = (hi - lo) / unit + 1;
+  const maxMarks = hi0 >= 100 ? 7 : hi0 > 10 ? Math.min(11, Math.max(9, span + 2)) : 11;
+  const all = Math.floor((hi0 - lo0) / unit) + 1;
+  if (all <= maxMarks) return { marks: Array.from({ length: all }, (_, i) => lo0 + i * unit), unit };
   if (span > maxMarks) return null;
   // Centre the start-to-answer stretch, with room to hop past it either way.
   let first = lo - Math.floor((maxMarks - span) / 2) * unit;

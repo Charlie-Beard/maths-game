@@ -83,7 +83,7 @@ export function cardRow(shell: Shell, values: Answer[], answer: Answer, onPick: 
     cards,
     show(calm) {
       if (calm) return;
-      gsap.from([...cards.values()], { y: 60, opacity: 0, duration: 0.3, stagger: 0.06, ease: 'steps(4)' });
+      gsap.from([...cards.values()], { y: 60, opacity: 0, duration: 0.3, stagger: 0.06, ease: 'steps(4)', clearProps: 'opacity' });
     },
     wrong(v) {
       const card = cards.get(String(v));
@@ -120,7 +120,8 @@ export function seal(shell: Shell, icon: IconName, o: { x: number; y: number; si
 /** Entrance for the picture: drops in a few frames (nothing in calm mode). */
 export function enter(els: Element[], calm: boolean): void {
   if (calm || !els.length) return;
-  smFrom(els, 0.35, { y: -24, opacity: 0, stagger: 0.03 });
+  // clearProps: leave no inline opacity behind to override classes like .faded.
+  smFrom(els, 0.35, { y: -24, opacity: 0, stagger: 0.03, clearProps: 'opacity' });
 }
 
 /** A round paper counter (when the problem has no prop). */
