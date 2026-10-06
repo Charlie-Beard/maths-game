@@ -1,1 +1,196 @@
-/* Styles owned by workstream W2c (docs/ROADMAP.md). */
+/*
+ * Styles owned by workstream W2c (docs/ROADMAP.md): the problem pictures
+ * (visual.ts, moved here from faraway.css) and the clock, coins and shape
+ * activities.
+ */
+
+/* ---------- Visuals (the picture in a problem) ---------- */
+
+.visual {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+}
+.visual > svg.paper {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.visual text,
+.c-activity text {
+  font-family: var(--font-body);
+  user-select: none;
+}
+.obj-group {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-content: center;
+  gap: 10px;
+}
+.obj-group.scatter {
+  display: block;
+}
+.obj-group.scatter .obj {
+  position: absolute;
+}
+.obj {
+  position: relative;
+  width: 84px;
+  height: 84px;
+}
+.obj svg {
+  width: 100%;
+  height: 100%;
+}
+.obj.gone {
+  opacity: 0.35;
+}
+.obj.gone::after {
+  content: '';
+  position: absolute;
+  left: 8px;
+  right: 8px;
+  top: 50%;
+  height: 6px;
+  background: var(--scarlet-500);
+  transform: rotate(-35deg);
+  border-radius: 3px;
+}
+.obj-count {
+  position: absolute;
+  right: -4px;
+  top: -6px;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: var(--gold-300);
+  color: var(--ink-900);
+  font-weight: 700;
+  font-size: 24px;
+  display: grid;
+  place-items: center;
+}
+.obj-op {
+  font-size: 72px;
+  font-weight: 700;
+  color: var(--ink-700);
+}
+.visual-clock svg.paper {
+  position: static;
+}
+
+/* ---------- Clock, coins and shape (W2c) ---------- */
+
+.c-activity button {
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  color: inherit;
+  touch-action: manipulation;
+}
+.c-activity svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+.c-sum {
+  font-size: 56px;
+}
+.c-card-text {
+  line-height: 1.05;
+  text-align: center;
+  padding: 0 14px;
+}
+.c-num {
+  font-weight: 700;
+}
+.c-clock svg.paper,
+.c-sign svg.paper,
+.c-price svg.paper,
+.c-counter > svg.paper,
+.c-purse svg.paper {
+  position: absolute;
+  inset: 0;
+}
+.c-step .choice-text {
+  line-height: 1;
+  padding-bottom: 8px;
+}
+.c-hand-icon {
+  position: absolute;
+}
+.c-hand-icon svg {
+  height: 100px;
+}
+.c-hand-label {
+  display: block;
+  text-align: center;
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--ink-700);
+}
+.c-done {
+  opacity: 0.4;
+}
+.c-ok.is-pressed,
+.c-coin.is-pressed,
+.c-hand-icon.is-pressed {
+  transform: translateY(3px) scale(0.96);
+}
+.c-coin {
+  position: absolute;
+}
+.c-ghost {
+  position: absolute;
+  opacity: 0.32;
+  filter: grayscale(0.4);
+  pointer-events: none;
+}
+.c-total {
+  position: absolute;
+  display: grid;
+  place-items: center;
+  border-radius: 14px;
+  background: var(--parchment-100);
+  box-shadow: 0 3px 0 rgba(60, 38, 14, 0.35);
+  font-size: 40px;
+  font-weight: 700;
+  color: var(--ink-900);
+}
+.c-shape-choice {
+  position: absolute;
+}
+.c-side-hit {
+  cursor: pointer;
+}
+.c-shape-in {
+  position: absolute;
+  inset: 15px;
+}
+.c-spent {
+  opacity: 0.18;
+  pointer-events: none;
+}
+/* A stacked fraction (visual.ts stackedFraction): Andika has no ⅓ glyph. */
+.c-frac {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  vertical-align: middle;
+  line-height: 0.95;
+  font-size: 64px;
+  font-weight: 700;
+}
+.c-frac > span {
+  font-size: 0.55em;
+  padding: 0 0.1em;
+}
+.c-frac > span:first-child {
+  border-bottom: 0.07em solid currentColor;
+}
