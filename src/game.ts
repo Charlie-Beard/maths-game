@@ -20,6 +20,7 @@ import { CompleteScene } from './scenes/complete';
 import { IntroScene } from './scenes/intro';
 import { MapScene } from './scenes/map';
 import { ParentScene } from './scenes/parent';
+import { FinaleScene } from './scenes/finale';
 import { PlayScene } from './scenes/play';
 import { hasStory, StoryScene } from './scenes/story';
 import { TitleScene } from './scenes/title';
@@ -102,15 +103,9 @@ export class Game implements Nav {
   private play(land: Land, chapter: Chapter): void {
     const rand = makeRand(seedParam());
     const problems = buildRound(chapter, this.app.progress, rand, Date.now());
-    void this.app.go(
-      new PlayScene(this.app, {
-        land,
-        chapter,
-        problems,
-        rand,
-        onDone: () => this.finish(land, chapter),
-      }),
-    );
+    const o = { land, chapter, problems, rand, onDone: () => this.finish(land, chapter) };
+    // A land's chapter 8 plays inside its set piece (scenes/finale.ts).
+    void this.app.go(chapter.kind === 'finale' ? new FinaleScene(this.app, o) : new PlayScene(this.app, o));
   }
 
   private finish(land: Land, chapter: Chapter): void {
