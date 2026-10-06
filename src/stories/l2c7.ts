@@ -241,14 +241,12 @@ export default defineStory({
     rattle(1.6);
     void k.to([...cups, extra], 0.08, { x: '+=3', yoyo: true, repeat: 15, ease: 'none' });
     void k.to(sun, 6, { rotation: -720, ease: 'power1.in' });
-    void k.camera({ zoom: 1.4, x: 1000, y: 260 }, 1.2);
-    void k.quake(5);
+    void k.camera({ zoom: 1.3, x: 920, y: 400 }, 1.2);
     await k.all(k.say('spin', topsy), k.shake(topsy, 5, 3));
     // Back to the heroes before it's too much.
     void k.camera({}, 0.7);
     k.fx.wind(2.5);
     spinUp(2.5);
-    void k.quake(4);
     void k.to([hero, silky], 0.3, { rotation: (i: number) => (i ? 4 : -4), yoyo: true, repeat: 3, ease: 'sine.inOut' });
     await k.say('end');
     await k.wait(600);
