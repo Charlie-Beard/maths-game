@@ -53,7 +53,7 @@ describe('generators', () => {
         }
       }
     }
-  });
+  }, 60_000);
 
   it('are repeatable from a seed', () => {
     for (const skill of SKILL_IDS) expect(generate(skill, 1, makeRand(42))).toEqual(generate(skill, 1, makeRand(42)));

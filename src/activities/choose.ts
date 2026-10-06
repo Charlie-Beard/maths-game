@@ -44,12 +44,15 @@ export function choose(p: Problem, ctx: ActivityContext): Activity {
 
   const choices = p.choices ?? [p.answer];
   const cards = new Map<string, HTMLElement>();
-  const cw = 150;
-  const gap = 40;
+  // Word answers ("the same", "half past 3") need wider cards and smaller type.
+  const longest = Math.max(...choices.map((c) => String(c).length));
+  const cw = longest <= 3 ? 150 : Math.min(240, Math.floor((860 - (choices.length - 1) * 24) / choices.length));
+  const gap = longest <= 3 ? 40 : 24;
+  const fontSize = longest <= 3 ? undefined : longest <= 5 ? 48 : longest <= 8 ? 36 : 28;
   const x0 = 590 - (choices.length * cw + (choices.length - 1) * gap) / 2;
   choices.forEach((c, i) => {
     const card = h('button', { class: 'choice', 'aria-label': String(c), 'data-value': String(c), html: tileCard(cw, cw, hashString('choice' + i + String(c)), C.cream) });
-    card.append(h('span', { class: 'choice-text' }, String(c)));
+    card.append(h('span', { class: 'choice-text', style: fontSize ? `font-size:${fontSize}px;padding:0 10px;text-align:center;line-height:1.1` : undefined }, String(c)));
     place(card, x0 + i * (cw + gap), 600, cw, cw);
     cleanups.push(
       onTap(card, () => {
