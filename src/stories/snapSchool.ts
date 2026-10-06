@@ -163,16 +163,17 @@ export function crackArt(seed = 1): string {
 /**
  * Cracks rule `i` on a rules board actor (placed with x, y and width w):
  * the crack draws across the words, chalk dust puffs off it, and it
- * crackles. Leaves the crack on the board.
+ * crackles. Leaves the crack on the board. `amount` < 1 cracks it only
+ * part of the way (her last rule, still holding until the finale).
  */
-export async function crackRule(k: Kit, board: { x: number; y: number; w: number }, i: number): Promise<HTMLElement> {
+export async function crackRule(k: Kit, board: { x: number; y: number; w: number }, i: number, amount = 1): Promise<HTMLElement> {
   const s = board.w / BOARD.w;
   const y = board.y + (BOARD.top + i * BOARD.gap - 22) * s;
   const crack = k.add(crackArt(i), { x: board.x + 55 * s, y, w: 340 * s, z: 26 });
   k.set(crack, { scaleX: 0, transformOrigin: '0% 50%' });
   snapSound.crack();
-  await k.to(crack, 0.45, { scaleX: 1, ease: 'power1.in' });
-  k.puff(board.x + 390 * s, y + 20 * s, 70, C.chalk);
+  await k.to(crack, 0.45 * amount, { scaleX: amount, ease: 'power1.in' });
+  k.puff(board.x + (55 + 335 * amount) * s, y + 20 * s, 70, C.chalk);
   k.puff(board.x + 120 * s, y + 20 * s, 50, C.chalk);
   return crack;
 }

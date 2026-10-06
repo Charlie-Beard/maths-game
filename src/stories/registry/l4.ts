@@ -8,4 +8,5 @@ export const L4: Record<string, Loader> = {
   l4c4: () => import('../l4c4'),
   l4c5: () => import('../l4c5'),
   l4c6: () => import('../l4c6'),
+  l4c7: () => import('../l4c7'),
 };
