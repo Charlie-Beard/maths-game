@@ -14,12 +14,14 @@ import { installGrain } from './art/grain';
 import { parchmentDefs, uiDefs } from './art/ui';
 import { setVolumes, unlock } from './audio/engine';
 import { loadManifest, setPlayerName } from './audio/voice';
+import { activeProfile, getAuth, JASPER, setActiveProfile, setAuth } from './cloud/api';
+import { CloudProfile, keepInSync, onSignedOut } from './cloud/profile';
 import { Game } from './game';
-import { LocalProfile } from './save/local';
+import { LoginScene } from './scenes/login';
 import { Stage } from './stage';
 import { setCalm } from './ui/anim';
 import { Director } from './ui/director';
-import { h } from './ui/dom';
+import { h, place, wait } from './ui/dom';
 import { installGear } from './ui/gear';
 import type { App } from './ui/scene';
 import { installRotateScreen } from './ui/rotate';
@@ -33,17 +35,32 @@ stage.el.append(h('div', { class: 'vignette' }), h('div', { class: 'grain' }));
 
 const director = new Director(stage.el);
 const game = new Game();
-// SCAFFOLD: saved on this device only until W7 adds the cloud save and sign-in.
-const profile = new LocalProfile(new URLSearchParams(location.search).get('profile') ?? 'jasper');
+/** The signed-in player's save (none until the password has been given). */
+let profile: CloudProfile | null = null;
 
 const app: App = {
   stage,
-  profile,
+  get profile() {
+    if (!profile) throw new Error('Not signed in yet');
+    return profile;
+  },
   get progress() {
-    return profile.progress;
+    return app.profile.progress;
   },
   nav: game,
-  save: () => profile.save(),
+  save: () => profile?.save(),
+  signOut: async () => {
+    if (profile) await Promise.race([profile.sync(), wait(4000)]);
+    setAuth(null);
+    location.reload();
+  },
+  switchProfile: async (to) => {
+    // Send this profile's changes, and fetch the other's, so it opens as itself.
+    await Promise.race([Promise.all([profile?.sync(), CloudProfile.for(to.id).sync()]), wait(5000)]);
+    setActiveProfile(to);
+    // Start afresh on the new profile, at the title screen.
+    location.href = location.pathname;
+  },
   go: (scene, t) => director.go(scene, t),
 };
 game.attach(app);
@@ -63,31 +80,52 @@ window.addEventListener(
 );
 void loadManifest();
 
-/** Puts the player's settings into effect. */
+/** Puts the player's settings into effect (also when they change on another device). */
 function applySettings(): void {
+  if (!profile) return;
   const p = profile.progress;
   setCalm(p.settings.calm);
   setPlayerName(p.name);
   if (audioOn) setVolumes({ master: p.settings.volume });
 }
-applySettings();
-profile.onChange(applySettings);
+// Before sign-in there are no settings yet: follow the iPad's own motion setting.
+setCalm(matchMedia('(prefers-reduced-motion: reduce)').matches);
 
-// Dev shortcuts: ?scene=map|choose|album|parent|chapter|practice|story&id=l1c1
-//   ?scene=skill&id=add-10&tier=3   8 problems of one skill at one tier
-//   ?scene=fixtures&kind=clock      the hand-made example problems for an activity
-const q = new URLSearchParams(location.search);
-const scene = q.get('scene');
-if (scene === 'map') game.map();
-else if (scene === 'choose') game.choose();
-else if (scene === 'album') game.album();
-else if (scene === 'parent') game.parent();
-else if (scene === 'chapter') game.chapter(q.get('id') ?? 'l1c1');
-else if (scene === 'practice') game.practice();
-else if (scene === 'skill') game.skill(q.get('id') as never, Number(q.get('tier')) || 1);
-else if (scene === 'fixtures') game.fixtures(q.get('kind') as never);
-else if (scene === 'story') game.story(q.get('id') ?? 'l1c1', () => game.map());
-else game.title();
+async function start(): Promise<void> {
+  const active = activeProfile();
+  profile = CloudProfile.for(active.id);
+  // A profile new to this device: fetch it before showing anything.
+  if (!profile.cached && active.id !== JASPER) await Promise.race([profile.sync(), wait(5000)]);
+  // Anyone but Jasper gets a name badge, so a demo is never mistaken for his game.
+  if (active.id !== JASPER) stage.el.append(place(h('div', { class: 'profile-badge' }, active.label), 12, 80));
+  applySettings();
+  profile.onChange(applySettings);
+  keepInSync(profile);
+
+  // Dev shortcuts: ?scene=map|choose|album|parent|chapter|practice|story&id=l1c1
+  //   ?scene=skill&id=add-10&tier=3   8 problems of one skill at one tier
+  //   ?scene=fixtures&kind=clock      the hand-made example problems for an activity
+  const q = new URLSearchParams(location.search);
+  const scene = q.get('scene');
+  if (scene === 'map') game.map();
+  else if (scene === 'choose') game.choose();
+  else if (scene === 'album') game.album();
+  else if (scene === 'parent') game.parent();
+  else if (scene === 'chapter') game.chapter(q.get('id') ?? 'l1c1');
+  else if (scene === 'practice') game.practice();
+  else if (scene === 'skill') game.skill(q.get('id') as never, Number(q.get('tier')) || 1);
+  else if (scene === 'fixtures') game.fixtures(q.get('kind') as never);
+  else if (scene === 'story') game.story(q.get('id') ?? 'l1c1', () => game.map());
+  else game.title();
+}
+
+// If the cloud stops accepting this device's sign-in, ask for the password
+// next time the app opens (not mid-game: play carries on and is kept here).
+onSignedOut(() => setAuth(null));
+
+// The password is asked once per device (dev shortcuts wait until then too).
+if (getAuth()) void start();
+else void director.go(new LoginScene(app, () => void start()));
 
 // Offline support (production builds only).
 if (import.meta.env.PROD && 'serviceWorker' in navigator) {

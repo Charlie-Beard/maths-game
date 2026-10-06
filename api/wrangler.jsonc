@@ -1,0 +1,30 @@
+{
+  // The maths game's own Worker and database, apart from Wizard Words'
+  // (wizard-words-api), so the two games can never break each other.
+  "name": "faraway-api",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-09-01",
+  "workers_dev": true,
+  "vars": {
+    // Where the game is served from (GitHub Pages), plus local dev and preview.
+    "ALLOWED_ORIGINS": "https://charlie-beard.github.io,http://localhost:5173,http://localhost:4173"
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "faraway",
+      // PLACEHOLDER: replace with the id printed by `npx wrangler d1 create faraway` (see README).
+      "database_id": "PASTE-THE-FARAWAY-DATABASE-ID-HERE",
+      "migrations_dir": "migrations"
+    }
+  ],
+  // At most 10 password guesses a minute from one address. Its own
+  // namespace (Wizard Words uses 1001), so the two games count separately.
+  "ratelimits": [
+    {
+      "name": "LOGIN_LIMIT",
+      "namespace_id": "1002",
+      "simple": { "limit": 10, "period": 60 }
+    }
+  ]
+}
