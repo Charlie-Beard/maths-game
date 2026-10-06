@@ -20,8 +20,8 @@
  */
 import { landSeal } from '../art/keepsakes';
 import { house } from '../art/lands/common';
-import { band, bell, C, circle, curve, defineStory, dot, ellipse, ink, noiseBurst, NOTE, now, piece, poly, rect, rng, svg, tone, type Kit, type Node, type Pt } from './kit';
-import { flump, moonRoom, together, wave } from './l1c8';
+import { band, bell, C, circle, curve, defineStory, dot, ellipse, ink, noiseBurst, NOTE, now, piece, poly, rect, rng, svg, tone, type Node, type Pt } from './kit';
+import { flump, moonRoom, wave } from './l1c8';
 
 // ------------------------------------------------------------------ sounds
 
@@ -217,7 +217,7 @@ export default defineStory({
     await k.say('quick', mf);
 
     // Upside-down houses, trees and teacups whirl past through the sky.
-    const flyers = [flyingHouse(0), flyingTree(0), flyingCup(), flyingHouse(1), flyingTree(1), flyingHouse(2), flyingCup()];
+    const flyers = [flyingHouse(0), flyingTree(0), flyingCup(), flyingHouse(1), flyingTree(1), flyingHouse(2), flyingCup(), flyingTree(2), flyingHouse(0), flyingCup()];
     const lookLine = k.say('look', hero);
     for (const [i, art] of flyers.entries()) {
       const fromLeft = i % 2 === 0;
@@ -269,21 +269,21 @@ export default defineStory({
     tumble();
     void k.camera({ zoom: 1.15, x: 590, y: 380 }, 0.6);
     await k.all(
-      scrollTo(at + 900, 1.4, 'power2.in'),
+      scrollTo(at + 500, 1.4, 'power2.in'),
       k.spin(h2, 1, 1.3),
       k.spin(m2, -1, 1.3),
       k.to(h2, 0.7, { x: -40, ease: 'sine.inOut' }).then(() => k.to(h2, 0.6, { x: 0, ease: 'sine.inOut' })),
       k.to(m2, 0.7, { x: 40, ease: 'sine.inOut' }).then(() => k.to(m2, 0.6, { x: 0, ease: 'sine.inOut' })),
     );
-    at += 900;
+    at += 500;
     // Grab! And they hang on.
     k.fx.thud();
     k.puff(RAIL_L - 60, 260, 140, C.cloud);
     k.puff(RAIL_R + 80, 140, 140, C.cloud);
     void k.quake(4);
     await k.say('hold', h2);
-    for (let i = 0; i < 6; i++) {
-      at += 120;
+    for (let i = 0; i < 4; i++) {
+      at += 100;
       rung(i);
       await scrollTo(at, 0.3);
     }
@@ -308,7 +308,7 @@ export default defineStory({
     windUp(7, 260, 520);
     // The land turns like a spinning top: it squeezes thin and opens out, again and again.
     const spinning = (async () => {
-      for (let i = 0; i < 7; i++) {
+      for (let i = 0; i < 9; i++) {
         await k.to(far, 0.45, { scaleX: -1, ease: 'sine.inOut' });
         await k.to(far, 0.45, { scaleX: 1, ease: 'sine.inOut' });
       }
@@ -320,8 +320,8 @@ export default defineStory({
     // Up and away, smaller and smaller, into the sky.
     k.fx.wind(3);
     await k.all(
-      k.to(far, 3.2, { y: -300, scale: 0.3, ease: 'power1.in' }),
-      k.to(t3, 3.2, { x: -150, y: -330, scale: 0.3, ease: 'power1.in' }),
+      k.to(far, 5, { y: -300, scale: 0.3, ease: 'power1.in' }),
+      k.to(t3, 5, { x: -150, y: -330, scale: 0.3, ease: 'power1.in' }),
       k.say('away'),
     );
     k.sparkle(590, 80, 10, 120);
@@ -344,6 +344,7 @@ export default defineStory({
     void k.quake(3);
     await k.all(k.hop(m4, 20, 1), k.hop(h4, 20, 1));
     giggle();
+    await k.wait(600);
     await k.say('phew', m4);
 
     // The hero stands on their head, like the Topsy-Turvy Man.
@@ -353,7 +354,7 @@ export default defineStory({
     await k.say('me', h4);
     giggle(600);
     void k.shake(m4, 5, 3);
-    await k.wait(500);
+    await k.all(k.hop(m4, 24, 2), k.wait(1200));
     await k.to(h4, 0.5, { rotation: 360, y: 0, ease: 'back.out(1.4)' });
     k.set(h4, { rotation: 0 });
 
@@ -406,6 +407,7 @@ export default defineStory({
     k.fx.twinkle();
     k.sparkle(590, 220, 14, 180);
     await k.all(k.hop(h4, 30, 1), k.hop(m4, 20, 1));
-    await k.wait(1400);
+    await k.camera({ zoom: 1.4, x: 590, y: 240 }, 2.4);
+    await k.wait(1600);
   },
 });
