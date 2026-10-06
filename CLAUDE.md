@@ -12,7 +12,8 @@ look at how that repo does it.
 
 ```bash
 npm install
-npm run dev            # http://localhost:5173  (?scene=map|chapter|story|practice|album|parent &id=l1c1 &seed=7)
+npm run dev            # http://localhost:5173  (?scene=map|chapter|story|practice|album|parent|skill|fixtures &id=l1c1 &seed=7)
+                       # the dev server starts signed in (offline); add ?login to see the password screen
 npm run typecheck
 npm test               # Vitest: src/core (pure logic)
 npm run test:e2e       # Playwright at 1180×820 and 1180×760 (in the cloud: PW_CHROMIUM=/opt/pw-browsers/chromium)
@@ -79,4 +80,5 @@ Look at screenshots of anything visual you change, using Playwright at
 | `src/stories/` | `kit.ts` (the puppet-show kit) and one script per story |
 | `src/art/` | Paper engine, palette, characters, props, scenery |
 | `src/audio/` | Web Audio engine, sfx, synth (story sounds and music), voice |
-| `src/save/local.ts` | The `Profile` interface and the on-device save |
+| `src/save/local.ts` | The `Profile` interface scenes use |
+| `src/cloud/`, `api/` | The cloud save: `CloudProfile` (device first, synced) and its Cloudflare Worker |

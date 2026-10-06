@@ -123,6 +123,12 @@ async function start(): Promise<void> {
 // next time the app opens (not mid-game: play carries on and is kept here).
 onSignedOut(() => setAuth(null));
 
+// Dev server only: start signed in (offline until the Worker is reachable),
+// so screens can be worked on without a password. ?login shows the password screen.
+if (import.meta.env.DEV && !getAuth() && !new URLSearchParams(location.search).has('login')) {
+  setAuth({ token: 'dev', who: JASPER });
+}
+
 // The password is asked once per device (dev shortcuts wait until then too).
 if (getAuth()) void start();
 else void director.go(new LoginScene(app, () => void start()));
