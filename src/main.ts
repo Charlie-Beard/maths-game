@@ -10,6 +10,7 @@ import './styles/activities-a.css';
 import './styles/activities-b.css';
 import './styles/activities-c.css';
 import './styles/login.css';
+import './styles/finale.css';
 import { installGrain } from './art/grain';
 import { parchmentDefs, uiDefs } from './art/ui';
 import { setVolumes, unlock } from './audio/engine';

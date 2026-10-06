@@ -1,0 +1,4 @@
+/** The land finale stories, l1c8 … l10c8 (workstream W6). Add one line per story file. */
+import type { Loader } from './types';
+
+export const FINALES: Record<string, Loader> = {};

@@ -30,7 +30,9 @@ import { gsap } from 'gsap';
 import { sfx } from '../audio/sfx';
 import { fx, musicBed, type Mood, type MusicBed } from '../audio/synth';
 import { voice } from '../audio/voice';
-import { characters } from '../art/characters';
+import { characters, dameSnapPose, type SnapPose } from '../art/characters';
+import { keepsakeArt } from '../art/keepsakes';
+import { LAND_ART } from '../art/lands';
 import { C } from '../art/palette';
 import { circle, curve, piece, rng, svg, type Pt } from '../art/paper';
 import { prop } from '../art/props';
@@ -187,6 +189,37 @@ export class Kit<K extends string = string> {
     return this.add(prop(id), { w: 100, ...o });
   }
 
+  /** A chapter keepsake (200 × 200) by id: the chapter's own is `k.chapter?.keepsake`. */
+  keepsake(id: string, o: PlaceOpts): HTMLElement {
+    return this.add(keepsakeArt(id), { w: 160, ...o });
+  }
+
+  /**
+   * Dame Snap in a pose: 'loom' | 'point' | 'shriek' | 'stomp' | 'defeated'
+   * (300 × 340 like other portraits). Swap poses with k.pose().
+   */
+  snap(pose: SnapPose, o: PlaceOpts): HTMLElement {
+    const el = this.add(dameSnapPose(pose), { w: 300, ...o });
+    el.dataset.who = 'dameSnap';
+    return el;
+  }
+
+  /** Changes Dame Snap's pose in place. */
+  pose(el: HTMLElement, pose: SnapPose): void {
+    const inner = el.querySelector<HTMLElement>(':scope > .story-flip');
+    if (inner) inner.innerHTML = dameSnapPose(pose);
+  }
+
+  /** A land's ground-level scene as the backdrop (default: this story's land). */
+  landScene(n: number = this.land.n): HTMLElement {
+    return this.backdrop(LAND_ART[n].scene(`story-land-${n}`));
+  }
+
+  /** A land seen far off, sitting on its cloud (600 × 180): for "the land at the top of the tree". */
+  landFar(n: number, o: PlaceOpts): HTMLElement {
+    return this.add(LAND_ART[n].far(`story-far-${n}`), { w: 600, ...o });
+  }
+
   /** Changes an actor's mirroring. */
   face(el: HTMLElement, flip: boolean): void {
     const inner = el.querySelector<HTMLElement>(':scope > .story-flip');
@@ -258,11 +291,43 @@ export class Kit<K extends string = string> {
 
   /** Makes an actor bob as if talking, until the returned stopper is called. */
   talk(el: HTMLElement): () => void {
-    if (this.calm) return () => {};
-    const tw = gsap.to(el, { y: '-=6', rotation: '+=2', duration: 0.17, yoyo: true, repeat: -1, ease: 'steps(1)' });
+    // The mouth opens and shuts (portraits with a `mouthOpen` part), even in calm mode.
+    const shut = this.part(el, 'mouth');
+    const open = this.part(el, 'mouthOpen');
+    let flap: ReturnType<typeof setInterval> | null = null;
+    if (open.length) {
+      let isOpen = false;
+      flap = setInterval(() => {
+        isOpen = !isOpen;
+        open.forEach((m) => (m.style.opacity = isOpen ? '1' : '0'));
+        shut.forEach((m) => (m.style.opacity = isOpen ? '0' : '1'));
+      }, 170);
+    }
+    const tw = this.calm ? null : gsap.to(el, { y: '-=6', rotation: '+=2', duration: 0.17, yoyo: true, repeat: -1, ease: 'steps(1)' });
     return () => {
-      tw.progress(0).kill();
+      if (flap) clearInterval(flap);
+      open.forEach((m) => (m.style.opacity = '0'));
+      shut.forEach((m) => (m.style.opacity = '1'));
+      tw?.progress(0).kill();
     };
+  }
+
+  /**
+   * An actor's named parts (`data-part` groups in its art: eyes, mouth,
+   * armL, armR, lids, hat, Silky's wingL/wingR …; see src/art/characters).
+   * Animate them with k.to(); rotate with `rotation`, never "rotate(n x y)".
+   */
+  part(el: HTMLElement, name: string): SVGGElement[] {
+    return [...el.querySelectorAll<SVGGElement>(`[data-part="${name}"]`)];
+  }
+
+  /** A quick blink (portraits with `lids`). */
+  async blink(el: HTMLElement): Promise<void> {
+    const lids = this.part(el, 'lids');
+    if (!lids.length) return;
+    lids.forEach((l) => (l.style.opacity = '1'));
+    await this.wait(140);
+    lids.forEach((l) => (l.style.opacity = '0'));
   }
 
   // ----------------------------------------------------------------- motion
