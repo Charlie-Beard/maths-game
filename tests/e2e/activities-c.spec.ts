@@ -25,7 +25,7 @@ const pence = (a: string): number => (a.startsWith('£') ? Math.round(Number(a.s
 async function tap(page: Page, selector: string, index = 0): Promise<void> {
   const el = page.locator(selector).nth(index);
   await settled(el);
-  await el.click();
+  await el.click({ force: true });
   // onTap ignores a second tap on the same thing within 250 ms.
   await page.waitForTimeout(300);
 }

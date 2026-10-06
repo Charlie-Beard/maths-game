@@ -14,3 +14,10 @@ export async function settled(locator: Locator): Promise<void> {
     expect(moved).toBeLessThan(2);
   }).toPass({ timeout: 15_000 });
 }
+
+/*
+ * After settled(), click with { force: true }: buttons that "breathe" (the
+ * glowing next step) never hold perfectly still, so Playwright's own
+ * stability check would wait forever. settled() already checked that the
+ * button's centre has stopped moving.
+ */
