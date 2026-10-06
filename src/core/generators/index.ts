@@ -11,6 +11,9 @@ import type { Rand } from '../random';
 import { SKILL_IDS, tierCount, type SkillId } from '../skills';
 import { add10, add5, bonds10, count10, sub10 } from './early';
 import { choicesFor, type Generator } from './helpers';
+import { ADDSUB } from './addsub';
+import { MORE } from './more';
+import { NUMBER } from './number';
 
 export type { Generator } from './helpers';
 
@@ -40,6 +43,9 @@ const BUILT: Partial<Record<SkillId, Generator>> = {
   'add-10': add10,
   'sub-10': sub10,
   'bonds-10': bonds10,
+  ...NUMBER,
+  ...ADDSUB,
+  ...MORE,
 };
 
 export const GENERATORS: Record<SkillId, Generator> = Object.fromEntries(

@@ -6,6 +6,10 @@ import './styles/ui.css';
 import './styles/parent.css';
 import './styles/story.css';
 import './styles/faraway.css';
+import './styles/activities-a.css';
+import './styles/activities-b.css';
+import './styles/activities-c.css';
+import './styles/login.css';
 import { installGrain } from './art/grain';
 import { parchmentDefs, uiDefs } from './art/ui';
 import { setVolumes, unlock } from './audio/engine';
@@ -70,6 +74,8 @@ applySettings();
 profile.onChange(applySettings);
 
 // Dev shortcuts: ?scene=map|choose|album|parent|chapter|practice|story&id=l1c1
+//   ?scene=skill&id=add-10&tier=3   8 problems of one skill at one tier
+//   ?scene=fixtures&kind=clock      the hand-made example problems for an activity
 const q = new URLSearchParams(location.search);
 const scene = q.get('scene');
 if (scene === 'map') game.map();
@@ -78,6 +84,8 @@ else if (scene === 'album') game.album();
 else if (scene === 'parent') game.parent();
 else if (scene === 'chapter') game.chapter(q.get('id') ?? 'l1c1');
 else if (scene === 'practice') game.practice();
+else if (scene === 'skill') game.skill(q.get('id') as never, Number(q.get('tier')) || 1);
+else if (scene === 'fixtures') game.fixtures(q.get('kind') as never);
 else if (scene === 'story') game.story(q.get('id') ?? 'l1c1', () => game.map());
 else game.title();
 

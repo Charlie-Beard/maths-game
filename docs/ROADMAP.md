@@ -29,7 +29,13 @@ replaces.
 ## The workstreams
 
 Each workstream owns a set of files, so agents running in parallel in
-separate worktrees don't conflict. **Shared files** (registries such as
+separate worktrees don't conflict. Each W1 group registers its generators
+in its own file (`NUMBER` / `ADDSUB` / `MORE`). Each W2 group registers its
+activities in `src/activities/set-{a,b,c}.ts`, keeps hand-made example
+problems in `fixtures-{a,b,c}.ts` (shown by `?scene=fixtures&kind=…`), and
+puts its styles in `src/styles/activities-{a,b,c}.css`. W7's styles go in
+`login.css`. Agents running e2e tests at the same time each set their own
+`PW_PORT`. **Shared files** (registries such as
 `src/activities/index.ts`, `src/stories/index.ts`, `src/core/generators/index.ts`
 and `src/styles/faraway.css`) get small, append-only edits: add your line
 and leave the rest. Rebase on main before opening a PR.

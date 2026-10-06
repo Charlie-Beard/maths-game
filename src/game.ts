@@ -10,7 +10,10 @@
 import { ALL_CHAPTERS, findChapter, LANDS, type Chapter, type Land } from './core/curriculum';
 import { finishChapter } from './core/progress';
 import { makeRand, randomSeed } from './core/random';
-import { buildPractice, buildRound } from './core/round';
+import { buildPractice, buildRound, makeProblems } from './core/round';
+import type { ActivityKind } from './core/problem';
+import type { SkillId } from './core/skills';
+import { fixturesFor } from './activities/fixtures';
 import { AlbumScene } from './scenes/album';
 import { ChooseScene } from './scenes/choose';
 import { CompleteScene } from './scenes/complete';
@@ -72,6 +75,20 @@ export class Game implements Nav {
         onDone: () => this.map(),
       }),
     );
+  }
+
+  /** Dev: 8 problems of one skill at one tier. */
+  skill(id: SkillId, tier: number): void {
+    const rand = makeRand(seedParam());
+    const problems = makeProblems(Array.from({ length: 8 }, () => ({ skill: id, tier, role: 'focus' as const })), rand);
+    void this.app.go(new PlayScene(this.app, { land: LANDS[0], chapter: null, problems, rand, onDone: () => this.map() }));
+  }
+
+  /** Dev: the hand-made example problems for an activity (all of them if no kind). */
+  fixtures(kind: ActivityKind | null): void {
+    const problems = fixturesFor(kind);
+    if (!problems.length) return this.map();
+    void this.app.go(new PlayScene(this.app, { land: LANDS[0], chapter: null, problems, rand: makeRand(seedParam()), onDone: () => this.map() }));
   }
 
   story(id: string, back: () => void): void {
