@@ -115,12 +115,12 @@ export default defineStory({
   lines: {
     breath_fran: { who: 'fran', text: 'Sixteen candles: ten in a row and six more. Take a big, big breath!' },
     breath_beth: { who: 'beth', text: 'Sixteen candles: ten in a row and six more. Take a big, big breath!' },
-    blow: { who: 'narrator', text: 'Whoosh! Ten candles out. Sixteen take away ten leaves six. Whoosh! All out!' },
+    blow: { who: 'narrator', text: 'Whoosh! Ten out. Sixteen take away ten leaves six. Whoosh! All out!' },
     eyes_fran: { who: 'fran', text: 'Now close your eyes and make a wish.' },
     eyes_beth: { who: 'beth', text: 'Now close your eyes and make a wish.' },
     wish: { who: 'narrator', text: '{name} wished that the Folk of the Faraway Tree would always, always be safe.' },
     kind: { who: 'moonface', text: 'What a kind wish, {name}. Oh! What’s that rumbling?' },
-    run: { who: 'silky', text: 'The land is moving on! The party’s over. Quick, run for the tree!' },
+    run: { who: 'silky', text: 'The land is moving on! Quick, run for the tree!' },
   },
 
   async play(k: Kit) {
@@ -208,9 +208,10 @@ export default defineStory({
     const mf = k.character('moonface', { x: 250, y: 30, w: 220, z: 22 });
     const silky = k.character('silky', { x: 720, y: 30, w: 220, z: 22, flip: true });
     k.set([mf, silky], { opacity: 0 });
+    void k.enter(silky, 'top', 0.7);
     await k.enter(mf, 'top', 0.6);
     const rumble = async () => {
-      await k.wait(1600);
+      await k.wait(1500);
       k.silence();
       k.fx.rumble(2.2);
       void k.quake(6);
@@ -220,7 +221,6 @@ export default defineStory({
 
     // ---- The land is moving on!
     k.music('adventure');
-    await k.enter(silky, 'top', 0.5);
     k.fx.rumble(2.5);
     void k.quake(8);
     void k.shake(hostEl, 8, 2);
