@@ -78,6 +78,8 @@ export default defineConfig({
   build: {
     target: 'safari16',
     assetsInlineLimit: 0,
+    // Only the game is built. lab.html (the art gallery) is served by the
+    // dev server alone (npm run dev, then /lab.html?set=lands) and never ships.
     rollupOptions: { input: { main: 'index.html' } },
   },
   server: { host: true },
