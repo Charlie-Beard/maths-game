@@ -1,4 +1,5 @@
 import { gsap } from 'gsap';
+import type { ProfileInfo } from '../cloud/api';
 import type { Progress } from '../core/progress';
 import type { Profile } from '../save/local';
 import type { Stage } from '../stage';
@@ -27,6 +28,10 @@ export interface App {
   readonly progress: Progress;
   nav: Nav;
   save(): void;
+  /** Sends any unsent progress, forgets the sign-in, and goes back to the password. */
+  signOut(): Promise<void>;
+  /** Plays as another profile from now on (a grown-up's choice), restarting at the title. */
+  switchProfile(to: ProfileInfo): Promise<void>;
   go(scene: Scene, transition?: 'page' | 'fade' | 'none'): Promise<void>;
 }
 
