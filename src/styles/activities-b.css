@@ -1,1 +1,410 @@
-/* Styles owned by workstream W2b (docs/ROADMAP.md). */
+/* Styles owned by workstream W2b (docs/ROADMAP.md): compare, tensOnes,
+ * groups, share and fraction. Everything is still unless he touches it. */
+
+.b-activity svg {
+  display: block;
+}
+
+/* ---------- Cards ---------- */
+
+.b-choice .b-word {
+  font-size: 44px;
+  line-height: 1;
+  padding: 0 12px;
+  text-align: center;
+}
+.b-choice .b-symbol {
+  position: absolute;
+  inset: 16px;
+  display: grid;
+  place-items: center;
+}
+.b-choice .b-symbol svg {
+  position: static;
+  width: 100%;
+  height: 100%;
+}
+.b-frac {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: 56px;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--ink-900);
+}
+.b-frac-bar {
+  width: 56px;
+  height: 6px;
+  margin: 6px 0;
+  border-radius: 3px;
+  background: var(--ink-900);
+}
+.b-card-pic {
+  position: absolute;
+  inset: 14px;
+}
+.b-card-pic svg {
+  position: static;
+  width: 100%;
+  height: 100%;
+}
+.b-sum {
+  white-space: nowrap;
+}
+
+/* ---------- Counting tags (help) ---------- */
+
+.b-tag {
+  position: absolute;
+  display: grid;
+  place-items: center;
+  border-radius: 24px;
+  background: var(--gold-300);
+  color: var(--ink-900);
+  font-size: 34px;
+  font-weight: 700;
+  box-shadow: 0 3px 0 rgba(60, 38, 14, 0.3);
+  pointer-events: none;
+  z-index: 5;
+}
+
+/* ---------- The scales ---------- */
+
+.b-scales-stand,
+.b-beam {
+  position: absolute;
+  pointer-events: none;
+}
+.b-beam {
+  transform-origin: 50% 50%;
+  z-index: 2;
+}
+.b-pan {
+  position: absolute;
+  width: 330px;
+  height: 250px;
+  z-index: 1;
+}
+.b-pan > svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.b-pan.is-pressed {
+  filter: brightness(0.95);
+}
+.b-pan-load {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  pointer-events: none;
+}
+.b-pan-num {
+  min-width: 150px;
+  padding: 4px 18px;
+  margin-bottom: 6px;
+  border-radius: 14px;
+  background: var(--parchment-100);
+  box-shadow: 2px 5px 0 rgba(60, 38, 14, 0.3);
+  text-align: center;
+  font-size: 96px;
+  font-weight: 700;
+  line-height: 1.1;
+  color: var(--ink-900);
+}
+.b-pan.is-right .b-pan-num {
+  color: var(--emerald-600);
+}
+.b-obj-grid {
+  display: grid;
+  justify-content: center;
+  align-content: end;
+  gap: 4px;
+}
+.b-obj svg,
+.b-obj-grid .b-obj svg {
+  width: 100%;
+  height: 100%;
+}
+.b-obj {
+  position: relative;
+}
+.b-pan-count {
+  position: absolute;
+}
+.b-compare-sum {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 28px;
+}
+.b-gap {
+  display: inline-grid;
+  place-items: center;
+  width: 104px;
+  height: 92px;
+  border: 4px dashed var(--ink-500);
+  border-radius: 14px;
+  color: var(--ink-500);
+}
+.b-gap svg {
+  width: 84px;
+  height: 84px;
+}
+.b-gap .b-symbol {
+  display: grid;
+  place-items: center;
+}
+
+/* ---------- Bundles and sticks ---------- */
+
+.b-picture {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.b-bundle-row {
+  --stick-h: 160px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 4px;
+  row-gap: 8px;
+}
+.b-bundle {
+  position: relative;
+  width: calc(var(--stick-h) * 0.4);
+  height: var(--stick-h);
+}
+.b-loose {
+  display: flex;
+  gap: 2px;
+  margin-left: 12px;
+}
+.b-stick {
+  position: relative;
+  width: calc(var(--stick-h) * 0.15);
+  height: var(--stick-h);
+}
+.b-bundle svg,
+.b-stick svg {
+  width: 100%;
+  height: 100%;
+}
+.b-skip {
+  position: absolute;
+  left: 50%;
+  top: -44px;
+  transform: translateX(-50%);
+  min-width: 52px;
+  padding: 0 6px;
+  border-radius: 20px;
+  background: var(--gold-300);
+  color: var(--ink-900);
+  font-size: 28px;
+  font-weight: 700;
+  text-align: center;
+  line-height: 40px;
+}
+.b-stick .b-skip {
+  min-width: 34px;
+  font-size: 22px;
+  line-height: 32px;
+  top: -38px;
+}
+.b-stick .b-skip.is-low {
+  top: auto;
+  bottom: -38px;
+}
+
+/* ---------- The place value mat ---------- */
+
+.b-mat,
+.b-mat-label {
+  position: absolute;
+  pointer-events: none;
+}
+.b-mat-label {
+  text-align: center;
+  font-size: 30px;
+  font-weight: 700;
+  color: var(--parchment-100);
+}
+.b-cell {
+  position: absolute;
+  border: 3px dashed rgba(246, 236, 212, 0.18);
+  border-radius: 12px;
+  pointer-events: none;
+}
+.b-cell.is-ghost-ten,
+.b-cell.is-ghost-one {
+  border-color: var(--gold-300);
+  background: rgba(240, 205, 124, 0.16);
+}
+.b-piece {
+  position: absolute;
+  display: grid;
+  place-items: center;
+  z-index: 2;
+}
+.b-piece svg {
+  height: 112px;
+  width: auto;
+}
+.b-pile {
+  position: absolute;
+  border-radius: 24px;
+  background: rgba(138, 90, 59, 0.16);
+  border: 4px solid rgba(138, 90, 59, 0.35);
+}
+.b-pile.is-pressed {
+  transform: translateY(3px) scale(0.97);
+}
+.b-pile-bundle,
+.b-pile-stick {
+  position: absolute;
+  top: 10px;
+  height: 150px;
+  pointer-events: none;
+}
+.b-pile-bundle {
+  width: 60px;
+}
+.b-pile-stick {
+  width: 22px;
+}
+.b-pile-bundle svg,
+.b-pile-stick svg {
+  width: 100%;
+  height: 100%;
+}
+
+/* ---------- Plates, shelves and sharing ---------- */
+
+.b-plate,
+.b-shelf {
+  position: absolute;
+}
+.b-plate > svg,
+.b-shelf > svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.b-plate .b-obj,
+.b-shelf .b-obj {
+  position: absolute;
+}
+.b-plate.is-pressed,
+.b-shelf.is-pressed {
+  filter: brightness(0.96);
+}
+.b-ghost-slot {
+  position: absolute;
+  border: 3px dashed var(--gold-500);
+  border-radius: 50%;
+  background: rgba(240, 205, 124, 0.2);
+  pointer-events: none;
+}
+.b-folk {
+  position: absolute;
+  pointer-events: none;
+}
+.b-folk svg {
+  width: 100%;
+  height: 100%;
+}
+.b-dealing > .b-obj {
+  position: absolute;
+  z-index: 3;
+}
+.b-share-pile .b-obj {
+  position: absolute;
+  pointer-events: none;
+}
+.b-share-pile.is-empty {
+  border-style: dashed;
+  background: transparent;
+}
+
+/* ---------- Pies and cakes ---------- */
+
+.b-fraction-shape svg {
+  width: 100%;
+  height: 100%;
+}
+.b-part .b-shade {
+  opacity: 0;
+}
+.b-part.is-shaded .b-shade {
+  opacity: 1;
+}
+.is-build .b-part {
+  cursor: pointer;
+}
+.b-part.is-ghost:not(.is-shaded) .b-shade {
+  opacity: 0.25;
+}
+.b-part-tag {
+  font-size: 28px;
+  height: 44px !important;
+  background: rgba(246, 236, 212, 0.92);
+}
+.b-frac-title {
+  position: absolute;
+  display: grid;
+  place-items: center;
+  font-size: 96px;
+  font-weight: 700;
+  color: var(--ink-900);
+}
+
+.b-plate .b-plate-bundle {
+  position: absolute;
+  left: 50% !important;
+  top: 10% !important;
+  height: 80%;
+  aspect-ratio: 64 / 160;
+  transform: translateX(-50%) rotate(-70deg);
+}
+.b-plate-bundle svg {
+  width: 100%;
+  height: 100%;
+}
+
+/* Taking away from a picture: pieces become big enough targets. */
+.b-loose.is-tappable {
+  min-width: 76px;
+  min-height: 76px;
+  justify-content: center;
+  padding: 0 8px;
+  border-radius: 14px;
+  background: rgba(138, 90, 59, 0.1);
+}
+.b-tens-picture .b-bundle[role='button'] {
+  box-sizing: content-box;
+  padding: 0 7px;
+}
+.b-tens-picture .b-bundle[role='button'] svg {
+  width: calc(var(--stick-h) * 0.4);
+}
+.b-pile.is-small .b-pile-bundle,
+.b-pile.is-small .b-pile-stick {
+  height: 144px;
+}
+.b-gone {
+  display: flex;
+  gap: 2px;
+  margin-left: 18px;
+}
+.b-bundle.is-gone,
+.b-stick.is-gone {
+  opacity: 0.3;
+}
