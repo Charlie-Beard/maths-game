@@ -129,6 +129,8 @@ describe('W1b generators: adding and taking away', () => {
           expect(p.visual.start).toBeLessThanOrEqual(p.visual.to);
           expect(p.answer as number).toBeGreaterThanOrEqual(p.visual.from);
           expect(p.answer as number).toBeLessThanOrEqual(p.visual.to);
+          for (const m of p.visual.marks ?? []) expect(m > p.visual.from && m < p.visual.to, `${skill} mark ${m}`).toBe(true);
+          expect(p.visual.to - p.visual.from).toBeLessThanOrEqual(20);
         }
         if (p.visual.type === 'tenFrame') for (const f of p.visual.frames) expect(f).toBeLessThanOrEqual(10);
         if (p.visual.type === 'tensOnes' && skill !== 'missing-100') {
@@ -269,16 +271,13 @@ describe('W1b generators: adding and taking away', () => {
     }
   });
 
-  it('fact-family-10 tier 2 offers one true family fact among false ones', () => {
-    const truth = (f: string) => {
-      const m = f.match(/^(\d+) ([+−]) (\d+) = (\d+)$/)!;
-      return (m[2] === '+' ? +m[1] + +m[3] : +m[1] - +m[3]) === +m[4];
-    };
+  it('fact-family-10 tier 2 finishes a family fact, with the other family numbers as the choices', () => {
     for (const p of many('fact-family-10', 2)) {
-      expect(p.choices!.length).toBe(3);
-      for (const c of p.choices!) expect(truth(String(c)), String(c)).toBe(c === p.answer);
-      const fam = Object.values(p.say.vals!).map(String).sort();
-      expect(String(p.answer).match(/\d+/g)!.sort()).toEqual(fam);
+      const { a, b, w } = p.say.vals as Record<string, number>;
+      const s = parse(p)!;
+      expect([s.a, s.b, s.c].sort()).toEqual([a, b, w].sort());
+      expect(p.choices).toEqual(expect.arrayContaining([a, b, w]));
+      expect(p.choices!.length).toBe(4);
     }
   });
 

@@ -139,7 +139,6 @@ export function factFamily10(tier: number, r: Rand): Problem {
   let { w, a, b } = split10(r);
   while (a === b) ({ w, a, b } = split10(r));
   const base = { skill: 'fact-family-10', tier } as const;
-  const family = { text: '{a} and {b} make {w}. They are a family!', vals: { a, b, w } };
 
   if (tier === 1) {
     // Two sums from one picture: we know a + b; the same objects show the
@@ -172,33 +171,33 @@ export function factFamily10(tier: number, r: Rand): Problem {
     };
   }
 
-  const facts = [sumText(a, '+', b, w), sumText(b, '+', a, w), sumText(w, '−', a, b), sumText(w, '−', b, a)];
+  const facts: [number, Op, number, number][] = [
+    [a, '+', b, w],
+    [b, '+', a, w],
+    [w, '−', a, b],
+    [w, '−', b, a],
+  ];
   if (tier === 2) {
-    // Which sum belongs to the family? The others are near misses: one
-    // number out, or the right numbers in the wrong order.
-    const answer: string = r.pick(facts);
-    const wrong = r.shuffle([
-      sumText(a, '+', b, w + 1),
-      sumText(w, '−', a, b + 1),
-      sumText(w, '−', b, a + 1),
-      sumText(a, '+', w, b),
-      sumText(w, '+', b, a),
-    ]);
+    // Which number makes this sum belong to the family? One fact, its
+    // answer missing; the choices are the three family numbers (picking
+    // the wrong one is the slip) and one near miss. The cards hold a
+    // number each, so the facts themselves are not the choices.
+    const [x, op, y, z] = r.pick(facts);
     return {
       ...base,
       activity: 'choose',
-      say: { text: 'The family is {a}, {b} and {w}. Which sum belongs to the family?', vals: { a, b, w } },
-      answer,
-      choices: choicesFrom(answer, [answer, ...wrong.slice(0, 2)], r),
+      say: { text: `The family is {a}, {b} and {w}. Which one finishes the sum? {x} ${op === '+' ? 'add' : 'take away'} {y}…`, vals: { a, b, w, x, y } },
+      text: sumText(x, op, y, '?'),
+      answer: z,
+      choices: choicesFrom(z, [...new Set([a, b, w, w + 1])], r),
       visual: { type: 'partWhole', whole: w, parts: [a, b], model: 'cherry' },
-      explain: family,
-      key: `fact-family-10:pick:${a}+${b}`,
+      explain: { text: `{x} ${op === '+' ? 'add' : 'take away'} {y} ${op === '+' ? 'makes' : 'leaves'} {z}. {a}, {b} and {w} are a family!`, vals: { x, y, z, a, b, w } },
+      key: `fact-family-10:${x}${op}${y}:pick`,
     };
   }
 
   // Tier 3: all four facts. The family is shown; one fact has a gap.
-  const which = r.int(0, 3);
-  const [x, op, y, z]: [number, Op, number, number] = ([[a, '+', b, w], [b, '+', a, w], [w, '−', a, b], [w, '−', b, a]] as const)[which] as [number, Op, number, number];
+  const [x, op, y, z] = r.pick(facts);
   const gapLast = r.chance(0.5);
   return {
     ...base,

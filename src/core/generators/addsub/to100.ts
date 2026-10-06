@@ -68,15 +68,18 @@ function twoDigitOneDigit(skill: 'add-2d1d' | 'sub-2d1d', op: Op, tier: number, 
     return { ...common, activity: 'tensOnes', visual: { type: 'tensOnes', tens: tensOf(a), ones: onesOf(a) } };
   }
   if (tier === 3) {
-    // A short number line across the ten he crosses, in two hops.
+    // A short number line across the ten he crosses, in two hops: just
+    // the stretch from the start to the answer, one either side, so the
+    // 2-digit labels have room.
     const ten = op === '+' ? (tensOf(a) + 1) * 10 : tensOf(a) * 10;
-    const from = op === '+' ? tensOf(a) * 10 : ten - 10;
+    const from = Math.min(a, c) - 1;
+    const to = Math.max(a, c) + 1;
     const k = op === '+' ? ten - a : a - ten;
     return {
       ...common,
       activity: 'numberLine',
       say: op === '+' ? { text: 'Jump to the next ten first. What is {a} add {b}?', vals: { a, b } } : { text: 'Jump back to the ten first. What is {a} take away {b}?', vals: { a, b } },
-      visual: { type: 'numberLine', from, to: from + 20, start: a, step: op === '+' ? 1 : -1, marks: [ten] },
+      visual: { type: 'numberLine', from, to, start: a, step: op === '+' ? 1 : -1, marks: [ten] },
       explain:
         op === '+'
           ? { text: '{a} add {k} makes {ten}, and {rest} more makes {c}!', vals: { a, k, ten, rest: b - k, c } }
