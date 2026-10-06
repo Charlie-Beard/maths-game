@@ -23,7 +23,7 @@ import type { Activity, ActivityContext } from './types';
 
 const BOX = { x: 160, y: 104, w: 860 };
 const PILE = { y: 404, h: 80 };
-const FOLK = ['moonface', 'saucepan', 'washalot', 'watzisname', 'pixie', 'silky'];
+const FOLK = ['moonface', 'saucepan', 'washalot', 'watzisname', 'pixie', 'oomboom'];
 
 export function share(p: Problem, ctx: ActivityContext): Activity {
   return dealing(p, ctx, true);
@@ -98,17 +98,21 @@ function dealing(p: Problem, ctx: ActivityContext, withFolk: boolean): Activity 
   };
 
   k.tap(pile, () => {
+    if (dealing) return;
     if (!pileItems.length) return void wobble(pile);
     void dealOne();
   });
 
+  // While Silky deals the rest, the pile ignores taps (the cards still work).
+  let dealing = false;
   const dealAll = async () => {
-    k.lock(true);
+    if (dealing) return;
+    dealing = true;
     while (pileItems.length) {
       void dealOne(true);
       await new Promise((r) => setTimeout(r, ctx.calm ? 20 : 120));
     }
-    k.lock(false);
+    dealing = false;
   };
 
   let tagged = false;

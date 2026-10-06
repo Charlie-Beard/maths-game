@@ -4,14 +4,17 @@
  * What he does depends on the problem:
  *   - shade: the picture is cut but nothing is coloured yet (visual
  *     shaded = 0). He taps parts to colour them in (tap again to undo),
- *     then OK. The answer is a fraction ("1/2") or a number of parts; any
- *     equal fraction counts (2 of 4 shaded is a half).
+ *     then OK. The answer is a word ("half", "quarter", "third", "whole"),
+ *     a fraction ("1/2") or a number of parts; any equal fraction counts
+ *     (2 of 4 shaded is a half).
  *   - which picture: the choices are picture codes like "circle:2:1" or
  *     "rect:2:1:u" (u = cut unequally; see parsePictureCode), shown as
  *     little pies and cakes on the cards.
- *   - read: the picture is shaded and the cards say ½, ¼, ⅓ (or words).
+ *   - read: the picture is shaded and the cards say half / quarter / third
+ *     (or yes / no: "is the shaded piece a half?", or ½ ¼ as fractions).
  *   - of an amount: with a `share` visual ("half of 8 apples") he deals the
- *     objects onto plates, as in `share`, and chooses how many on one.
+ *     objects onto plates, as in `share`, and chooses how many on one. (The
+ *     generators send these to `share` itself; both work.)
  *
  * "Show me" numbers the parts, so he can count how many there are and how
  * many are coloured; in shade mode it outlines the parts to colour.
@@ -26,6 +29,8 @@ import { sharePlates } from './share';
 import type { Activity, ActivityContext } from './types';
 
 const SIZE = 340;
+/** Fractions as words, as the generators write them. */
+const WORDS: Record<string, number> = { whole: 1, half: 1 / 2, third: 1 / 3, quarter: 1 / 4 };
 const PIC = { x: 590 - SIZE / 2, y: 112 };
 
 export function fraction(p: Problem, ctx: ActivityContext): Activity {
@@ -68,25 +73,24 @@ function shadeMode(p: Problem, ctx: ActivityContext): Activity {
   const { box, parts, tagAll } = bigShape(p, el);
   sumText(k, p.text, 466);
 
-  // How many parts the answer means.
-  const want = (() => {
+  // What the answer means, as a fraction of the whole: "1/2", "half", or a number of parts.
+  const share = (() => {
     const s = String(p.answer);
     if (isFraction(s)) {
       const [a, b] = s.split('/').map(Number);
-      return Math.round((a / b) * v.parts);
+      return a / b;
     }
-    return Number(p.answer);
+    if (s in WORDS) return WORDS[s];
+    return Number(p.answer) / v.parts;
   })();
+  const want = Math.round(share * v.parts);
 
   const shadedCount = () => parts.filter((g) => g.classList.contains('is-shaded')).length;
-  /** What OK answers: the problem's own answer when it matches, so "2/4" counts as "1/2". */
+  /** What OK answers: the problem's own answer when it matches, so 2 of 4 counts as a half. */
   const value = (): Answer => {
     const s = shadedCount();
-    if (isFraction(String(p.answer))) {
-      const [a, b] = String(p.answer).split('/').map(Number);
-      return s * b === a * v.parts ? p.answer : `${s}/${v.parts}`;
-    }
-    return s;
+    if (typeof p.answer === 'number') return s;
+    return Math.abs(s / v.parts - share) < 1e-9 ? p.answer : `${s}/${v.parts}`;
   };
   const ok = okSeal(k, 526, 606, () => ctx.answer(value()));
   const refresh = () => {

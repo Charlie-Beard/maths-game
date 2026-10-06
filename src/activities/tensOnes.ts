@@ -3,7 +3,10 @@
  *
  * Two ways to play:
  *   - read: the picture shows bundles and sticks (visual tens, ones) and he
- *     chooses the number from the cards,
+ *     chooses the number from the cards. When the picture is the first
+ *     number of a sum ("34 + 20 = ?", add-2d1d and friends), he can add
+ *     bundles and sticks from two piles, or tap pieces to take them away,
+ *     before choosing,
  *   - build: the mat starts empty (visual tens = ones = 0, or the problem
  *     has no choices) and he makes the answer: tapping the bundle pile puts
  *     a bundle on the mat, tapping the stick pile puts a stick, tapping a
@@ -14,7 +17,7 @@
  * piece is a big enough target and "how many more to make ten" is visible.
  */
 import type { Answer, Problem } from '../core/problem';
-import { pop, wobble } from '../ui/anim';
+import { pop, smFrom, wobble } from '../ui/anim';
 import { h, place } from '../ui/dom';
 import { bundleArt, matArt, stickArt } from './b-art';
 import {
@@ -32,7 +35,7 @@ import {
   sumText,
   wobbleValue,
 } from './b-kit';
-import { bundleRow } from './compare';
+import { bundleRow, fitStick } from './compare';
 import { choose } from './choose';
 import type { Activity, ActivityContext } from './types';
 
@@ -50,24 +53,123 @@ export function tensOnes(p: Problem, ctx: ActivityContext): Activity {
 function readMode(p: Problem, tens: number, ones: number, ctx: ActivityContext): Activity {
   const k = kit('tensOnes', ctx);
   const { el } = k;
-  const picture = place(h('div', { class: 'b-picture b-tens-picture' }), 160, 110, 860, 360);
-  const row = bundleRow(tens, ones, 820, 300);
-  picture.append(row);
+  const shown = tens * 10 + ones;
+  // An adding or taking-away sum that starts from the picture ("34 + 20 = ?"):
+  // he can add bundles and sticks from piles, or tap pieces to take them away.
+  const m = /^\s*(\d+)\s*([+−-])\s*(\d+)\s*=\s*\?\s*$/.exec(p.text ?? '');
+  const op = m && Number(m[1]) === shown ? (m[2] === '+' ? '+' : '-') : null;
+  const target = Number(p.answer);
+  const W = op === '+' ? 640 : 820;
+  const most = Math.max(shown, Number.isFinite(target) ? target : 0);
+  const stickH = Math.min(160, fitStick(Math.floor(most / 10), Math.min(9, most % 10 + (op === '+' ? 2 : 0)), W, 300));
+
+  const picture = place(h('div', { class: 'b-picture b-tens-picture' }), 160, 110, op === '+' ? 660 : 860, 360);
   el.append(picture);
-  sumText(k, p.text);
-  const cards = answerCards(k, p.choices ?? fallbackChoices(p.answer));
+  let t = tens;
+  let o = ones;
+  let row = bundleRow(t, o, W, 300, stickH);
+  let counted = false;
 
   // Show me: count the bundles in tens, then the sticks in ones.
-  let counted = false;
+  const tagRow = () => {
+    let n = 0;
+    row.querySelectorAll<HTMLElement>('.b-bundle:not(.is-gone), .b-loose .b-stick').forEach((piece, i) => {
+      n += piece.classList.contains('b-bundle') ? 10 : 1;
+      piece.append(h('span', { class: `b-skip${piece.classList.contains('b-stick') && i % 2 ? ' is-low' : ''}` }, String(n)));
+    });
+  };
   const countAlong = () => {
     if (counted) return;
     counted = true;
-    let n = 0;
-    row.querySelectorAll<HTMLElement>('.b-bundle, .b-stick').forEach((piece, i) => {
-      n += piece.classList.contains('b-bundle') ? 10 : 1;
-      const tag = h('span', { class: `b-skip${piece.classList.contains('b-stick') && i % 2 ? ' is-low' : ''}` }, String(n));
-      piece.append(tag);
+    tagRow();
+  };
+
+  /** Redraws the row after a change; `fresh` is the piece that just arrived. */
+  const draw = (fresh?: 'ten' | 'one') => {
+    row.remove();
+    row = bundleRow(t, o, W, 300, stickH);
+    // What has been taken away stays, faded and crossed out, so the sum is visible.
+    if (op === '-' && (tens - t || ones - o)) {
+      const gone = h('div', { class: 'b-gone' });
+      for (let i = 0; i < tens - t; i++) gone.append(h('div', { class: 'b-bundle is-gone', html: bundleArt() }));
+      for (let i = 0; i < ones - o; i++) gone.append(h('div', { class: 'b-stick is-gone', html: stickArt() }));
+      row.append(gone);
+    }
+    picture.append(row);
+    if (counted) tagRow();
+    if (op === '-') {
+      row.querySelectorAll<HTMLElement>('.b-bundle').forEach((b) => {
+        b.setAttribute('role', 'button');
+        b.setAttribute('aria-label', 'Take away a bundle');
+        k.tap(b, () => {
+          if (t <= 0) return;
+          t -= 1;
+          ctx.sfx('lift');
+          draw();
+        });
+      });
+      const loose = row.querySelector<HTMLElement>('.b-loose');
+      if (loose) {
+        loose.setAttribute('role', 'button');
+        loose.setAttribute('aria-label', 'Take away a stick');
+        loose.classList.add('is-tappable');
+        k.tap(loose, () => {
+          if (o <= 0) return;
+          o -= 1;
+          ctx.sfx('lift');
+          draw();
+        });
+      }
+    }
+    if (fresh && !ctx.calm) {
+      const all = row.querySelectorAll<HTMLElement>(fresh === 'ten' ? '.b-bundle' : '.b-stick');
+      const last = all[all.length - 1];
+      if (last) void smFrom(last, 0.3, { y: -40, opacity: 0, ease: 'back.out(2)' });
+    }
+  };
+  draw();
+
+  const piles: HTMLElement[] = [];
+  if (op === '+') {
+    const tenPile = place(h('button', { class: 'b-pile b-ten-pile is-small', 'aria-label': 'Add a bundle of ten', 'data-role': 'add-ten' }), 836, 116, 176, 168);
+    tenPile.innerHTML = [0, 1].map((i) => `<div class="b-pile-bundle" style="left:${46 + i * 30}px;transform:rotate(${(i - 0.5) * 8}deg)">${bundleArt()}</div>`).join('');
+    const onePile = place(h('button', { class: 'b-pile b-one-pile is-small', 'aria-label': 'Add one stick', 'data-role': 'add-one' }), 836, 296, 176, 168);
+    onePile.innerHTML = [0, 1, 2, 3].map((i) => `<div class="b-pile-stick" style="left:${50 + i * 20}px;transform:rotate(${(i - 1.5) * 7}deg)">${stickArt()}</div>`).join('');
+    k.tap(tenPile, () => {
+      if (t >= 10) return void wobble(tenPile);
+      t += 1;
+      ctx.sfx('place');
+      draw('ten');
     });
+    k.tap(onePile, () => {
+      if (t * 10 + o >= 99) return void wobble(onePile);
+      o += 1;
+      if (o === 10) {
+        // Ten loose sticks tie into a bundle.
+        o = 0;
+        t += 1;
+        ctx.sfx('rustle');
+        draw('ten');
+      } else {
+        ctx.sfx('place');
+        draw('one');
+      }
+    });
+    piles.push(tenPile, onePile);
+    el.append(tenPile, onePile);
+  }
+
+  sumText(k, p.text);
+  const cards = answerCards(k, p.choices ?? fallbackChoices(p.answer));
+
+  /** Show me: Silky does the adding or taking away, then counts. */
+  const finish = () => {
+    if (op && Number.isFinite(target) && target >= 0 && target <= 100) {
+      t = Math.floor(target / 10);
+      o = target % 10;
+    }
+    counted = true;
+    draw();
   };
 
   return {
@@ -80,14 +182,15 @@ function readMode(p: Problem, tens: number, ones: number, ctx: ActivityContext):
       await cardRight(cards.get(String(p.answer)));
     },
     help(level) {
-      if (level === 1) picture.classList.add('hint-glow');
-      else if (level === 2) {
-        countAlong();
-        removeOneWrong(cards, p.answer);
-      } else {
-        countAlong();
-        hintAnswer(k, p.answer);
+      if (level === 1) {
+        picture.classList.add('hint-glow');
+        piles.forEach((pl) => pl.classList.add('hint-glow'));
+        return;
       }
+      if (op) finish();
+      else countAlong();
+      if (level === 2) removeOneWrong(cards, p.answer);
+      else hintAnswer(k, p.answer);
     },
     lock: k.lock,
     destroy: k.destroy,

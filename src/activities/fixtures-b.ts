@@ -3,15 +3,19 @@
  * be built and tested before the generators exist. Shown by the dev page
  * ?scene=fixtures&kind=<activity kind>.
  *
- * They also show the generators (W1a, W1c) what each activity understands:
- *   compare   answer a side's number (or "left" / "right") → tap a pan;
- *             "<" ">" "=" → crocodile cards; anything else → cards
+ * They follow the generators' conventions (headers of
+ * core/generators/number.ts and more.ts) and show what each activity does:
+ *   compare   answer a side's number → tap a pan; "<" "=" ">" → crocodile
+ *             cards; words ("more", "fewer", "the same") → cards
  *   tensOnes  visual tens = ones = 0 → build the answer on the mat; else read
- *   groups    visual each = 0 → build: the answer is how many on each plate
+ *             (with piles to add from, or pieces to take away, when the
+ *             text is a sum starting from the picture: "34 + 20 = ?")
+ *   groups    by skill and tier: see, build (groups / arrays tier 3) or
+ *             make groups from a loose pile (group-div)
  *   share     tap the pile to deal; answer how many each, from the cards
- *   fraction  visual shaded = 0 → shade (answer "1/2" or a number of parts);
- *             choices like "circle:2:1" / "rect:4:1:u" → picture cards;
- *             a `share` visual → a fraction of an amount, dealt onto plates
+ *   fraction  answers "half" / "quarter" / "third" / "whole" or yes / no;
+ *             visual shaded = 0 → shade the parts, then OK; choices like
+ *             "circle:2:1" / "rect:4:1:u" → picture cards (W2b extras)
  */
 import type { Problem } from '../core/problem';
 
@@ -66,8 +70,9 @@ export const FIXTURES_B: Problem[] = [
     tier: 3,
     activity: 'compare',
     say: { text: 'Which crocodile goes in the gap? It eats the bigger number.' },
+    text: '56 ? 47',
     answer: '>',
-    choices: ['<', '>', '='],
+    choices: ['<', '=', '>'],
     visual: { type: 'compare', left: 56, right: 47 },
     explain: { text: '{a} is bigger than {b}.', vals: { a: 56, b: 47 } },
     key: 'fx-compare:56>47',
@@ -77,8 +82,9 @@ export const FIXTURES_B: Problem[] = [
     tier: 3,
     activity: 'compare',
     say: { text: 'Which crocodile goes in the gap?' },
+    text: '25 ? 25',
     answer: '=',
-    choices: ['<', '>', '='],
+    choices: ['<', '=', '>'],
     visual: { type: 'compare', left: 25, right: 25 },
     explain: { text: '{a} is the same as {b}.', vals: { a: 25, b: 25 } },
     key: 'fx-compare:25=25',
@@ -141,6 +147,30 @@ export const FIXTURES_B: Problem[] = [
     explain: { text: '9 ones make {n}!', vals: { n: 9 } },
     key: 'fx-tens:build9',
   },
+  {
+    skill: 'add-tens',
+    tier: 1,
+    activity: 'tensOnes',
+    say: { text: 'Here is {a}. Add {t} more bundles of ten. What is {a} add {b}?', vals: { a: 34, t: 2, b: 20 } },
+    text: '34 + 20 = ?',
+    answer: 54,
+    choices: [54, 36, 44, 64],
+    visual: { type: 'tensOnes', tens: 3, ones: 4 },
+    explain: { text: '{a} add {b} makes {c}!', vals: { a: 34, b: 20, c: 54 } },
+    key: 'fx-tens:34+20',
+  },
+  {
+    skill: 'sub-2d1d',
+    tier: 1,
+    activity: 'tensOnes',
+    say: { text: 'What is {a} take away {b}?', vals: { a: 37, b: 4 } },
+    text: '37 − 4 = ?',
+    answer: 33,
+    choices: [33, 34, 41, 3],
+    visual: { type: 'tensOnes', tens: 3, ones: 7 },
+    explain: { text: '{a} take away {b} leaves {c}!', vals: { a: 37, b: 4, c: 33 } },
+    key: 'fx-tens:37-4',
+  },
 
   // ---------------- groups ----------------
   {
@@ -159,11 +189,11 @@ export const FIXTURES_B: Problem[] = [
     skill: 'groups',
     tier: 3,
     activity: 'groups',
-    say: { text: 'Put {e} apples on each plate.', vals: { e: 3 } },
-    answer: 3,
-    choices: [3, 2, 4],
-    visual: { type: 'groups', groups: 4, each: 0, layout: 'groups', prop: 'apple' },
-    explain: { text: '4 plates with 3 on each. That makes 12!' },
+    say: { text: 'Make {g} equal groups, with {e} apples in each. How many altogether?', vals: { g: 4, e: 3 } },
+    answer: 12,
+    choices: [12, 7, 15, 9],
+    visual: { type: 'groups', groups: 4, each: 3, layout: 'groups', prop: 'apple' },
+    explain: { text: '4 groups of 3 make 12!' },
     key: 'fx-groups:build4x3',
   },
   {
@@ -193,10 +223,11 @@ export const FIXTURES_B: Problem[] = [
     skill: 'arrays',
     tier: 3,
     activity: 'groups',
-    say: { text: 'Make {g} rows with {e} toy soldiers in each row.', vals: { g: 2, e: 4 } },
-    answer: 4,
-    choices: [4, 2, 8],
-    visual: { type: 'groups', groups: 2, each: 0, layout: 'array', prop: 'soldier' },
+    say: { text: 'Build an array: {g} rows, with {e} toy soldiers in each row. How many altogether?', vals: { g: 2, e: 4 } },
+    text: '2 × 4 = ?',
+    answer: 8,
+    choices: [8, 6, 12, 9],
+    visual: { type: 'groups', groups: 2, each: 4, layout: 'array', prop: 'soldier' },
     explain: { text: '2 rows of 4 make 8!' },
     key: 'fx-arrays:build2x4',
   },
@@ -216,12 +247,24 @@ export const FIXTURES_B: Problem[] = [
     skill: 'group-div',
     tier: 1,
     activity: 'groups',
-    say: { text: 'How many groups of 2 are there?' },
+    say: { text: 'There are {t} snowballs. Put them in groups of {s}. How many groups can you make?', vals: { t: 10, s: 2 } },
     answer: 5,
     choices: [5, 2, 10, 4],
     visual: { type: 'groups', groups: 5, each: 2, layout: 'groups', prop: 'snowball' },
     explain: { text: '10 makes 5 groups of 2.' },
     key: 'fx-groupdiv:10/2',
+  },
+  {
+    skill: 'times-10',
+    tier: 1,
+    activity: 'groups',
+    say: { text: 'There are {n} bundles of {m} sticks. Count in {m}s. How many sticks altogether?', vals: { n: 4, m: 10 } },
+    text: '4 × 10 = ?',
+    answer: 40,
+    choices: [40, 14, 30, 50],
+    visual: { type: 'groups', groups: 4, each: 10, layout: 'groups', prop: 'stick' },
+    explain: { text: '10, 20, 30, 40. 4 bundles of 10 make 40!' },
+    key: 'fx-times10:4',
   },
 
   // ---------------- share ----------------
@@ -270,8 +313,53 @@ export const FIXTURES_B: Problem[] = [
     explain: { text: '15 divided by 3 is 5!' },
     key: 'fx-share:15/3',
   },
+  {
+    skill: 'fractions',
+    tier: 3,
+    activity: 'share',
+    say: { text: 'What is a quarter of {t} acorns?', vals: { t: 12 } },
+    text: '¼ of 12 = ?',
+    answer: 3,
+    choices: [3, 4, 6, 12],
+    visual: { type: 'share', total: 12, between: 4, prop: 'acorn' },
+    explain: { text: 'A quarter of {t} is {c}! {n} equal groups of {c}.', vals: { t: 12, c: 3, n: 4 } },
+    key: 'fx-share:quarter-of-12',
+  },
 
   // ---------------- fraction ----------------
+  {
+    skill: 'fractions',
+    tier: 1,
+    activity: 'fraction',
+    say: { text: 'Silky cut the ice-pie. Is the shaded piece a half?' },
+    answer: 'no',
+    choices: ['yes', 'no'],
+    visual: { type: 'fraction', shape: 'circle', parts: 2, shaded: 1, equal: false },
+    explain: { text: 'No! The {n} parts are not the same size, so they are not halves.', vals: { n: 2 } },
+    key: 'fx-frac:unequal-half',
+  },
+  {
+    skill: 'fractions',
+    tier: 2,
+    activity: 'fraction',
+    say: { text: 'What fraction of the birthday cake is shaded?' },
+    answer: 'quarter',
+    choices: ['half', 'quarter', 'whole'],
+    visual: { type: 'fraction', shape: 'rect', parts: 4, shaded: 1, equal: true },
+    explain: { text: '{n} equal parts. One part is a quarter!', vals: { n: 4 } },
+    key: 'fx-frac:name-quarter',
+  },
+  {
+    skill: 'fractions',
+    tier: 4,
+    activity: 'fraction',
+    say: { text: 'What fraction of the ice-pie is shaded?' },
+    answer: 'third',
+    choices: ['half', 'quarter', 'third', 'whole'],
+    visual: { type: 'fraction', shape: 'circle', parts: 3, shaded: 1, equal: true },
+    explain: { text: '{n} equal parts. One part is a third!', vals: { n: 3 } },
+    key: 'fx-frac:name-third',
+  },
   {
     skill: 'fractions',
     tier: 1,
@@ -289,9 +377,8 @@ export const FIXTURES_B: Problem[] = [
     tier: 2,
     activity: 'fraction',
     say: { text: 'Colour in a quarter of the cake.' },
-    text: '1/4',
-    answer: '1/4',
-    choices: ['1/4', '1/2', '1/3'],
+    answer: 'quarter',
+    choices: ['half', 'quarter', 'whole'],
     visual: { type: 'fraction', shape: 'rect', parts: 4, shaded: 0 },
     explain: { text: 'One of four equal parts is a quarter!' },
     key: 'fx-frac:shade-quarter',
@@ -301,43 +388,19 @@ export const FIXTURES_B: Problem[] = [
     tier: 2,
     activity: 'fraction',
     say: { text: 'Colour in half of the cake.' },
-    answer: '1/2',
-    choices: ['1/2', '1/4', '2/4'],
+    answer: 'half',
+    choices: ['half', 'quarter', 'whole'],
     visual: { type: 'fraction', shape: 'rect', parts: 4, shaded: 0 },
     explain: { text: 'Two of four parts is a half!' },
     key: 'fx-frac:shade-half-of-4',
   },
   {
     skill: 'fractions',
-    tier: 2,
-    activity: 'fraction',
-    say: { text: 'How much of the ice-pie is coloured?' },
-    answer: '1/4',
-    choices: ['1/2', '1/4', '1/3'],
-    visual: { type: 'fraction', shape: 'circle', parts: 4, shaded: 1 },
-    explain: { text: 'One of four equal parts. A quarter!' },
-    key: 'fx-frac:read-quarter',
-  },
-  {
-    skill: 'fractions',
-    tier: 3,
-    activity: 'fraction',
-    say: { text: 'What is half of {t} apples?', vals: { t: 8 } },
-    text: 'half of 8 = ?',
-    answer: 4,
-    choices: [4, 2, 6, 8],
-    visual: { type: 'share', total: 8, between: 2, prop: 'apple' },
-    explain: { text: 'Half of 8 is 4!' },
-    key: 'fx-frac:half-of-8',
-  },
-  {
-    skill: 'fractions',
     tier: 4,
     activity: 'fraction',
     say: { text: 'Colour in a third of the ice-pie.' },
-    text: '1/3',
-    answer: '1/3',
-    choices: ['1/3', '1/2', '1/4'],
+    answer: 'third',
+    choices: ['half', 'quarter', 'third'],
     visual: { type: 'fraction', shape: 'circle', parts: 3, shaded: 0 },
     explain: { text: 'One of three equal parts is a third!' },
     key: 'fx-frac:shade-third',

@@ -365,3 +365,46 @@
   font-weight: 700;
   color: var(--ink-900);
 }
+
+.b-plate .b-plate-bundle {
+  position: absolute;
+  left: 50% !important;
+  top: 10% !important;
+  height: 80%;
+  aspect-ratio: 64 / 160;
+  transform: translateX(-50%) rotate(-70deg);
+}
+.b-plate-bundle svg {
+  width: 100%;
+  height: 100%;
+}
+
+/* Taking away from a picture: pieces become big enough targets. */
+.b-loose.is-tappable {
+  min-width: 76px;
+  min-height: 76px;
+  justify-content: center;
+  padding: 0 8px;
+  border-radius: 14px;
+  background: rgba(138, 90, 59, 0.1);
+}
+.b-tens-picture .b-bundle[role='button'] {
+  box-sizing: content-box;
+  padding: 0 7px;
+}
+.b-tens-picture .b-bundle[role='button'] svg {
+  width: calc(var(--stick-h) * 0.4);
+}
+.b-pile.is-small .b-pile-bundle,
+.b-pile.is-small .b-pile-stick {
+  height: 144px;
+}
+.b-gone {
+  display: flex;
+  gap: 2px;
+  margin-left: 18px;
+}
+.b-bundle.is-gone,
+.b-stick.is-gone {
+  opacity: 0.3;
+}

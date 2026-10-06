@@ -227,7 +227,7 @@ export function fractionArt(shape: FracShape, parts: number, shaded: number, o: 
       group({ className: `b-part${i < shaded ? ' is-shaded' : ''}`, part: String(i) }, [
         piece(pts, BASE[shape], { edge: 'clean', shadow: false }),
         group({ className: 'b-shade' }, [piece(pts, SHADE[shape], { edge: 'clean', shadow: false })]),
-        ink([...pts, pts[0]], { width: 4, color: C.ink, wobble: 0.4 }),
+        ink(pts, { width: 4, color: C.ink, wobble: 0.4, closed: true }),
       ]),
     );
   });
