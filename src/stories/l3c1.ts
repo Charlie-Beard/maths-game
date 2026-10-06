@@ -128,7 +128,7 @@ export default defineStory({
     arrive: { who: 'narrator', text: 'Into the Land of Goodies! Here, the trees grow toffees.' },
     watch: { who: 'silky', text: 'Toffee shocks! Ten on this tree. Watch… fizz, bang, POP!' },
     ten: { who: 'hero', text: 'Three in the bag, seven on the tree. Seven and three make ten!' },
-    try: { who: 'narrator', text: '{name} tried a toffee shock. It fizzed… and fizzed… and fizzed…' },
+    try: { who: 'narrator', text: '{name} tried one. It fizzed… and fizzed… and fizzed…' },
     next: { who: 'silky', text: 'Ha! Up like a cork! Now listen… splashing! Is that lemonade?' },
   },
 
@@ -153,7 +153,7 @@ export default defineStory({
     k.set([silky, hero, bag], { opacity: 0 });
 
     await k.camera({ zoom: 1.25, x: 590, y: 300 }, 0.01);
-    await k.all(k.say('arrive'), k.camera({}, 2.6));
+    await k.all(k.say('arrive'), k.camera({}, 2.0));
     k.fx.twinkle();
     await k.all(k.enter(silky, 'left'), k.enter(hero, 'right').then(() => k.appear(bag, 0.3)));
     k.float(silky, 6, 2.4);
