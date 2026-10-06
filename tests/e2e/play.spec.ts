@@ -1,5 +1,12 @@
 import { expect, test } from '@playwright/test';
+import { fakeCloud, type FakeCloud } from './cloud';
 import { settled } from './wait';
+
+// Signed in already (playwright.config.ts), with a stand-in for the cloud save.
+let cloud: FakeCloud;
+test.beforeEach(async ({ page }) => {
+  cloud = await fakeCloud(page);
+});
 
 test('a first chapter plays end to end: choose, map, intro, 8 problems, story, reward', async ({ page }) => {
   await page.goto('/?seed=7');
@@ -48,6 +55,8 @@ test('a first chapter plays end to end: choose, map, intro, 8 problems, story, r
   expect(saved.chapters.l1c1.done).toBe(true);
   expect(saved.toffees).toBe(8);
   expect(saved.skills['count-10'].seen).toBeGreaterThan(0);
+  // And it goes up to the cloud a moment later.
+  await expect.poll(() => cloud.jasper?.data?.chapters?.l1c1?.done, { timeout: 10_000 }).toBe(true);
 });
 
 test('a wrong answer brings help, and Silky shows the answer on the third', async ({ page }) => {
