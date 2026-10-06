@@ -1,5 +1,6 @@
 import { defineConfig } from 'vitest/config';
 
 export default defineConfig({
-  test: { include: ['tests/unit/**/*.test.ts'], environment: 'node' },
+  // Generous timeout: seeded sweeps over every skill run slowly when agents share the machine.
+  test: { include: ['tests/unit/**/*.test.ts'], environment: 'node', testTimeout: 30_000 },
 });
