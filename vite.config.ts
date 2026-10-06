@@ -1,7 +1,7 @@
 import { createHash } from 'node:crypto';
-import { readdirSync, readFileSync, statSync } from 'node:fs';
+import { readdirSync, readFileSync, realpathSync, statSync } from 'node:fs';
 import { join, relative } from 'node:path';
-import { defineConfig, type Plugin } from 'vite';
+import { defineConfig, searchForWorkspaceRoot, type Plugin } from 'vite';
 
 /**
  * Writes sw.js after the build with every output file pre-cached, so the
@@ -82,6 +82,11 @@ export default defineConfig({
     // dev server alone (npm run dev, then /lab.html?set=lands) and never ships.
     rollupOptions: { input: { main: 'index.html' } },
   },
-  server: { host: true },
+  server: {
+    host: true,
+    // Agent worktrees symlink node_modules from the main checkout: let the
+    // dev server serve files (fonts) from wherever it really lives.
+    fs: { allow: [searchForWorkspaceRoot(process.cwd()), realpathSync('node_modules')] },
+  },
   plugins: [serviceWorker()],
 });

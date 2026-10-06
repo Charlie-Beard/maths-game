@@ -26,6 +26,37 @@ follows are in [CLAUDE.md](../CLAUDE.md).
 Every **SCAFFOLD** comment in `src/` marks something a workstream below
 replaces.
 
+## Session 2: done
+
+All ten workstreams were merged into `claude/plan-and-scaffold`:
+
+- **W1a/b/c:** every one of the 48 skills makes real problems at every
+  tier. The conventions activities rely on are in each generator file's
+  header comment.
+- **W2a/b/c:** all 14 activities are built, and `visual.ts` draws every
+  Visual kind. Written fractions are drawn stacked (Andika has no ⅓).
+- **W3a:** 19 character portraits with `data-part` groups (see the
+  list in the merge commit's W3a report: eyes, mouth, arms, lids,
+  mouthOpen, plus extras such as Silky's wings), and `dameSnapPose()`.
+- **W3b:** 24 props, 80 keepsakes (`keepsakeArt`, `KEEPSAKE_NAMES`) and
+  10 land seals (`landSeal`).
+- **W3c:** `LAND_ART` (far view and scene for each land), the map tree
+  with `TREE_PLACES`, `TREE_HOOKS` and `TREE_SPOTS`, and `lab.html`.
+- **W7:** the cloud save (`CloudProfile`), sign-in, and the `faraway-api`
+  Worker. It isn't deployed yet: the parent follows the README. The dev
+  server starts signed in.
+
+**Notes for session 3:**
+
+- **W4:** the map's title banner covers the land in the cloud, so it
+  needs to move. Land seals on `TREE_HOOKS` sit among the leaves. The
+  grown-ups' corner needs sign-out and profile switching (as Wizard Words
+  has).
+- **Stories** should use the `data-part` names. Animate with
+  `rotate(n)`, not `rotate(n x y)`.
+- `play.spec.ts` can time out when many agents share the machine: run e2e
+  with `--workers=1` under load.
+
 ## The workstreams
 
 Each workstream owns a set of files, so agents running in parallel in

@@ -119,6 +119,7 @@ export class PlayScene extends Scene {
       calm: isCalm(),
     });
     this.root.insertBefore(this.activity.el, this.silky);
+    stackFractions(this.activity.el);
     this.activity.show();
     this.drawDots();
     this.sayQuestion();
@@ -220,5 +221,27 @@ export class PlayScene extends Scene {
     if (isCalm()) return;
     await sm(this.hero, 0.2, { y: -40, ease: 'power2.out' });
     await sm(this.hero, 0.2, { y: 0, ease: 'power2.in' });
+  }
+}
+
+const FRACTIONS: Record<string, [number, number]> = { '½': [1, 2], '¼': [1, 4], '¾': [3, 4], '⅓': [1, 3], '⅔': [2, 3] };
+
+/**
+ * Andika has no ⅓ (and ½ and ¼ look tiny), so written fractions in any
+ * activity become stacked numerals, the way he sees them at school.
+ */
+function stackFractions(root: HTMLElement): void {
+  const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+  const hits: Text[] = [];
+  for (let n = walker.nextNode(); n; n = walker.nextNode()) if (/[½¼¾⅓⅔]/.test(n.nodeValue ?? '')) hits.push(n as Text);
+  for (const t of hits) {
+    const span = document.createElement('span');
+    span.innerHTML = (t.nodeValue ?? '')
+      .replace(/[&<>]/g, (c) => `&#${c.charCodeAt(0)};`)
+      .replace(/[½¼¾⅓⅔]/g, (c) => {
+        const [n, d] = FRACTIONS[c];
+        return `<span class="c-frac" style="font-size:1em"><span>${n}</span><span>${d}</span></span>`;
+      });
+    t.replaceWith(span);
   }
 }
