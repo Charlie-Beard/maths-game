@@ -176,11 +176,11 @@ export function moonRoom(name: string): string {
     piece(ellipse(590, 660, 330, 64), C.gold, { edge: 'cut', fibre: false, shadow: false, opacity: 0.85 }),
     piece(ellipse(590, 660, 250, 46), C.rose, { edge: 'cut', fibre: false, shadow: false }),
     // The trapdoor, open, with the top of the ladder.
-    piece(poly([[60, 640], [250, 640], [270, 720], [40, 720]]), C.ink, { edge: 'cut' }),
-    piece(poly([[60, 640], [250, 640], [236, 560], [78, 560]]), C.wood, { edge: 'cut' }),
-    piece(band([[100, 760], [104, 616]], 12), C.tan, { edge: 'cut' }),
-    piece(band([[210, 760], [206, 616]], 12), C.tan, { edge: 'cut' }),
-    ...[700, 650].map((y) => piece(rect(100, y, 110, 9, 2), C.tan, { edge: 'cut', fibre: false })),
+    piece(poly([[140, 640], [330, 640], [350, 720], [120, 720]]), C.ink, { edge: 'cut' }),
+    piece(poly([[140, 640], [330, 640], [316, 560], [158, 560]]), C.wood, { edge: 'cut' }),
+    piece(band([[180, 760], [184, 616]], 12), C.tan, { edge: 'cut' }),
+    piece(band([[290, 760], [286, 616]], 12), C.tan, { edge: 'cut' }),
+    ...[700, 650].map((y) => piece(rect(180, y, 110, 9, 2), C.tan, { edge: 'cut', fibre: false })),
     // The mouth of the slippery-slip, with its polished rim.
     piece(ellipse(1000, 690, 130, 40), SLIDE_RIM),
     piece(ellipse(1000, 692, 110, 30), C.ink, { edge: 'cut', fibre: false }),
@@ -337,10 +337,10 @@ export default defineStory({
     k.light(590, 236, 230, { color: '#c9d4ff', strength: 0.25 });
     k.light(860, 190, 120, { color: C.candle, strength: 0.35, flicker: true });
     k.ambient('dust', { count: 14 });
-    const mf = k.character('moonface', { x: 470, y: 330, w: 270, z: 20 });
-    const hero = k.character('hero', { x: 50, y: 400, w: 240, z: 18 });
+    const mf = k.character('moonface', { x: 520, y: 330, w: 270, z: 20 });
+    const hero = k.character('hero', { x: 125, y: 400, w: 240, z: 18 });
     // A strip of floor in front of the trapdoor, so the hero rises out of the hole.
-    k.add(svg({ w: 220, h: 120, name: 'l1c8-lip', boil: false }, [piece(poly([[0, 0], [220, 0], [230, 120], [-10, 120]]), C.barkLight, { edge: 'torn', shadow: false })]), { x: 40, y: 720, w: 240, z: 19, still: true });
+    k.add(svg({ w: 220, h: 120, name: 'l1c8-lip', boil: false }, [piece(poly([[0, 0], [220, 0], [230, 120], [-10, 120]]), C.barkLight, { edge: 'torn', shadow: false })]), { x: 120, y: 720, w: 240, z: 19, still: true });
     k.set(hero, { opacity: 0 });
     k.set(mf, { opacity: 0 });
 
@@ -373,7 +373,7 @@ export default defineStory({
     lampOn();
     k.light(785, 450, 160, { color: C.candle, strength: 0.55, flicker: true, z: 23 });
     k.sparkle(785, 440, 16, 140);
-    await k.to(lamp, 1.2, { x: -460, y: 60, rotation: -6, ease: 'sine.inOut' });
+    await k.to(lamp, 1.2, { x: -380, y: 60, rotation: -6, ease: 'sine.inOut' });
     void k.hop(hero, 24, 1);
     await k.wait(1800);
 
