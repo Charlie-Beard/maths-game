@@ -1,0 +1,1066 @@
+/* Shared paper UI: seals, tiles, slots, cards, page wipe. */
+
+.wipe {
+  position: absolute;
+  left: -160px;
+  top: -90px;
+  width: 1500px;
+  height: 1000px;
+  z-index: 800;
+  display: none;
+  pointer-events: none;
+}
+.wipe svg {
+  width: 100%;
+  height: 100%;
+}
+
+.parchment {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+/* ---------- Wax-seal buttons ---------- */
+
+.seal-btn {
+  position: absolute;
+  display: block;
+  transition: transform 80ms ease-out, filter 80ms;
+}
+.seal-btn svg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  display: block;
+}
+.seal-btn.is-pressed {
+  transform: translateY(3px) scale(0.94);
+  filter: brightness(0.92);
+}
+.seal-btn .label {
+  position: absolute;
+  left: 50%;
+  top: 100%;
+  transform: translateX(-50%);
+  margin-top: 2px;
+  white-space: nowrap;
+  font-weight: 700;
+  font-size: 20px;
+  color: var(--parchment-100);
+  text-shadow: 0 2px 0 rgba(0, 0, 0, 0.4);
+}
+
+/* ---------- Letter tiles ---------- */
+
+.tile {
+  position: absolute;
+  display: grid;
+  place-items: center;
+  color: var(--ink-900);
+  font-weight: 700;
+  line-height: 1;
+  z-index: 10;
+  will-change: transform;
+  transition: filter 80ms;
+}
+.tile .card-bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  transition: transform 70ms ease-out;
+}
+.tile .card-shadow {
+  transition: transform 70ms ease-out;
+}
+.tile .glyph {
+  position: relative;
+  padding-bottom: 0.12em;
+  transition: transform 70ms ease-out;
+}
+.tile.is-pressed .card-bg,
+.tile.is-pressed .glyph {
+  transform: translateY(4px);
+}
+.tile.is-pressed .card-shadow {
+  transform: translate(1px, 1px);
+}
+.tile.placed {
+  pointer-events: none;
+}
+.tile.flying {
+  z-index: 50;
+}
+.tile .glow {
+  position: absolute;
+  inset: -42%;
+  opacity: 0;
+  pointer-events: none;
+}
+.tile .glow svg {
+  width: 100%;
+  height: 100%;
+}
+.tile.glowing .glow {
+  animation: glow-pulse 1.6s steps(8, end) infinite;
+}
+/* The hint must be impossible to miss: gold edge, bright halo, a little bounce. */
+.tile.glowing .card-face {
+  stroke: var(--gold-500);
+  stroke-width: 7px;
+  paint-order: stroke;
+}
+.tile.glowing .glyph {
+  color: #7a4a10;
+  animation: hint-bounce 1.2s steps(6, end) infinite;
+}
+@keyframes hint-bounce {
+  0%,
+  60%,
+  100% {
+    transform: translateY(0);
+  }
+  30% {
+    transform: translateY(-8px);
+  }
+}
+.calm .tile.glowing .glyph {
+  animation: none;
+}
+@keyframes glow-pulse {
+  0%,
+  100% {
+    opacity: 0.8;
+    transform: scale(0.95);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.12);
+  }
+}
+.calm .tile.glowing .glow {
+  animation: none;
+  opacity: 0.9;
+}
+
+/* ---------- Slots ---------- */
+
+.slot {
+  position: absolute;
+  z-index: 5;
+}
+.slot .slot-bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.slot.target .slot-bg path:last-child {
+  stroke: var(--accent);
+  stroke-width: 4;
+  stroke-dasharray: none;
+}
+.slot.target::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: -26px;
+  width: 0;
+  height: 0;
+  margin-left: -12px;
+  border-left: 12px solid transparent;
+  border-right: 12px solid transparent;
+  border-bottom: 14px solid var(--accent);
+  opacity: 0.9;
+}
+.slot.done::after {
+  display: none;
+}
+
+/* Sound buttons (dots and dashes) under each slot, as in school. */
+.sound-btn {
+  position: absolute;
+  height: 14px;
+  border-radius: 7px;
+  background: rgba(74, 54, 38, 0.35);
+  transition: background 120ms, transform 120ms;
+  z-index: 6;
+}
+.sound-btn.lit {
+  background: var(--gold-500);
+  transform: scale(1.3);
+  box-shadow: 0 0 14px var(--gold-300);
+}
+.split-arc {
+  position: absolute;
+  z-index: 6;
+  pointer-events: none;
+}
+.split-arc path {
+  transition: stroke 120ms;
+}
+.split-arc.lit path {
+  stroke: var(--gold-500);
+}
+
+/* ---------- Picture card ---------- */
+
+.picture-card {
+  position: absolute;
+  z-index: 4;
+  transition: transform 80ms ease-out;
+}
+.picture-card.is-pressed {
+  transform: scale(0.97);
+}
+.picture-card > .card-bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+.picture-card .art {
+  position: absolute;
+  inset: 26px;
+}
+.picture-card .art svg {
+  width: 100%;
+  height: 100%;
+}
+.picture-card .ear {
+  position: absolute;
+  right: -14px;
+  bottom: -14px;
+  width: 70px;
+  height: 70px;
+}
+
+/* ---------- Progress ---------- */
+
+.progress-stars {
+  position: absolute;
+  display: flex;
+  gap: 10px;
+  z-index: 20;
+}
+.progress-stars .s {
+  width: 54px;
+  height: 54px;
+}
+.progress-stars svg {
+  width: 100%;
+  height: 100%;
+}
+
+.gem-counter {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 700;
+  font-size: 34px;
+  color: var(--parchment-100);
+  text-shadow: 0 2px 0 rgba(0, 0, 0, 0.4);
+  z-index: 20;
+}
+.gem-counter .g {
+  width: 44px;
+  height: 44px;
+}
+
+.particle {
+  position: absolute;
+  width: 26px;
+  height: 26px;
+  margin: -13px 0 0 -13px;
+  pointer-events: none;
+  z-index: 60;
+}
+.particle svg {
+  width: 100%;
+  height: 100%;
+}
+
+/* ---------- Hedwig ---------- */
+
+.hedwig-btn {
+  position: absolute;
+  z-index: 30;
+}
+.hedwig-btn svg {
+  width: 100%;
+  height: 100%;
+}
+.hedwig-btn.is-pressed {
+  transform: scale(0.95);
+}
+
+/* ---------- Banners, speech, cards ---------- */
+
+.banner {
+  position: absolute;
+  z-index: 20;
+}
+.banner-text {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-weight: 700;
+  color: var(--ink-900);
+  padding: 0 30px 6px;
+  text-align: center;
+  line-height: 1.05;
+}
+
+.speech {
+  position: absolute;
+  z-index: 25;
+}
+.speech svg {
+  position: absolute;
+  inset: 0;
+  overflow: visible;
+}
+.speech-text {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  font-size: 30px;
+  line-height: 1.25;
+  font-weight: 700;
+  color: var(--ink-900);
+}
+
+.frog-card {
+  position: relative;
+}
+.frog-card .frame {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+.frog-portrait {
+  position: absolute;
+  display: grid;
+  place-items: end center;
+  overflow: hidden;
+}
+.frog-portrait svg {
+  width: 100%;
+  height: 100%;
+}
+.frog-portrait .q {
+  align-self: center;
+  font-size: 64px;
+  font-weight: 700;
+  color: var(--night-500);
+}
+.frog-name {
+  position: absolute;
+  left: 0;
+  right: 0;
+  text-align: center;
+  font-weight: 700;
+  color: var(--ink-900);
+  line-height: 1.05;
+  padding: 0 8px;
+}
+
+.big-title {
+  position: absolute;
+  left: 0;
+  right: 0;
+  text-align: center;
+  font-weight: 700;
+  color: var(--gold-300);
+  text-shadow:
+    0 3px 0 #7a5420,
+    0 6px 14px rgba(0, 0, 0, 0.5);
+  letter-spacing: 1px;
+  z-index: 20;
+}
+
+.backdrop-wrap {
+  position: absolute;
+  inset: 0;
+}
+.backdrop-wrap svg {
+  width: 100%;
+  height: 100%;
+}
+
+/* ---------- Grown-ups' gear and its sum ---------- */
+
+/* Above every scene (and the album's zoom), below the page wipe. */
+.gear-btn {
+  position: absolute;
+  z-index: 750;
+  opacity: 0.8;
+}
+.gear-btn svg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+.gear-btn.is-pressed {
+  transform: scale(0.94);
+}
+.no-gear .gear-btn {
+  display: none;
+}
+.gate {
+  position: absolute;
+  inset: 0;
+  z-index: 760;
+  background: rgba(14, 16, 34, 0.75);
+  -webkit-user-select: none;
+  user-select: none;
+}
+.gate-card {
+  position: absolute;
+  text-align: center;
+  color: var(--ink-900);
+}
+.gate-card h2 {
+  position: relative;
+  margin: 38px 0 6px;
+  font-size: 34px;
+}
+.gate-sum {
+  position: relative;
+  display: inline-block;
+  font-size: 56px;
+  margin-right: 14px;
+}
+.gate-answer {
+  position: relative;
+  display: inline-block;
+  min-width: 120px;
+  padding: 4px 14px;
+  font-size: 56px;
+  border-bottom: 4px solid var(--parchment-500);
+}
+.gate-answer.empty {
+  color: var(--parchment-400);
+}
+.gate-note {
+  position: relative;
+  height: 28px;
+  margin: 8px 0 6px;
+  font-size: 22px;
+  color: var(--scarlet-600);
+}
+.gate-keys {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(3, 110px);
+  gap: 12px;
+  justify-content: center;
+}
+.gate-key {
+  height: 84px;
+  border-radius: 18px;
+  font-size: 38px;
+  font-weight: 700;
+  background: #fffaf0;
+  box-shadow: 0 4px 0 rgba(90, 62, 30, 0.35);
+}
+.gate-key:active {
+  transform: translateY(3px);
+  box-shadow: 0 1px 0 rgba(90, 62, 30, 0.35);
+}
+.gate-key.ok {
+  background: var(--emerald-500);
+  color: var(--parchment-100);
+}
+.gate-close {
+  position: absolute;
+  right: 26px;
+  top: 24px;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  font-size: 26px;
+  background: var(--parchment-300);
+}
+
+/* ---------- Title ---------- */
+
+.letter {
+  position: absolute;
+  z-index: 30;
+}
+.letter .envelope {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+.letter .flap {
+  transform-box: fill-box;
+}
+.letter .address {
+  position: absolute;
+  left: 40px;
+  right: 40px;
+  top: 206px;
+  text-align: center;
+  font-weight: 700;
+  font-size: 28px;
+  color: #2a3a6a;
+  line-height: 1.05;
+  pointer-events: none;
+}
+.letter .address span {
+  font-size: 18px;
+  font-weight: 400;
+  color: #3a4a7a;
+}
+.letter-seal {
+  position: absolute;
+  left: 160px;
+  top: 104px;
+  width: 100px;
+  height: 100px;
+}
+.letter-seal svg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+.title-owl {
+  position: absolute;
+  z-index: 10;
+}
+.title-owl svg {
+  width: 100%;
+  height: 100%;
+}
+
+.dim {
+  position: absolute;
+  inset: 0;
+  background: rgba(14, 16, 34, 0.45);
+}
+.choose-card {
+  position: absolute;
+  z-index: 10;
+  transition: transform 80ms;
+}
+.choose-card.is-pressed {
+  filter: brightness(0.95);
+}
+
+/* ---------- Map ---------- */
+
+.trail {
+  pointer-events: none;
+}
+.stop {
+  position: absolute;
+  z-index: 10;
+}
+.stop .medal {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: var(--book);
+  box-shadow:
+    0 0 0 6px var(--parchment-100),
+    0 0 0 9px rgba(90, 62, 30, 0.35),
+    4px 10px 0 9px rgba(40, 25, 10, 0.25);
+  overflow: hidden;
+  transition: transform 80ms;
+}
+.stop .face {
+  position: absolute;
+  inset: 4px;
+  border-radius: 50%;
+  overflow: hidden;
+  background: var(--night-600);
+}
+.stop .face svg {
+  width: 100%;
+  height: 100%;
+}
+.stop.kind-horcrux .medal,
+.stop.kind-horcrux .face,
+.stop.kind-battle .medal,
+.stop.kind-battle .face {
+  border-radius: 22%;
+}
+.stop.kind-horcrux .medal,
+.stop.kind-battle .medal {
+  background: var(--night-900);
+  box-shadow:
+    0 0 0 6px var(--gold-500),
+    0 0 0 9px rgba(90, 62, 30, 0.35),
+    4px 10px 0 9px rgba(40, 25, 10, 0.25);
+}
+.stop.locked .face svg {
+  filter: brightness(0.12) saturate(0);
+  opacity: 0.6;
+}
+.stop.is-pressed .medal {
+  transform: scale(0.95);
+}
+.stop .halo {
+  position: absolute;
+  inset: -40px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 231, 163, 0.9), rgba(255, 217, 119, 0.35) 45%, transparent 70%);
+  opacity: 0;
+}
+.stop.current .halo {
+  opacity: 1;
+  animation: halo 2s steps(10, end) infinite;
+}
+.calm .stop.current .halo {
+  animation: none;
+}
+@keyframes halo {
+  0%,
+  100% {
+    transform: scale(0.92);
+    opacity: 0.75;
+  }
+  50% {
+    transform: scale(1.06);
+    opacity: 1;
+  }
+}
+.stop .badge {
+  position: absolute;
+  right: -6px;
+  top: -6px;
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-size: 28px;
+  font-weight: 700;
+  box-shadow: 2px 4px 0 rgba(40, 25, 10, 0.3);
+}
+.stop .badge.tick {
+  background: var(--emerald-500);
+  color: var(--parchment-100);
+}
+.stop .badge.lock {
+  background: var(--night-600);
+}
+.stop .badge.lock::before {
+  content: '';
+  width: 16px;
+  height: 13px;
+  margin-top: 8px;
+  background: var(--parchment-300);
+  border-radius: 3px;
+  box-shadow: 0 -9px 0 -3px transparent;
+}
+.stop .badge.lock::after {
+  content: '';
+  position: absolute;
+  top: 9px;
+  width: 12px;
+  height: 12px;
+  border: 3px solid var(--parchment-300);
+  border-bottom: 0;
+  border-radius: 8px 8px 0 0;
+}
+.stop-label {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  width: 220px;
+  margin: 14px 0 0 -110px;
+  text-align: center;
+  font-weight: 700;
+  font-size: 22px;
+  line-height: 1.1;
+  color: var(--ink-700);
+}
+.stop.locked .stop-label {
+  opacity: 0.45;
+}
+.stop.current .stop-label {
+  color: var(--ink-900);
+  font-size: 25px;
+}
+.token {
+  position: absolute;
+  z-index: 15;
+  pointer-events: none;
+  filter: drop-shadow(3px 8px 0 rgba(40, 25, 10, 0.25));
+  transform-origin: 50% 100%;
+}
+.token svg {
+  width: 100%;
+  height: 100%;
+}
+
+/* ---------- Intro & complete ---------- */
+
+.intro-tint {
+  position: absolute;
+  opacity: 0.12;
+  border-radius: 30px;
+  pointer-events: none;
+}
+.chapter-kicker {
+  position: absolute;
+  text-align: center;
+  font-weight: 700;
+  font-size: 22px;
+  color: var(--ink-500);
+  z-index: 20;
+}
+.intro-host {
+  position: absolute;
+  z-index: 20;
+}
+.intro-host svg,
+.cheer svg,
+.horcrux-reward svg {
+  width: 100%;
+  height: 100%;
+}
+.reward-glow {
+  position: absolute;
+  z-index: 1;
+  pointer-events: none;
+}
+.reward-glow svg {
+  width: 100%;
+  height: 100%;
+}
+.card-reward,
+.horcrux-reward {
+  position: absolute;
+  z-index: 10;
+  transform-style: preserve-3d;
+}
+.reward-name {
+  position: absolute;
+  text-align: center;
+  font-weight: 700;
+  font-size: 40px;
+  color: var(--gold-300);
+  text-shadow: 0 3px 0 rgba(0, 0, 0, 0.5);
+  z-index: 12;
+}
+.cheer {
+  position: absolute;
+  z-index: 8;
+  transform-origin: 50% 100%;
+}
+.gem-tally {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 700;
+  font-size: 52px;
+  color: var(--parchment-100);
+  text-shadow: 0 3px 0 rgba(0, 0, 0, 0.5);
+  z-index: 12;
+}
+.gem-tally .g {
+  width: 70px;
+  height: 70px;
+}
+.gem-tally svg {
+  width: 100%;
+  height: 100%;
+}
+
+/* ---------- Album ---------- */
+
+.album-card,
+.album-hx {
+  position: absolute;
+  z-index: 5;
+}
+.album-card.is-pressed,
+.album-hx.is-pressed {
+  transform: scale(0.95);
+}
+.album-hx svg {
+  width: 100%;
+  height: 100%;
+}
+.album-hx.missing svg {
+  filter: brightness(0) opacity(0.25);
+}
+.shelf {
+  position: absolute;
+  background: var(--wood, #8a5a3b);
+  border-radius: 6px;
+  box-shadow: 0 6px 0 rgba(40, 25, 10, 0.3);
+}
+.shelf-label {
+  position: absolute;
+  text-align: center;
+  font-weight: 700;
+  font-size: 26px;
+  color: var(--ink-700);
+}
+.veil {
+  position: absolute;
+  inset: 0;
+  z-index: 700;
+  background: rgba(14, 16, 34, 0.75);
+}
+.zoom {
+  position: absolute;
+}
+.zoom-hx svg {
+  width: 100%;
+  height: 100%;
+}
+
+/* ---------- Battle ---------- */
+
+.battle-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+}
+.battle .desk {
+  z-index: 2;
+}
+.dome {
+  position: absolute;
+  inset: 0;
+}
+.dome svg,
+.eater svg,
+.battle-vold svg,
+.battle-hero svg,
+.smoke svg {
+  width: 100%;
+  height: 100%;
+}
+.eater,
+.battle-vold,
+.battle-hero,
+.smoke {
+  position: absolute;
+}
+.spark {
+  position: absolute;
+  border-radius: 50%;
+  z-index: 6;
+}
+/* The duel with Voldemort */
+.battle-vold svg {
+  transform: scaleX(-1);
+}
+.duel-dark,
+.duel-flash {
+  position: absolute;
+  inset: -40px;
+  pointer-events: none;
+}
+.duel-dark {
+  background: #0b0d24;
+  opacity: 0;
+}
+.duel-flash {
+  z-index: 8;
+  opacity: 0;
+}
+.duel-fx {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+  z-index: 5;
+}
+.bolt,
+.clash,
+.protego {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+}
+.bolt {
+  z-index: 6;
+  background: radial-gradient(circle closest-side, #fff 0 24%, var(--c) 48%, transparent 100%);
+}
+.clash {
+  z-index: 6;
+  background: radial-gradient(circle closest-side, #fff 0 30%, #ffe9a8 46%, rgba(255, 190, 110, 0.6) 66%, transparent 100%);
+}
+.protego {
+  z-index: 4;
+  background: radial-gradient(
+    circle closest-side,
+    rgba(191, 227, 255, 0.06) 0 70%,
+    rgba(191, 227, 255, 0.5) 88%,
+    rgba(255, 255, 255, 0.9) 94%,
+    rgba(191, 227, 255, 0) 100%
+  );
+}
+
+/* ---------- Rotate-to-landscape ---------- */
+
+.rotate-inner {
+  display: grid;
+  justify-items: center;
+  gap: 18px;
+}
+.rotate-inner p {
+  margin: 0;
+  font-size: 34px;
+  font-weight: 700;
+  color: var(--parchment-100);
+}
+.rotate-owl {
+  width: 200px;
+  height: 200px;
+}
+.rotate-owl svg {
+  width: 100%;
+  height: 100%;
+}
+.rotate-ipad {
+  width: 110px;
+  height: 150px;
+  border-radius: 16px;
+  background: var(--parchment-300);
+  padding: 10px;
+  animation: turn 2.4s steps(12, end) infinite;
+}
+.rotate-ipad .screen {
+  width: 100%;
+  height: 100%;
+  border-radius: 8px;
+  background: var(--night-600);
+}
+@keyframes turn {
+  0%,
+  30% {
+    transform: rotate(0deg);
+  }
+  60%,
+  100% {
+    transform: rotate(-90deg);
+  }
+}
+
+.stop .go {
+  position: absolute;
+  right: -30px;
+  bottom: -20px;
+  width: 76px;
+  height: 76px;
+  pointer-events: none;
+}
+.stop .go svg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.caster {
+  position: absolute;
+  z-index: 40;
+  pointer-events: none;
+}
+.caster svg {
+  width: 100%;
+  height: 100%;
+}
+
+/* ---------- Sign in ---------- */
+
+.login-card {
+  position: absolute;
+  z-index: 20;
+  text-align: center;
+  touch-action: manipulation;
+}
+.login-card.busy {
+  opacity: 0.8;
+}
+.login-form {
+  position: absolute;
+  inset: 0;
+}
+.login-form h2 {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 44px;
+  margin: 0;
+  font-size: 46px;
+  color: var(--ink-900);
+}
+.login-form input {
+  position: absolute;
+  left: 60px;
+  top: 134px;
+  width: 440px;
+  height: 88px;
+  padding: 0 24px;
+  font: inherit;
+  font-size: 44px;
+  text-align: center;
+  color: var(--ink-900);
+  background: #fffaf0;
+  border: 3px solid var(--parchment-400);
+  border-radius: 18px;
+  box-shadow: inset 0 3px 0 rgba(90, 62, 30, 0.12);
+  -webkit-user-select: text;
+  user-select: text;
+  outline: none;
+}
+.login-form input:focus {
+  border-color: var(--gold-500);
+}
+.login-message {
+  position: absolute;
+  left: 30px;
+  right: 30px;
+  top: 244px;
+  margin: 0;
+  font-size: 24px;
+  color: var(--scarlet-600);
+}
+.login-owl {
+  position: absolute;
+  z-index: 25;
+}
+.login-owl svg {
+  width: 100%;
+  height: 100%;
+}
+
+/* Which profile is playing, when it isn't Jasper's (e.g. "Demo"). */
+.profile-badge {
+  position: absolute;
+  z-index: 750;
+  padding: 3px 12px;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--parchment-100);
+  background: var(--scarlet-500);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.35);
+  pointer-events: none;
+}
+.no-gear .profile-badge {
+  display: none;
+}

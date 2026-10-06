@@ -1,0 +1,12 @@
+{
+  "name": "Up the Faraway Tree",
+  "short_name": "Faraway Tree",
+  "description": "A Magic Faraway Tree maths adventure.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "fullscreen",
+  "orientation": "landscape",
+  "background_color": "#1f2a22",
+  "theme_color": "#2c4a3a",
+  "icons": []
+}

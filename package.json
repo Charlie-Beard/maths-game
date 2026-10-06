@@ -1,0 +1,27 @@
+{
+  "name": "faraway-maths",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Up the Faraway Tree: a maths adventure for iPad (landscape), in torn-paper stop-motion.",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:e2e": "playwright test"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.56.1",
+    "playwright": "^1.56.1",
+    "tsx": "^4.23.15",
+    "typescript": "5.9",
+    "vite": "^8.3.2",
+    "vitest": "^5.0.3"
+  },
+  "dependencies": {
+    "@fontsource/andika": "^5.3.0",
+    "gsap": "^3.15.0"
+  }
+}
