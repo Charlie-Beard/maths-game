@@ -5,4 +5,5 @@ export const L5: Record<string, Loader> = {
   l5c1: () => import('../l5c1'),
   l5c2: () => import('../l5c2'),
   l5c3: () => import('../l5c3'),
+  l5c4: () => import('../l5c4'),
 };
