@@ -35,6 +35,8 @@ test('a first chapter plays end to end: choose, map, intro, 8 problems, story, r
   await expect(scene).toBeVisible();
   for (let i = 0; i < 8; i++) {
     await expect(page.locator('.pdot.done')).toHaveCount(i, { timeout: 20_000 });
+    // The problem is up once the scene says its answer (not yet, just after the intro).
+    await expect(scene).toHaveAttribute('data-answer', /.+/);
     const answer = await scene.getAttribute('data-answer');
     const card = page.locator(`.choice[data-value="${answer}"]`);
     await settled(card);

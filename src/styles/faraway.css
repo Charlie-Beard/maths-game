@@ -46,28 +46,190 @@
   font-weight: 700;
 }
 
-/* ---------- Map ---------- */
+/* ---------- Map: the tree ---------- */
 
-.map-stop .stop-n {
+/* A stop is the place on the tree itself: the button is see-through, with a wax tag. */
+.map-stop {
   position: absolute;
-  right: -6px;
+  z-index: 6;
+  border-radius: 40%;
+}
+.map-stop.is-pressed .stop-tag {
+  transform: scale(0.92);
+}
+.stop-tag {
+  position: absolute;
+  pointer-events: none;
+}
+.stop-tag svg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+.stop-tag .stop-n {
+  position: absolute;
+  right: -8px;
   bottom: -6px;
-  min-width: 34px;
-  height: 34px;
-  border-radius: 17px;
+  min-width: 28px;
+  height: 28px;
+  border-radius: 14px;
   background: var(--parchment-100);
   color: var(--ink-900);
   font-weight: 700;
-  font-size: 22px;
+  font-size: 19px;
+  line-height: 1;
   display: grid;
   place-items: center;
   box-shadow: 0 2px 0 rgba(0, 0, 0, 0.3);
 }
-.map-stop.locked {
-  filter: grayscale(0.6) brightness(0.85);
+.stop-tag.shut {
+  filter: saturate(0.6) brightness(0.92);
 }
-.map-stop.is-next {
-  filter: drop-shadow(0 0 14px var(--hint-glow));
+.stop-tag.shut svg g {
+  opacity: 0;
+}
+.map-stop.done .stop-tag .stop-n {
+  background: var(--gold-300);
+}
+/* The one glowing next stop: a warm ring round the place, never a flash. */
+.stop-glow {
+  position: absolute;
+  inset: -16px;
+  border-radius: 50%;
+  pointer-events: none;
+  background: radial-gradient(closest-side, rgba(255, 231, 163, 0) 58%, rgba(255, 231, 163, 0.85) 76%, rgba(255, 231, 163, 0) 100%);
+}
+.map-stop.is-next .stop-tag {
+  filter: drop-shadow(0 0 10px var(--hint-glow));
+}
+.tomorrow-tag {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 6px 12px;
+  border-radius: 14px;
+  background: var(--parchment-100);
+  box-shadow: 0 3px 0 rgba(40, 25, 10, 0.35);
+  font-size: 19px;
+  font-weight: 700;
+  color: var(--ink-700);
+  white-space: nowrap;
+  pointer-events: none;
+}
+.tomorrow-tag .moon {
+  position: relative;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--gold-500);
+  overflow: hidden;
+}
+.tomorrow-tag .moon::after {
+  content: '';
+  position: absolute;
+  left: 8px;
+  top: -4px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--parchment-100);
+}
+
+/* Finished lands' seals on strings from the branch tips: in front of the leaves. */
+.tree-seal {
+  position: absolute;
+  z-index: 5;
+}
+.seal-string {
+  position: absolute;
+  background: var(--parchment-100);
+  border-radius: 2px;
+  box-shadow: 1px 2px 0 rgba(0, 0, 0, 0.3);
+}
+.seal-knot {
+  position: absolute;
+  border-radius: 50%;
+  background: #4a3222;
+  box-shadow: 0 0 0 2px var(--parchment-100);
+}
+.seal-art {
+  position: absolute;
+  filter: drop-shadow(0 0 3px rgba(255, 248, 230, 0.9)) drop-shadow(0 4px 4px rgba(20, 12, 4, 0.45));
+  transform-origin: 50% 0;
+}
+.seal-art svg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.map-banner {
+  z-index: 8;
+  transform-origin: 50% 50%;
+}
+.map-banner .banner-text {
+  line-height: 1.05;
+  padding: 0 18px;
+}
+
+/* Up the ladder (arrow up) and down the slippery-slip (arrow down). */
+.land-nav {
+  z-index: 8;
+}
+.land-nav svg {
+  transform: rotate(-90deg);
+}
+.arrive-land,
+.arrive-cloud {
+  position: absolute;
+  z-index: 7;
+  pointer-events: none;
+}
+.arrive-land svg,
+.arrive-cloud svg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+/* Round portrait buttons: Practice with Silky, the Treasure Room. */
+.portrait-btn {
+  position: absolute;
+  z-index: 9;
+}
+.portrait-btn .ring {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+.portrait-btn .face {
+  position: absolute;
+  border-radius: 50%;
+  overflow: hidden;
+}
+.portrait-btn .face svg {
+  width: 100%;
+  height: 100%;
+}
+.portrait-btn .label {
+  position: absolute;
+  left: -30px;
+  right: -30px;
+  bottom: -30px;
+  text-align: center;
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--parchment-100);
+  text-shadow:
+    0 2px 0 rgba(0, 0, 0, 0.6),
+    0 0 8px rgba(0, 0, 0, 0.6);
+}
+.portrait-btn.is-pressed {
+  transform: scale(0.95);
 }
 
 /* ---------- Play ---------- */
@@ -176,83 +338,270 @@
 /* ---------- Rewards ---------- */
 
 .complete .big-title {
-  color: var(--parchment-100);
+  color: var(--gold-300);
 }
-.keepsake {
+.complete-veil {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(ellipse 70% 60% at 50% 45%, rgba(16, 18, 30, 0.45), rgba(16, 18, 30, 0.72));
+}
+.complete-keepsake,
+.complete-seal {
+  position: absolute;
+  z-index: 10;
+}
+.complete-keepsake svg,
+.complete-seal svg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+.complete-seal {
+  filter: drop-shadow(0 8px 10px rgba(0, 0, 0, 0.45));
+}
+.complete .reward-name {
+  line-height: 1.1;
+}
+.reward-caption {
+  position: absolute;
+  z-index: 12;
+  text-align: center;
+  font-size: 30px;
+  font-weight: 700;
+  color: var(--parchment-100);
+  text-shadow: 0 2px 0 rgba(0, 0, 0, 0.5);
+}
+.stamp-dust {
+  position: absolute;
+  z-index: 9;
+  border-radius: 50%;
+  background: rgba(246, 236, 212, 0.8);
+  pointer-events: none;
+}
+
+/* A card that flips: the face and the back share one spot. */
+.card-flip {
+  position: absolute;
+  z-index: 10;
+  perspective: 900px;
+}
+.card-inner {
+  position: absolute;
+  inset: 0;
+  transform-style: preserve-3d;
+}
+.card-face {
+  position: absolute;
+  inset: 0;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+.card-back {
+  transform: rotateY(180deg);
+}
+.card-back svg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+/* ---------- Treasure Room ---------- */
+
+.album {
+  background: #8a6446;
+}
+.treasure-tab {
   position: absolute;
   z-index: 5;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 18px;
-}
-.keepsake-name {
-  font-size: 40px;
+  justify-content: center;
+  gap: 4px;
+  border-radius: 22px;
+  background: rgba(246, 236, 212, 0.55);
+  box-shadow: 0 4px 0 rgba(40, 25, 10, 0.3);
+  font-size: 21px;
   font-weight: 700;
-  color: var(--parchment-100);
-  text-shadow: 0 2px 0 rgba(0, 0, 0, 0.4);
+  color: var(--ink-700);
 }
-
-/* ---------- Treasure Room (scaffold) ---------- */
-
-.album {
-  background: var(--forest-700);
-}
-.album-list {
-  position: absolute;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 16px;
-  align-content: flex-start;
-  overflow-y: auto;
-}
-.album-story {
-  padding: 18px 26px;
-  border-radius: 14px;
+.treasure-tab.on {
   background: var(--parchment-100);
-  font-size: 26px;
-  font-weight: 700;
+  color: var(--ink-900);
+  box-shadow:
+    0 0 0 4px var(--gold-500),
+    0 4px 0 rgba(40, 25, 10, 0.3);
 }
-.album-empty,
-.album-count {
+.treasure-tab.is-pressed {
+  transform: scale(0.95);
+}
+.tab-icon {
+  width: 84px;
+  height: 84px;
+  display: grid;
+  place-items: center;
+}
+.tab-icon > svg {
   width: 100%;
-  color: var(--parchment-100);
-  font-size: 26px;
+  height: 100%;
+  overflow: visible;
 }
-
-/* ---------- Grown-ups' corner (scaffold) ---------- */
-
-.parent-panel {
+.tab-icon .frog-card svg {
+  width: 100%;
+  height: 100%;
+}
+.treasure-body {
   position: absolute;
+  z-index: 4;
   overflow-y: auto;
-  padding: 24px 36px;
-  border-radius: 18px;
-  background: var(--parchment-100);
-  font-size: 22px;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
+  padding: 6px 14px 40px 10px;
 }
-.parent-row {
+.shelf-row,
+.story-group {
+  position: relative;
+  margin-bottom: 18px;
+}
+.shelf-name {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--parchment-100);
+  text-shadow: 0 2px 0 rgba(0, 0, 0, 0.45);
+  margin: 0 0 4px 8px;
+}
+.shelf-items {
+  position: relative;
+  z-index: 1;
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  padding: 10px 0;
-  border-bottom: 1px solid var(--parchment-300);
+  padding: 0 14px;
 }
-.parent-danger {
-  padding: 8px 16px;
-  border-radius: 10px;
-  background: var(--scarlet-500);
-  color: white;
-  font-size: 20px;
+.shelf-plank {
+  height: 18px;
+  margin-top: -12px;
+  border-radius: 6px;
+  background: linear-gradient(#a06d43, #7a5232);
+  box-shadow: 0 6px 0 rgba(40, 25, 10, 0.35);
 }
-.skill-table {
+.keepsake-item {
+  width: 104px;
+  height: 104px;
+}
+.keepsake-item svg,
+.seal-pic svg,
+.zoom-art svg {
   width: 100%;
-  border-collapse: collapse;
+  height: 100%;
+  overflow: visible;
 }
-.skill-table th,
-.skill-table td {
+.keepsake-item.missing svg,
+.seal-item.missing .seal-pic svg {
+  filter: brightness(0) opacity(0.3);
+}
+.keepsake-item.is-pressed,
+.card-item.is-pressed,
+.seal-item.is-pressed,
+.story-tile.is-pressed {
+  transform: scale(0.95);
+}
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 132px);
+  justify-content: space-between;
+  row-gap: 22px;
+  padding: 6px 10px;
+}
+.card-item {
+  width: 132px;
+  height: 185px;
+}
+.seal-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 170px);
+  justify-content: space-between;
+  row-gap: 30px;
+  padding: 30px 20px;
+}
+.seal-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--parchment-100);
+  text-shadow: 0 2px 0 rgba(0, 0, 0, 0.45);
+}
+.seal-pic {
+  width: 160px;
+  height: 160px;
+  filter: drop-shadow(0 6px 6px rgba(20, 12, 4, 0.4));
+}
+.story-tiles {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+}
+.story-tile {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 96px;
+  padding: 8px 54px 8px 8px;
+  border-radius: 16px;
+  background: var(--parchment-100);
+  box-shadow:
+    inset 0 -8px 0 var(--land),
+    0 4px 0 rgba(40, 25, 10, 0.3);
   text-align: left;
-  padding: 6px 8px;
-  border-bottom: 1px solid var(--parchment-300);
+}
+.story-tile.finale {
+  background: var(--gold-300);
+}
+.story-face {
+  flex: none;
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  overflow: hidden;
+  background: var(--night-600);
+}
+.story-face svg {
+  width: 100%;
+  height: 100%;
+}
+.story-title {
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1.15;
+  color: var(--ink-900);
+}
+.story-play {
+  position: absolute;
+  right: 4px;
+  top: 50%;
+  width: 50px;
+  height: 50px;
+  margin-top: -25px;
+}
+.story-play svg {
+  width: 100%;
+  height: 100%;
+}
+.treasure-empty {
+  margin: 120px 60px;
+  text-align: center;
+  font-size: 30px;
+  font-weight: 700;
+  color: var(--parchment-100);
+  text-shadow: 0 2px 0 rgba(0, 0, 0, 0.45);
+}
+.zoom-name {
+  line-height: 1.1;
 }
 
 /* The title sits over a busy tree: give it a soft dark halo. */
@@ -261,4 +610,33 @@
     0 3px 0 #7a5420,
     0 0 26px rgba(20, 30, 20, 0.85),
     0 0 8px rgba(20, 30, 20, 0.6);
+}
+
+/* ---------- Title ---------- */
+
+.title-dusk {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 60% 22% at 50% 52%, rgba(20, 24, 40, 0.45), rgba(20, 24, 40, 0) 100%),
+    linear-gradient(180deg, rgba(20, 24, 48, 0.25), rgba(20, 24, 48, 0) 30%, rgba(20, 24, 48, 0) 70%, rgba(20, 24, 48, 0.35));
+}
+.window-glow {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+  background: radial-gradient(closest-side, rgba(255, 226, 150, 0.9), rgba(255, 205, 120, 0.4) 45%, rgba(255, 200, 110, 0) 100%);
+  mix-blend-mode: screen;
+}
+.title-moon,
+.title-moon-cloud {
+  position: absolute;
+  pointer-events: none;
+}
+.title-moon svg,
+.title-moon-cloud svg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
 }

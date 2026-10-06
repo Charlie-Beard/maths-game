@@ -331,3 +331,79 @@
   color: var(--emerald-600);
   font-weight: 700;
 }
+
+/* ---------- The maths game's corner: grouping and the skills table ---------- */
+
+.parent select {
+  font: inherit;
+  font-size: 19px;
+  padding: 8px 12px;
+  border-radius: 10px;
+  border: 2px solid var(--parchment-400);
+  background: var(--parchment-100);
+}
+.parent input[type='text'] {
+  font: inherit;
+  font-size: 20px;
+  padding: 8px 12px;
+  border-radius: 10px;
+  border: 2px solid var(--parchment-400);
+  background: var(--parchment-100);
+  width: 260px;
+}
+.p-skills-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.p-segs {
+  display: flex;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 3px 0 rgba(90, 62, 30, 0.35);
+}
+.p-seg {
+  padding: 10px 20px;
+  font-size: 18px;
+  font-weight: 700;
+  background: var(--parchment-300);
+}
+.p-seg.on {
+  background: var(--emerald-500);
+  color: var(--parchment-100);
+}
+.skill-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 17px;
+}
+.skill-table th,
+.skill-table td {
+  text-align: left;
+  padding: 7px 10px;
+  border-bottom: 1px solid rgba(90, 62, 30, 0.18);
+  vertical-align: top;
+}
+.skill-table tr:first-child th {
+  position: sticky;
+  top: -4px;
+  background: var(--parchment-200);
+  font-size: 16px;
+  color: var(--ink-500);
+  z-index: 1;
+}
+.skill-table .p-group th {
+  padding-top: 16px;
+  font-size: 19px;
+  color: var(--emerald-600);
+  border-bottom: 2px solid rgba(47, 93, 71, 0.4);
+}
+.skill-table td small {
+  display: block;
+  font-size: 14px;
+  color: var(--ink-500);
+}
+.skill-table tr.unseen td {
+  color: var(--ink-500);
+  opacity: 0.7;
+}
