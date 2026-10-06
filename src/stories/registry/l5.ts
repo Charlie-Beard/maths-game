@@ -2,4 +2,6 @@
 import type { Loader } from './types';
 
 export const L5: Record<string, Loader> = {
+  l5c1: () => import('../l5c1'),
+  l5c2: () => import('../l5c2'),
 };
