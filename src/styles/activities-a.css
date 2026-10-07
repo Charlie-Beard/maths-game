@@ -1,0 +1,438 @@
+/* Styles owned by workstream W2a (docs/ROADMAP.md): count, tenFrame,
+   numberLine, partWhole, numberPad. Everything is scoped under .act-a. */
+
+:where(.act-a) button {
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  color: inherit;
+  touch-action: manipulation;
+}
+/* GSAP moves these; a CSS transition on transform fights it. */
+.act-a .seal-btn {
+  transition: filter 80ms;
+}
+.act-a .seal-btn.hint-answer,
+.act-a .seal-btn.ready {
+  filter: drop-shadow(0 0 16px var(--hint-glow)) drop-shadow(0 0 4px var(--gold-500));
+}
+.act-a .choice.going {
+  pointer-events: none;
+}
+
+/* A gold paper tag with a number: what he's counted. */
+.act-a .ct-tag {
+  position: absolute;
+  right: -10px;
+  top: -12px;
+  min-width: 46px;
+  height: 46px;
+  padding: 0 6px;
+  border-radius: 23px 21px 24px 20px;
+  background: var(--gold-300);
+  border: 3px solid var(--ink-700);
+  color: var(--ink-900);
+  font-weight: 700;
+  font-size: 28px;
+  line-height: 1;
+  display: grid;
+  place-items: center;
+  box-shadow: 1px 3px 0 rgba(40, 24, 10, 0.3);
+  pointer-events: none;
+}
+.act-a .ct-tag.small {
+  min-width: 36px;
+  height: 36px;
+  right: -8px;
+  top: -10px;
+  font-size: 22px;
+  border-width: 2px;
+}
+
+/* ---------- count ---------- */
+
+.ct-obj {
+  position: absolute;
+  border-radius: 50%;
+  isolation: isolate;
+}
+.ct-obj svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+  pointer-events: none;
+}
+/* Counted: a soft gold ring underneath, so done ones stand out. */
+.ct-obj.counted::before {
+  content: '';
+  position: absolute;
+  inset: 2px;
+  border-radius: 50%;
+  background: rgba(240, 205, 124, 0.45);
+  box-shadow: 0 0 0 4px rgba(216, 164, 63, 0.65);
+  z-index: -1;
+}
+.ct-obj.gone {
+  pointer-events: none;
+}
+.ct-obj.gone svg {
+  opacity: 0.45;
+}
+.ct-obj.gone::after {
+  content: '';
+  position: absolute;
+  left: 6px;
+  right: 6px;
+  top: 50%;
+  height: 9px;
+  background: var(--scarlet-600);
+  transform: rotate(-35deg);
+  border-radius: 4px;
+}
+.ct-obj.is-pressed {
+  transform: scale(0.95);
+}
+.ct-op {
+  position: absolute;
+  display: grid;
+  place-items: center;
+  font-size: 80px;
+  font-weight: 700;
+  color: var(--ink-700);
+  pointer-events: none;
+}
+
+/* ---------- tenFrame ---------- */
+
+.tf-frame {
+  position: absolute;
+  background: var(--ink-700);
+  border-radius: 12px 10px 14px 9px;
+  box-shadow: 3px 6px 0 rgba(40, 24, 10, 0.3);
+}
+.tf-cell {
+  position: absolute;
+  background: var(--parchment-100);
+  border-radius: 7px;
+}
+.tf-cell.ghost::after {
+  content: '';
+  position: absolute;
+  inset: 12px;
+  border-radius: 50%;
+  border: 4px dashed var(--parchment-500);
+}
+.tf-counter {
+  position: absolute;
+  z-index: 2;
+  isolation: isolate;
+}
+.tf-counter svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+  pointer-events: none;
+}
+.tf-counter.more::before {
+  content: '';
+  position: absolute;
+  inset: -3px;
+  border-radius: 50%;
+  box-shadow: 0 0 0 4px var(--sky-400);
+  z-index: -1;
+}
+.tf-counter.to-go::after {
+  content: '';
+  position: absolute;
+  inset: -6px;
+  border-radius: 50%;
+  border: 4px dashed var(--scarlet-500);
+}
+.tf-counter.taken {
+  opacity: 0.4;
+}
+.tf-counter.taken::after {
+  content: '';
+  position: absolute;
+  left: 4px;
+  right: 4px;
+  top: 50%;
+  height: 7px;
+  background: var(--scarlet-500);
+  transform: rotate(-35deg);
+  border-radius: 3px;
+}
+.tf-count {
+  position: absolute;
+  border-radius: 16px 12px 18px 14px;
+  border: 5px dashed var(--parchment-500);
+  background: rgba(255, 255, 255, 0.35);
+  display: grid;
+  place-items: center;
+}
+.tf-count-n {
+  font-size: 88px;
+  font-weight: 700;
+  color: var(--ink-900);
+  line-height: 1;
+}
+.tf-count.is-right .tf-count-n {
+  color: var(--emerald-600);
+}
+
+/* ---------- numberLine ---------- */
+
+.nl-ladder svg,
+.nl-hopper svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+.nl-arc-layer {
+  pointer-events: none;
+}
+.nl-arc-layer svg {
+  width: 100%;
+  height: 100%;
+}
+.nl-arc {
+  fill: none;
+  stroke: var(--ink-700);
+  stroke-width: 5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 2 10;
+}
+.nl-arc-dot {
+  fill: var(--gold-300);
+  stroke: var(--ink-700);
+  stroke-width: 3;
+}
+.nl-arc-n {
+  font-family: var(--font-body);
+  font-size: 22px;
+  font-weight: 700;
+  text-anchor: middle;
+  fill: var(--ink-900);
+}
+.nl-hopper {
+  position: absolute;
+  z-index: 3;
+  pointer-events: none;
+}
+.nl-num {
+  position: absolute;
+  font-size: 64px;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--ink-900);
+  border-radius: 14px;
+  display: grid;
+  place-items: center;
+}
+.nl-num.start {
+  color: var(--scarlet-500);
+}
+.nl-num.marked::after {
+  content: '';
+  position: absolute;
+  inset: 4px;
+  border-radius: 50%;
+  border: 4px dashed var(--gold-500);
+  pointer-events: none;
+}
+.nl-num.here {
+  background: rgba(240, 205, 124, 0.55);
+  box-shadow: inset 0 0 0 3px var(--gold-500);
+}
+.nl-num.is-right {
+  color: var(--emerald-600);
+}
+.nl-num.faded {
+  opacity: 0.25;
+  pointer-events: none;
+}
+.nl-num.is-pressed {
+  transform: translateY(3px) scale(0.96);
+}
+.nl-step {
+  position: absolute;
+  border-radius: 50% 50% 46% 54%;
+  border: 4px dashed var(--ink-500);
+}
+.nl-step.done {
+  background: var(--gold-300);
+  border-style: solid;
+  border-color: var(--ink-700);
+}
+
+/* ---------- partWhole ---------- */
+
+.pw-stalks {
+  pointer-events: none;
+}
+.pw-stalks svg {
+  width: 100%;
+  height: 100%;
+}
+.pw-stalks line {
+  stroke: var(--bark, #6b4a32);
+  stroke-width: 10;
+  stroke-linecap: round;
+}
+.pw-box {
+  position: absolute;
+  display: grid;
+  place-items: center;
+}
+.pw-box > svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.pw-box.round > svg {
+  clip-path: circle(48%);
+}
+.pw-box.round {
+  border-radius: 50%;
+  border: 6px solid var(--ink-700);
+  background: var(--parchment-100);
+}
+.pw-box.bar {
+  border: 5px solid var(--ink-700);
+  border-radius: 8px;
+  background: var(--parchment-100);
+}
+.pw-box.missing {
+  border-style: dashed;
+  border-color: var(--scarlet-500);
+  background: rgba(255, 255, 255, 0.35);
+}
+.pw-n {
+  position: relative;
+  font-size: 72px;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--ink-900);
+}
+.pw-box.missing .pw-n {
+  color: var(--scarlet-500);
+}
+.pw-box.missing.filled .pw-n,
+.pw-box.is-right .pw-n {
+  color: var(--emerald-600);
+}
+.pw-dots {
+  display: none;
+}
+.pw-box.with-dots {
+  place-items: end center;
+}
+.pw-box.with-dots .pw-n {
+  font-size: 44px;
+  position: absolute;
+  top: 6px;
+}
+.pw-box.round.with-dots .pw-n {
+  top: 10px;
+}
+.pw-box.with-dots .pw-dots {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 4px;
+  width: 104px;
+  margin-bottom: 18px;
+}
+.pw-box.bar.with-dots .pw-dots {
+  width: auto;
+  max-width: calc(100% - 16px);
+  margin-bottom: 12px;
+}
+.pw-dots i {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 2px solid rgba(40, 24, 10, 0.6);
+}
+.pw-dots i.hollow {
+  background: transparent;
+  border: 3px dashed var(--ink-700);
+}
+
+/* ---------- numberPad ---------- */
+
+.np-sum {
+  position: absolute;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 18px;
+  font-size: 80px;
+  font-weight: 700;
+  color: var(--ink-900);
+  letter-spacing: 0.03em;
+}
+.np-sum.big {
+  font-size: 104px;
+}
+.np-box {
+  display: inline-grid;
+  place-items: center;
+  min-width: 1.6em;
+  height: 1.3em;
+  padding: 0 0.15em;
+  border-radius: 16px 12px 18px 14px;
+  border: 5px dashed var(--parchment-500);
+  background: rgba(255, 255, 255, 0.4);
+  line-height: 1;
+}
+.np-box.typed {
+  border-style: solid;
+  border-color: var(--ink-500);
+}
+.np-box.is-right {
+  color: var(--emerald-600);
+}
+.np-key {
+  position: absolute;
+}
+.np-key svg.card-bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.np-key-text {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-size: 64px;
+  font-weight: 700;
+  color: var(--ink-900);
+}
+.np-ok .np-key-text {
+  font-size: 52px;
+}
+.np-icon {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 72px;
+  height: 54px;
+  transform: translate(-50%, -50%);
+  color: var(--ink-700);
+}
+.np-key.is-pressed {
+  transform: translateY(3px) scale(0.96);
+}
+
+/* Help 3 on the number line: the answer's tag glows clearly (not flashing). */
+.nl-num.hint-answer {
+  background: rgba(255, 231, 163, 0.85);
+  box-shadow: inset 0 0 0 4px var(--gold-500);
+}

@@ -1,0 +1,123 @@
+/*
+ * The art lab (lab.html, development only). Undoes the game's fixed,
+ * untouchable stage so the gallery can scroll like an ordinary page.
+ */
+
+html,
+body {
+  position: static;
+  overflow: auto;
+  height: auto;
+  background: #e9d9b4;
+  touch-action: auto;
+  user-select: auto;
+  -webkit-user-select: auto;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-body);
+  color: var(--ink-900);
+}
+
+.lab-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 12px 16px 0;
+  font: 700 18px var(--font-body);
+}
+.lab-nav a {
+  color: var(--ink-900);
+  background: #fffaf0;
+  border-radius: 6px;
+  padding: 4px 12px;
+  text-decoration: none;
+}
+.lab-nav a.on {
+  background: var(--ink-900);
+  color: #fffaf0;
+}
+
+.lab-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  padding: 16px;
+}
+
+.lab-card {
+  margin: 0;
+  background: #fffaf0;
+  border-radius: 8px;
+  padding: 6px;
+}
+.lab-card svg {
+  display: block;
+  overflow: hidden;
+  width: 100%;
+  height: auto;
+}
+.lab-card figcaption {
+  text-align: center;
+  font: 700 20px var(--font-body);
+  padding-top: 4px;
+}
+
+.lab-land {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 1100px;
+}
+.lab-land .far {
+  width: 600px;
+}
+.lab-card.far,
+.lab-land .far {
+  background: linear-gradient(#9fb6c9, #f2c792);
+}
+
+/* One picture filling the window at exactly stage size (for screenshots). */
+.lab-full {
+  width: 1180px;
+  height: 820px;
+  position: relative;
+  overflow: hidden;
+}
+.lab-full svg {
+  width: 1180px;
+  height: 820px;
+  display: block;
+}
+.lab-full.far-only {
+  background: linear-gradient(#9fb6c9, #f2c792);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.lab-full.far-only svg {
+  width: 1180px;
+  height: 354px;
+}
+.lab-mark {
+  position: absolute;
+  width: 96px;
+  height: 96px;
+  margin: -48px 0 0 -48px;
+  border: 4px dashed rgba(169, 65, 58, 0.9);
+  border-radius: 50%;
+  font: 700 28px var(--font-body);
+  color: #fff;
+  text-shadow: 0 2px 3px #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.lab-mark.hook {
+  width: 40px;
+  height: 40px;
+  margin: -20px 0 0 -20px;
+  border-color: rgba(216, 164, 63, 0.95);
+  font-size: 16px;
+}

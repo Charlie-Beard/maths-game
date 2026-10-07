@@ -1,0 +1,12 @@
+/** Stories for land 5 (workstreams W5-5 and W6). Add one line per story file. */
+import type { Loader } from './types';
+
+export const L5: Record<string, Loader> = {
+  l5c1: () => import('../l5c1'),
+  l5c2: () => import('../l5c2'),
+  l5c3: () => import('../l5c3'),
+  l5c4: () => import('../l5c4'),
+  l5c5: () => import('../l5c5'),
+  l5c6: () => import('../l5c6'),
+  l5c7: () => import('../l5c7'),
+};
