@@ -4,8 +4,10 @@
  * scene does everything around it: speaking the question, "hear it again",
  * Silky's help, praise, toffees, progress dots, and moving on.
  *
- * Finales use this scene too for now. W6 gives each finale its own set
- * piece around the same Round.
+ * Everything on the problem screen lives in one layer, the desk, so a
+ * finale (scenes/finale.ts) can slide it away between problems to show its
+ * set piece. The hooks `afterRight` and `beforeProblem` are where the drama
+ * goes: they run only between problems, never while he's thinking.
  */
 import { gsap } from 'gsap';
 import { makeActivity } from '../activities';
@@ -37,9 +39,11 @@ export interface PlayOptions {
 }
 
 export class PlayScene extends Scene {
-  private o: PlayOptions;
-  private round: Round;
+  protected o: PlayOptions;
+  protected round: Round;
   private rand: Rand;
+  /** The layer holding the whole problem screen (finales slide it away between problems). */
+  protected desk: HTMLElement;
   private activity: Activity | null = null;
   private dots: HTMLElement[] = [];
   private dotsBox!: HTMLElement;
@@ -54,11 +58,13 @@ export class PlayScene extends Scene {
     this.o = o;
     this.rand = o.rand ?? makeRand(randomSeed());
     this.round = new Round(o.problems, (p) => generate(p.skill, Math.max(1, p.tier - 1), this.rand));
+    this.desk = h('div', { class: 'play-desk' });
   }
 
   build(): void {
-    const r = this.root;
-    r.style.setProperty('--land', this.o.land.color);
+    this.root.style.setProperty('--land', this.o.land.color);
+    this.root.append(this.desk);
+    const r = this.desk;
     r.append(place(h('div', { class: 'play-tint' }), 0, 0, 1180, 820));
 
     this.dotsBox = place(h('div', { class: 'progress-dots' }), 200, 26, 780, 40);
@@ -83,9 +89,19 @@ export class PlayScene extends Scene {
     r.append(this.hero);
   }
 
-  enter(): void {
-    this.showProblem();
+  enter(): void | Promise<void> {
+    void this.showProblem();
   }
+
+  /**
+   * After a right answer has been praised, before the next problem (or the
+   * end, when `last`). Finales play their drama here. `i` is the index of
+   * the problem just answered.
+   */
+  protected async afterRight(_i: number, _last: boolean): Promise<void> {}
+
+  /** Just before a problem appears: finales bring the desk back here. */
+  protected async beforeProblem(): Promise<void> {}
 
   leave(): void {
     voice.stop();
@@ -107,10 +123,11 @@ export class PlayScene extends Scene {
     });
   }
 
-  private showProblem(): void {
+  private async showProblem(): Promise<void> {
     const p = this.round.current;
     this.root.dataset.answer = String(p.answer);
     this.root.dataset.skill = p.skill;
+    this.busy = true;
     this.activity?.destroy();
     this.activity = makeActivity(p, {
       answer: (v) => void this.onAnswer(v),
@@ -118,10 +135,16 @@ export class PlayScene extends Scene {
       sfx: (name) => (name === 'place' ? sfx.place(0) : sfx[name]()),
       calm: isCalm(),
     });
-    this.root.insertBefore(this.activity.el, this.silky);
+    this.desk.insertBefore(this.activity.el, this.silky);
     stackFractions(this.activity.el);
-    this.activity.show();
     this.drawDots();
+    const activity = this.activity;
+    activity.lock(true);
+    await this.beforeProblem();
+    if (!this.alive || activity !== this.activity) return;
+    this.busy = false;
+    activity.lock(false);
+    activity.show();
     this.sayQuestion();
   }
 
@@ -175,14 +198,15 @@ export class PlayScene extends Scene {
     await voice.speech(p.explain);
     if (outcome.wrong === 0 && this.rand.chance(0.35)) await voice.say(this.rand.pick(PRAISE));
     await this.sleep(300);
+    await this.afterRight(this.round.index, this.round.index + 1 >= this.round.total);
+    if (!this.alive) return;
     this.dots[this.round.index]?.classList.add('done');
 
     if (!this.round.advance()) {
       this.o.onDone(this.round);
       return;
     }
-    this.busy = false;
-    this.showProblem();
+    void this.showProblem();
   }
 
   private stepHelp(): void {
