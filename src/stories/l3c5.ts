@@ -11,7 +11,8 @@
  * The chapter's host is Joe. If he climbs with Joe, Beth comes instead
  * (the hero speaks the lines either way).
  */
-import { band, C, circle, curve, defineStory, ellipse, ink, noiseBurst, now, piece, poly, raw, rect, rng, svg, tone, type Kit, type Node, type Pt } from './kit';
+import { band, C, circle, curve, defineStory, ellipse, ink, noiseBurst, now, piece, poly, raw, rect, rng, svg, tone, type Node, type Pt } from './kit';
+import { buddy } from './bits';
 
 // ------------------------------------------------------------------ sounds
 
@@ -142,9 +143,6 @@ function partWhole(): string {
 }
 
 // ------------------------------------------------------------------ helpers
-
-/** The chapter's host, or another child if the host is the one he climbs with. */
-const buddy = (k: Kit, host: string, instead: string): string => (host === k.hero ? instead : host);
 
 /** Where the ten dishes go (top-left corners), in a row at the foot of the hill. */
 const DISH: Pt[] = Array.from({ length: 10 }, (_, i) => [256 + i * 68, 580] as Pt);

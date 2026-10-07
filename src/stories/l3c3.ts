@@ -10,8 +10,8 @@
  * The chapter's host is Fran. If he climbs with Fran, the friend on the
  * blanket is Joe instead (the hero speaks the lines either way).
  */
-import { gsap } from 'gsap';
-import { C, circle, defineStory, ellipse, group, ink, noiseBurst, NOTE, now, piece, raw, rect, svg, tone, tune, type Kit, type Node } from './kit';
+import { C, circle, defineStory, ellipse, group, ink, noiseBurst, NOTE, now, piece, rect, svg, tone, tune, type Node } from './kit';
+import { buddy, jump, sumCard } from './bits';
 
 // ------------------------------------------------------------------ sounds
 
@@ -93,34 +93,7 @@ function smell(): string {
   return svg({ w: 120, h: 200, name: 'l3c3-smell' }, [wave(30), wave(60), wave(90)]);
 }
 
-/** A torn paper card with a sum on it, in big Andika (420 × 130). */
-function sumCard(text: string, name: string): string {
-  return svg({ w: 420, h: 130, name }, [
-    piece(rect(10, 10, 400, 110, 10), C.cream, { rough: 1.2 }),
-    raw(`<text x="210" y="92" font-family="Andika, sans-serif" font-weight="700" font-size="76" fill="${C.ink}" text-anchor="middle">${text}</text>`),
-  ]);
-}
-
 // ------------------------------------------------------------------ helpers
-
-/** The chapter's host, or another child if the host is the one he climbs with. */
-const buddy = (k: Kit, host: string, instead: string): string => (host === k.hero ? instead : host);
-
-/** Where an actor really is now (its placed corner plus its tween offset). */
-function at(el: HTMLElement): [number, number] {
-  return [(parseFloat(el.style.left) || 0) + Number(gsap.getProperty(el, 'x')), (parseFloat(el.style.top) || 0) + Number(gsap.getProperty(el, 'y'))];
-}
-
-/** A hop along an arc to an absolute stage spot (the actor's top-left). */
-function jump(k: Kit, el: HTMLElement, x: number, y: number, height: number, seconds: number): Promise<void> {
-  const bx = parseFloat(el.style.left) || 0;
-  const by = parseFloat(el.style.top) || 0;
-  const peak = Math.min(at(el)[1], y) - height;
-  return k.all(
-    k.to(el, seconds, { x: x - bx, ease: 'none' }),
-    k.to(el, seconds / 2, { y: peak - by, ease: 'power2.out' }).then(() => k.to(el, seconds / 2, { y: y - by, ease: 'power2.in' })),
-  );
-}
 
 /** Spots on the plates for the biscuits (top-left corners, 70 px biscuits). */
 const LEFT = [0, 1, 2, 3].flatMap((i) => [[300 + i * 64, 528], [316 + i * 64, 566]] as [number, number][]);

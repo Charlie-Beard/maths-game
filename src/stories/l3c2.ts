@@ -10,6 +10,7 @@
  */
 import { gsap } from 'gsap';
 import { band, bell, C, defineStory, ellipse, group, noiseBurst, NOTE, now, piece, poly, raw, rect, svg, tone, tune, type Kit } from './kit';
+import { sumCard } from './bits';
 
 // ------------------------------------------------------------------ sounds
 
@@ -93,14 +94,6 @@ function gushArt(): string {
   return svg({ w: 420, h: 480, name: 'l3c2-gush' }, [
     piece(band([[380, 480], [380, 160], [300, 40], [160, 40], [60, 160], [40, 330]], 46), C.lemonade, { edge: 'cut', fibre: C.white }),
     ...[[100, 120], [180, 60], [260, 50], [340, 110], [60, 230], [380, 220]].map(([x, y]) => piece(ellipse(x, y, 16, 14), C.white, { edge: 'cut', fibre: false, opacity: 0.85 })),
-  ]);
-}
-
-/** A torn paper card with a sum on it, in big Andika (420 × 130). */
-function sumCard(text: string, name: string): string {
-  return svg({ w: 420, h: 130, name }, [
-    piece(rect(10, 10, 400, 110, 10), C.cream, { rough: 1.2 }),
-    raw(`<text x="210" y="92" font-family="Andika, sans-serif" font-weight="700" font-size="76" fill="${C.ink}" text-anchor="middle">${text}</text>`),
   ]);
 }
 

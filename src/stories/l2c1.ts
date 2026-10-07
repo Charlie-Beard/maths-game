@@ -9,8 +9,9 @@
  * one less at a time, 5, 4, 3, 2, 1, none, and each pop is a note lower.
  * The last hat comes down upside down (the keepsake). Next: Hats on Feet.
  */
-import { characters } from '../art/characters';
-import { band, C, curve, defineStory, ellipse, group, type Kit, noiseBurst, now, piece, raw, rect, svg, tone, type Pt } from './kit';
+import { topsyTall } from '../art/characters';
+import { C, defineStory, noiseBurst, now, tone, type Pt } from './kit';
+import { numberCard } from './bits';
 
 // ------------------------------------------------------------------ sounds
 
@@ -47,54 +48,10 @@ function hatPop(left: number): void {
 
 // --------------------------------------------------------------------- art
 
-/**
- * The Topsy-Turvy Man with the rest of him: his portrait (standing on his
- * hands) under a pair of legs that go up into the air, so his feet are on
- * stage to balance things on. 300 × 590; the portrait sits at y 250.
- * Parts: legL, legR (kick them; pivots at the hips), plus all of his own.
- */
-function topsyTall(): string {
-  const trousers = C.topsyGreen;
-  const boot = (x: number, dir: 1 | -1) => [
-    piece(curve([[x - 20, 84], [x - 22, 40], [x - 6 * dir, 30], [x + 30 * dir, 28], [x + 38 * dir, 46], [x + 20, 84]], 2), C.topsyPink),
-    piece(band([[x - 26, 30], [x + 40 * dir, 26]], 10), C.plum, { edge: 'cut', fibre: false }),
-  ];
-  const leg = (part: string, hip: Pt, foot: Pt, dir: 1 | -1) =>
-    group({ part, origin: hip }, [
-      piece(band([hip, [(hip[0] + foot[0]) / 2 - dir * 10, (hip[1] + foot[1]) / 2], [foot[0], foot[1] + 20]], 40), trousers),
-      ...[0.35, 0.65].map((s) => piece(band([[hip[0] + (foot[0] - hip[0]) * s - 20, hip[1] + (foot[1] - hip[1]) * s], [hip[0] + (foot[0] - hip[0]) * s + 20, hip[1] + (foot[1] - hip[1]) * s]], 7), C.topsyPink, { edge: 'cut', fibre: false, shadow: false })),
-      ...boot(foot[0], dir),
-    ]);
-  return svg({ w: 300, h: 590, name: 'l2-topsy-tall', label: 'The Topsy-Turvy Man' }, [
-    leg('legL', [112, 230], [96, 70], -1),
-    leg('legR', [188, 230], [206, 70], 1),
-    piece(curve([[66, 262], [72, 206], [150, 194], [228, 206], [234, 262]], 2), trousers),
-    raw(characters.topsy().replace('<svg ', '<svg x="0" y="250" width="300" height="340" style="width:300px;height:340px" ')),
-  ]);
-}
-
-/** A torn paper disc with a big number on it, for counting. */
-function numberCard(text: string, color: string = C.cream): string {
-  const w = Math.max(160, text.length * 60 + 60);
-  return svg({ w, h: 160, name: `l2-card-${text}-${color}`, boil: false }, [
-    piece(text.length > 2 ? rect(8, 14, w - 16, 132, 30) : ellipse(w / 2, 80, w / 2 - 8, 72), color, { rough: 1.2 }),
-    raw(`<text x="${w / 2}" y="112" font-family="Andika, sans-serif" font-weight="700" font-size="92" fill="${C.plum}" text-anchor="middle">${text}</text>`),
-  ]);
-}
-
 /** Changes what a number card says. */
 function setCard(el: HTMLElement, text: string, color?: string): void {
   const inner = el.querySelector<HTMLElement>(':scope > .story-flip');
   if (inner) inner.innerHTML = numberCard(text, color);
-}
-
-/** Sets an SVG part to turn about the pivot its art gave it (data-part groups carry it as transform-origin). */
-function pivot(k: Kit, gs: SVGGElement[]): SVGGElement[] {
-  for (const g of gs) {
-    const [x, y] = g.style.transformOrigin.split(' ').map(parseFloat);
-    if (!Number.isNaN(x)) k.set(g, { svgOrigin: `${x} ${y}` });
-  }
-  return gs;
 }
 
 // ------------------------------------------------------------------- story
@@ -126,7 +83,7 @@ export default defineStory({
 
     // ---- Off the ladder, into nonsense.
     const hero = k.character('hero', { x: 110, y: 350, w: 270, z: 12 });
-    const arms = pivot(k, [...k.part(hero, 'armL'), ...k.part(hero, 'armR')]);
+    const arms = k.pivot([...k.part(hero, 'armL'), ...k.part(hero, 'armR')]);
     k.set(hero, { opacity: 0 });
     k.fx.patter(4);
     await k.enter(hero, 'bottom', 0.8);
@@ -145,7 +102,7 @@ export default defineStory({
 
     // ---- He hand-walks in, five hats wobbling on one foot.
     const topsy = k.add(topsyTall(), { ...TOPSY, z: 10 });
-    const legs = pivot(k, [...k.part(topsy, 'legL'), ...k.part(topsy, 'legR')]);
+    const legs = k.pivot([...k.part(topsy, 'legL'), ...k.part(topsy, 'legR')]);
     const hats = STACK.map(([f, l], i) => k.prop('hat', { x: FEET[f][0] - 28 + (l % 2 ? 3 : -3), y: FEET[f][1] - 52 - l * 34, w: 56, z: 11 + i }));
     const troupe = [topsy, ...hats];
     k.set(troupe, { x: 520 });

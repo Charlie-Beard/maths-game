@@ -10,7 +10,7 @@
  * ceiling and bounces on the floor (the keepsake). Cups clink: Silky's tea
  * party. Next: the Topsy-Turvy Tea Party.
  */
-import { C, circle, defineStory, ellipse, ink, type Kit, noiseBurst, now, piece, poly, raw, rect, svg, tone } from './kit';
+import { C, circle, defineStory, ellipse, ink, noiseBurst, now, piece, poly, raw, rect, svg, tone } from './kit';
 
 // ------------------------------------------------------------------ sounds
 
@@ -101,15 +101,6 @@ function ring(): string {
   return svg({ w: 160, h: 140, name: 'l2c6-ring', boil: false }, [raw(`<rect x="8" y="8" width="144" height="124" rx="12" fill="none" stroke="${C.topsyPink}" stroke-width="10"/>`)]);
 }
 
-/** Sets SVG parts to turn about the pivot their art gave them. */
-function pivot(k: Kit, gs: SVGGElement[]): SVGGElement[] {
-  for (const g of gs) {
-    const [x, y] = g.style.transformOrigin.split(' ').map(parseFloat);
-    if (!Number.isNaN(x)) k.set(g, { svgOrigin: `${x} ${y}` });
-  }
-  return gs;
-}
-
 // ------------------------------------------------------------------- story
 
 const W = 270;
@@ -140,7 +131,7 @@ export default defineStory({
     const floorY = 600 - PH + 40;
     const hero = k.character('hero', { x: TILE_X[1] - W / 2, y: floorY, w: W, z: 12 });
     const host = k.character(hostId, { x: TILE_X[0] - W / 2 - 90, y: floorY, w: W, z: 11 });
-    const hair = pivot(k, [...k.part(hero, 'hair'), ...k.part(host, 'hair')]);
+    const hair = k.pivot([...k.part(hero, 'hair'), ...k.part(host, 'hair')]);
     k.set([hero, host], { opacity: 0 });
     const glow = k.add(ring(), { x: TILE_X[1] - 80, y: 10, w: 160, z: 3 });
     k.set(glow, { opacity: 0 });

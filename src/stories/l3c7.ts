@@ -11,7 +11,8 @@
  * Next: The Jelly Goblin.
  */
 import { gsap } from 'gsap';
-import { bell, C, circle, curve, defineStory, ellipse, ink, noiseBurst, NOTE, now, piece, poly, raw, rect, svg, tone, tune, type Kit, type Node, type Pt } from './kit';
+import { bell, C, circle, curve, defineStory, ellipse, ink, noiseBurst, NOTE, now, piece, poly, rect, svg, tone, tune, type Kit, type Node, type Pt } from './kit';
+import { sumCard } from './bits';
 
 // ------------------------------------------------------------------ sounds
 
@@ -113,14 +114,6 @@ function looming(): string {
     // glinting eyes
     piece(ellipse(300, 300, 16, 10, -10), C.gold, flat),
     piece(ellipse(400, 300, 16, 10, 10), C.gold, flat),
-  ]);
-}
-
-/** A torn paper card with a sum on it, in big Andika (420 × 130). */
-function sumCard(text: string, name: string): string {
-  return svg({ w: 420, h: 130, name }, [
-    piece(rect(10, 10, 400, 110, 10), C.cream, { rough: 1.2 }),
-    raw(`<text x="210" y="92" font-family="Andika, sans-serif" font-weight="700" font-size="76" fill="${C.ink}" text-anchor="middle">${text}</text>`),
   ]);
 }
 

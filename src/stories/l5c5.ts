@@ -9,7 +9,8 @@
  * Moon-Face calls: he's baked the biggest cake ever. Next: The Biggest
  * Cake.
  */
-import { band, bell, C, defineStory, NOTE, noiseBurst, now, piece, raw, rect, svg, tone, type Kit, type Pt } from './kit';
+import { band, bell, C, defineStory, NOTE, noiseBurst, now, piece, rect, svg, tone, type Kit, type Pt } from './kit';
+import { numberTag } from './bits';
 import { balloon, bunting, hills, sceneSvg, sky } from '../art/lands/common';
 
 // ------------------------------------------------------------------ sounds
@@ -76,14 +77,6 @@ function wig(): string {
   ]);
 }
 
-/** A torn paper tag with a number on it. */
-function tag(text: string, color: string, name: string): string {
-  return svg({ w: 120, h: 80, name: `l5c5-tag-${name}`, boil: false }, [
-    piece(rect(6, 6, 108, 68, 8), color, { rough: 0.7 }),
-    raw(`<text x="60" y="56" font-family="Andika, sans-serif" font-weight="700" font-size="46" fill="${C.ink}" text-anchor="middle">${text}</text>`),
-  ]);
-}
-
 // ------------------------------------------------------------------- story
 
 export default defineStory({
@@ -140,9 +133,9 @@ export default defineStory({
     await k.all(k.say('chairs', hero), off, k.hop(hero, 30, 1));
 
     // ---- Twelve chairs: ten in a row, and two more.
-    const twelve = k.add(tag('12', C.goldLight, 'twelve'), { x: 530, y: 360, w: 120, z: 16 });
-    const minus = k.add(tag('−3', C.sky, 'minus'), { x: 540, y: 360, w: 110, z: 16 });
-    const nine = k.add(tag('9', C.pink, 'nine'), { x: 540, y: 360, w: 110, z: 16 });
+    const twelve = k.add(numberTag('12', C.goldLight, 'l5c5-tag-twelve'), { x: 530, y: 360, w: 120, z: 16 });
+    const minus = k.add(numberTag('−3', C.sky, 'l5c5-tag-minus'), { x: 540, y: 360, w: 110, z: 16 });
+    const nine = k.add(numberTag('9', C.pink, 'l5c5-tag-nine'), { x: 540, y: 360, w: 110, z: 16 });
     [twelve, minus, nine].forEach((t) => k.set(t, { opacity: 0 }));
     const setOut = async () => {
       for (const [i, c] of chairs.entries()) {

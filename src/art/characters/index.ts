@@ -14,6 +14,7 @@ import { lands } from './lands';
 import { snap } from './snap';
 
 export { dameSnapPose, type SnapPose } from './snap';
+export { topsyTall } from './lands';
 
 export const characters: Record<string, () => string> = {
   ...folk,

@@ -12,7 +12,8 @@
  * The chapter's host is Fran; if he climbs with Fran, Beth plays her part
  * (counting along on her fingers), so nobody appears twice.
  */
-import { C, circle, curve, defineStory, dot, ellipse, group, ink, noiseBurst, NOTE, now, piece, raw, rect, svg, tone, type Kit } from './kit';
+import { C, circle, curve, defineStory, dot, ellipse, group, ink, noiseBurst, NOTE, now, piece, rect, svg, tone, type Kit } from './kit';
+import { roundTag } from './bits';
 
 // ------------------------------------------------------------------ sounds
 
@@ -123,13 +124,8 @@ function rabbit(): string {
   ]);
 }
 
-/** A number on a round paper tag (100 × 100), for counting aloud. */
-function tag(n: number, color: string = C.cream): string {
-  return svg({ w: 100, h: 100, name: `l1c1-tag${n}`, boil: false }, [
-    piece(circle(50, 50, 40), color, { rough: 0.8 }),
-    raw(`<text x="50" y="68" text-anchor="middle" font-family="Andika, sans-serif" font-size="54" font-weight="700" fill="${C.ink}">${n}</text>`),
-  ]);
-}
+/** A number on a round paper tag (100 × 100). The name keeps this story's own torn edges. */
+const tag = (n: number, color: string = C.cream): string => roundTag(n, color, `l1c1-tag${n}`);
 
 // ---------------------------------------------------------------- helpers
 

@@ -12,7 +12,8 @@
  * pixie slams his shutters. Next: Dame Washalot's Washing.
  */
 import { gsap } from 'gsap';
-import { C, circle, curve, defineStory, dot, ellipse, ink, noiseBurst, NOTE, now, piece, poly, raw, rect, rng, svg, tone, type Node } from './kit';
+import { C, circle, curve, defineStory, dot, ellipse, ink, noiseBurst, NOTE, now, piece, poly, rect, rng, svg, tone, type Node } from './kit';
+import { roundTag } from './bits';
 
 // ------------------------------------------------------------------ sounds
 
@@ -131,13 +132,8 @@ function pot(i: number): string {
   ]);
 }
 
-/** A number on a round paper tag (100 × 100). */
-function tag(n: number, color: string = C.cream): string {
-  return svg({ w: 100, h: 100, name: `l1c3-tag${n}${color}`, boil: false }, [
-    piece(circle(50, 50, 40), color, { rough: 0.8 }),
-    raw(`<text x="50" y="68" text-anchor="middle" font-family="Andika, sans-serif" font-size="54" font-weight="700" fill="${C.ink}">${n}</text>`),
-  ]);
-}
+/** A number on a round paper tag (100 × 100). The name keeps this story's own torn edges. */
+const tag = (n: number, color: string = C.cream): string => roundTag(n, color, `l1c3-tag${n}${color}`);
 
 /** A falling drop of water (40 × 60). */
 function drop(): string {

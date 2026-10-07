@@ -13,12 +13,15 @@
  * TREE_PLACES gives the map its 8 stops (one per chapter, bottom to top)
  * in stage coordinates; TREE_HOOKS gives 10 branch tips where finished
  * lands' seals can hang; TREE_SPOTS marks the slide's ends and the cloud.
+ *
+ * Moon-Face's round room, inside, is here too: every land's finale comes
+ * home to it.
  */
 import { LANDS } from '../core/curriculum';
 import { LAND_ART } from './lands';
 import { cloudBank, stars } from './lands/common';
 import { C } from './palette';
-import { band, circle, curve, ellipse, group, ink, piece, poly, rect, rng, svg, type Node, type Pt } from './paper';
+import { band, circle, curve, dot, ellipse, group, ink, piece, poly, rect, rng, svg, type Node, type Pt } from './paper';
 
 export interface TreePlace {
   id: string;
@@ -64,8 +67,9 @@ export const TREE_SPOTS = {
 
 const WATER = '#bcd9e6';
 const WATER_LIGHT = '#e6f2f4';
-const SLIDE = '#c98a3e';
-const SLIDE_RIM = '#8a5426';
+/** The slippery-slip's polished chute and its darker rim (stories inside the trunk use them too). */
+export const SLIDE = '#c98a3e';
+export const SLIDE_RIM = '#8a5426';
 
 /** Trunk half-width and centre at height y (the trunk narrows as it climbs). */
 function trunkAt(y: number): { cx: number; hw: number } {
@@ -428,4 +432,91 @@ export function tree(name: string, o: TreeOpts = {}): string {
 export function treeDusk(name: string, o: { landColor?: string; landN?: number } = {}): string {
   const match = o.landColor ? LANDS.find((l) => l.color.toLowerCase() === o.landColor!.toLowerCase()) : undefined;
   return tree(name, { landN: o.landN ?? match?.n, landColor: o.landColor });
+}
+
+// ------------------------------------------------------- Moon-Face's room
+
+/** The colours of Moon-Face's cushions. */
+export const CUSHIONS = [C.rose, C.goldLight, C.blue, C.plum, C.green, C.orange, C.pink, C.teal];
+
+/** One plump tufted cushion, centred at (x, y). */
+export function cushionNodes(x: number, y: number, w: number, h: number, color: string, rot = 0): Node[] {
+  const c = Math.cos((rot * Math.PI) / 180);
+  const s = Math.sin((rot * Math.PI) / 180);
+  const at = (dx: number, dy: number): Pt => [x + dx * c - dy * s, y + dx * s + dy * c];
+  const hw = w / 2;
+  const hh = h / 2;
+  return [
+    piece(curve([at(-hw, -hh * 0.6), at(0, -hh), at(hw, -hh * 0.6), at(hw * 1.05, 0), at(hw, hh * 0.6), at(0, hh), at(-hw, hh * 0.6), at(-hw * 1.05, 0)], 3), color),
+    dot(...at(0, 0), Math.max(3, h * 0.07), 'rgba(40,25,10,0.35)'),
+    ...[-1, 1].map((sx) => ink([at(sx * hw * 0.55, -hh * 0.35), at(sx * hw * 0.2, -hh * 0.1)], { width: 2, color: 'rgba(40,25,10,0.25)' })),
+  ];
+}
+
+/**
+ * Moon-Face's round room, inside: curved plank walls, a big round window on
+ * the night clouds, a round rug, heaps of cushions, the trapdoor where the
+ * ladder comes up (left) and the mouth of the slippery-slip (right).
+ */
+export function moonRoom(name: string): string {
+  const r = rng(81);
+  const wx = 590;
+  const wy = 236;
+  const planks: Node[] = [];
+  for (let i = -6; i <= 6; i++) {
+    const x = 590 + i * 96;
+    const bend = i * 14;
+    planks.push(ink([[x - bend * 0.2, -10], [x, 280], [x + bend, 560]], { width: 3, color: C.brownDark, opacity: 0.35, wobble: 1.2 }));
+  }
+  const stars: Node[] = [];
+  for (let i = 0; i < 18; i++) {
+    const a = r() * Math.PI * 2;
+    const d = r() * 128;
+    stars.push(dot(wx + Math.cos(a) * d, wy + Math.sin(a) * d * 0.9, 1.4 + r() * 2.2, C.cream, 0.5 + r() * 0.5));
+  }
+  const back: Node[] = [];
+  // Cushions heaped against the wall on both sides of the window.
+  [[130, 520], [250, 500], [190, 470], [960, 500], [1070, 520], [1020, 470]].forEach(([x, y], i) => back.push(...cushionNodes(x, y, 150, 70, CUSHIONS[i % CUSHIONS.length], (i % 3 - 1) * 10)));
+  return svg({ w: 1180, h: 820, name, boil: false, className: 'backdrop' }, [
+    // The round wall, warm wood, darker at the edges.
+    piece(rect(-20, -20, 1220, 860), C.wood, { edge: 'clean', shadow: false }),
+    piece(rect(-20, -20, 200, 860), C.brown, { edge: 'torn', shadow: false, opacity: 0.55 }),
+    piece(rect(1000, -20, 200, 860), C.brown, { edge: 'torn', shadow: false, opacity: 0.55 }),
+    ...planks,
+    // A shelf with jars and a little clock, all round.
+    piece(rect(150, 210, 220, 14, 3), C.barkDark, { edge: 'cut' }),
+    ...[180, 230, 290, 340].map((x, i) => piece(circle(x, 186 + (i % 2) * 4, 18 - (i % 2) * 4), [C.goldLight, C.sky, C.rose, C.cream][i], { edge: 'cut' })),
+    piece(rect(820, 210, 220, 14, 3), C.barkDark, { edge: 'cut' }),
+    piece(circle(880, 178, 26), C.cream, { edge: 'cut' }),
+    ink([[880, 178], [880, 160]], { width: 3, color: C.ink }),
+    ink([[880, 178], [892, 184]], { width: 3, color: C.ink }),
+    ...[950, 1000].map((x, i) => piece(circle(x, 188, 16), [C.leaf, C.plum][i], { edge: 'cut' })),
+    // The big round window: night sky and clouds outside.
+    piece(circle(wx, wy, 168), C.barkDark),
+    piece(circle(wx, wy, 146), C.night, { edge: 'cut', fibre: false, shadow: false }),
+    piece(circle(wx, wy + 40, 120), C.nightLight, { edge: 'cut', fibre: false, shadow: false, opacity: 0.6 }),
+    ...stars,
+    piece(circle(wx + 70, wy - 60, 26), C.goldLight, { edge: 'cut', fibre: false }),
+    piece(circle(wx + 80, wy - 66, 22), C.night, { edge: 'cut', fibre: false, shadow: false }),
+    piece(ellipse(wx - 40, wy + 90, 110, 26), C.cloud, { edge: 'torn', fibre: false, shadow: false, opacity: 0.85 }),
+    piece(ellipse(wx + 70, wy + 110, 90, 22), C.cloudShade, { edge: 'torn', fibre: false, shadow: false, opacity: 0.85 }),
+    piece(band([[wx - 146, wy], [wx + 146, wy]], 10), C.barkDark, { edge: 'cut', fibre: false }),
+    piece(band([[wx, wy - 146], [wx, wy + 146]], 10), C.barkDark, { edge: 'cut', fibre: false }),
+    // The floor: a round rug on wooden boards.
+    piece(curve([[-20, 560], [300, 530], [590, 524], [880, 530], [1200, 560], [1200, 840], [-20, 840]], 2), C.barkLight, { rough: 1.2 }),
+    ...back,
+    piece(ellipse(590, 660, 400, 84), C.rose, { rough: 1.2 }),
+    piece(ellipse(590, 660, 330, 64), C.gold, { edge: 'cut', fibre: false, shadow: false, opacity: 0.85 }),
+    piece(ellipse(590, 660, 250, 46), C.rose, { edge: 'cut', fibre: false, shadow: false }),
+    // The trapdoor, open, with the top of the ladder.
+    piece(poly([[140, 640], [330, 640], [350, 720], [120, 720]]), C.ink, { edge: 'cut' }),
+    piece(poly([[140, 640], [330, 640], [316, 560], [158, 560]]), C.wood, { edge: 'cut' }),
+    piece(band([[180, 760], [184, 616]], 12), C.tan, { edge: 'cut' }),
+    piece(band([[290, 760], [286, 616]], 12), C.tan, { edge: 'cut' }),
+    ...[700, 650].map((y) => piece(rect(180, y, 110, 9, 2), C.tan, { edge: 'cut', fibre: false })),
+    // The mouth of the slippery-slip, with its polished rim.
+    piece(ellipse(1000, 690, 130, 40), SLIDE_RIM),
+    piece(ellipse(1000, 692, 110, 30), C.ink, { edge: 'cut', fibre: false }),
+    piece(band([[900, 700], [960, 716], [1040, 718], [1100, 700]], 14), SLIDE, { edge: 'cut', fibre: false, shadow: false }),
+  ]);
 }

@@ -9,7 +9,8 @@
  * lemonade fountain. Next: The Lemonade Fountain.
  */
 import { gsap } from 'gsap';
-import { band, C, circle, defineStory, ellipse, ink, noiseBurst, NOTE, now, piece, poly, raw, rect, svg, tone, tune, type Kit, type Node, type Pt } from './kit';
+import { band, C, circle, defineStory, ellipse, ink, noiseBurst, NOTE, now, piece, poly, svg, tone, tune, type Kit, type Node, type Pt } from './kit';
+import { at, sumCard } from './bits';
 
 // ------------------------------------------------------------------ sounds
 
@@ -95,20 +96,7 @@ function sweetBag(): string {
   ]);
 }
 
-/** A torn paper card with a sum on it, in big Andika (420 × 130). */
-function sumCard(text: string, name: string): string {
-  return svg({ w: 420, h: 130, name }, [
-    piece(rect(10, 10, 400, 110, 10), C.cream, { rough: 1.2 }),
-    raw(`<text x="210" y="92" font-family="Andika, sans-serif" font-weight="700" font-size="76" fill="${C.ink}" text-anchor="middle">${text}</text>`),
-  ]);
-}
-
 // ------------------------------------------------------------------ helpers
-
-/** Where an actor really is now (its placed corner plus its tween offset). */
-function at(el: HTMLElement): [number, number] {
-  return [(parseFloat(el.style.left) || 0) + Number(gsap.getProperty(el, 'x')), (parseFloat(el.style.top) || 0) + Number(gsap.getProperty(el, 'y'))];
-}
 
 /** A hop along an arc to an absolute stage spot (the actor's top-left). */
 function arc(k: Kit, el: HTMLElement, x: number, y: number, height: number, seconds: number): Promise<void> {

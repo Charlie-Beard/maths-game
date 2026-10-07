@@ -11,6 +11,7 @@
  * Walking on Ceilings.
  */
 import { C, circle, curve, defineStory, ellipse, ink, noiseBurst, now, piece, poly, raw, rect, svg, tone, type Pt } from './kit';
+import { tick } from './bits';
 
 // ------------------------------------------------------------------ sounds
 
@@ -26,11 +27,6 @@ function click(i: number): void {
   noiseBurst(t, { freq: 2600, q: 3, peak: 0.12, decay: 0.03 });
   tone(1800 + i * 160, t + 0.03, { peak: 0.05, attack: 0.002, decay: 0.35 });
   tone((1800 + i * 160) * 2.4, t + 0.03, { peak: 0.02, attack: 0.002, decay: 0.2 });
-}
-
-/** A counting tick, rising with each window counted. */
-function tick(i: number): void {
-  tone(560 * Math.pow(2, i / 6), now(), { wave: 'triangle', peak: 0.08, attack: 0.004, decay: 0.14 });
 }
 
 /** A jiggle: a little springy wobble when a shape is named. */

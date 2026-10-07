@@ -12,7 +12,8 @@
  * The chapter's host is Beth. If he climbs with Beth, Fran comes instead
  * (the hero speaks the lines either way).
  */
-import { C, circle, curve, defineStory, dot, ellipse, ink, noiseBurst, NOTE, now, piece, poly, raw, rect, rng, svg, tone, tune, type Kit, type Node } from './kit';
+import { C, circle, curve, defineStory, dot, ellipse, ink, noiseBurst, NOTE, now, piece, poly, raw, rect, rng, svg, tone, tune, type Node } from './kit';
+import { buddy } from './bits';
 
 // ------------------------------------------------------------------ sounds
 
@@ -115,11 +116,6 @@ function sumCard(text: string, name: string): string {
     raw(`<text x="150" y="66" font-family="Andika, sans-serif" font-weight="700" font-size="56" fill="${C.ink}" text-anchor="middle">${text}</text>`),
   ]);
 }
-
-// ------------------------------------------------------------------ helpers
-
-/** The chapter's host, or another child if the host is the one he climbs with. */
-const buddy = (k: Kit, host: string, instead: string): string => (host === k.hero ? instead : host);
 
 // -------------------------------------------------------------------- story
 

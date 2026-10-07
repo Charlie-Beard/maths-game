@@ -20,9 +20,9 @@
  */
 import { gsap } from 'gsap';
 import { landSeal } from '../art/keepsakes';
-import { tree } from '../art/scenery';
+import { moonRoom, tree } from '../art/scenery';
 import { bell, C, circle, curve, defineStory, ellipse, ink, noiseBurst, now, piece, poly, rect, rng, svg, tone, type Kit, type Node, type Pt } from './kit';
-import { flump, moonRoom, sting, together, wave } from './l1c8';
+import { blackSheet, flump, sting, together, wave } from './bits';
 
 // ------------------------------------------------------------------ sounds
 
@@ -187,8 +187,6 @@ function band2(pts: [Pt, Pt], w: number): Pt[] {
   const ny = ((x1 - x0) / len) * (w / 2);
   return [[x0 + nx, y0 + ny], [x1 + nx, y1 + ny], [x1 - nx, y1 - ny], [x0 - nx, y0 - ny]];
 }
-
-const blackArt = (): string => svg({ w: 1180, h: 820, name: 'l3c8-black', boil: false }, [() => `<rect x="-40" y="-40" width="1260" height="900" fill="#08070b"/>`]);
 
 // -------------------------------------------------------------------- moves
 
@@ -442,7 +440,7 @@ export default defineStory({
     toll();
     await k.wait(900);
     sting();
-    const black = k.add(blackArt(), { x: 0, y: 0, w: 1180, h: 820, z: 90, still: true });
+    const black = k.add(blackSheet(), { x: 0, y: 0, w: 1180, h: 820, z: 90, still: true });
     k.set(black, { opacity: 0 });
     await k.to(black, 1.8, { opacity: 1, ease: 'none' });
     await k.wait(1200);

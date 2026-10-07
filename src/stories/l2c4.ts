@@ -9,7 +9,8 @@
  * buns (circles) on a rectangle tray, with the tray's outline traced. The
  * keepsake is a bun. Next: the Wobbly Windows.
  */
-import { C, circle, curve, defineStory, ellipse, group, ink, type Kit, noiseBurst, now, piece, poly, raw, rect, svg, tone } from './kit';
+import { C, circle, curve, defineStory, ellipse, group, ink, noiseBurst, now, piece, poly, raw, rect, svg, tone } from './kit';
+import { tick } from './bits';
 
 // ------------------------------------------------------------------ sounds
 
@@ -48,11 +49,6 @@ function door(open: boolean): void {
     tone(120, t, { peak: 0.18, decay: 0.18, glideTo: 70 });
     noiseBurst(t, { freq: 600, type: 'lowpass', peak: 0.1, decay: 0.1 });
   }
-}
-
-/** A counting tick, rising with each bun counted. */
-function tick(i: number): void {
-  tone(560 * Math.pow(2, i / 6), now(), { wave: 'triangle', peak: 0.08, attack: 0.004, decay: 0.14 });
 }
 
 // --------------------------------------------------------------------- art
@@ -146,15 +142,6 @@ function card(text: string, color: string, size = 84, w = 420, h = 150): string 
   ]);
 }
 
-/** Sets SVG parts to turn about the pivot their art gave them. */
-function pivot(k: Kit, gs: SVGGElement[]): SVGGElement[] {
-  for (const g of gs) {
-    const [x, y] = g.style.transformOrigin.split(' ').map(parseFloat);
-    if (!Number.isNaN(x)) k.set(g, { svgOrigin: `${x} ${y}` });
-  }
-  return gs;
-}
-
 // ------------------------------------------------------------------- story
 
 const TRAY = { x: 350, y: 440, w: 480 };
@@ -186,7 +173,7 @@ export default defineStory({
     const buns = BUNS.map((b, i) => k.prop('googleBun', { x: b.x, y: b.y, w: BUN, z: 7 + Math.floor(i / 4) }));
     const hero = k.character('hero', { x: 40, y: 380, w: 250, z: 12 });
     const sp = k.character('saucepan', { x: 880, y: 330, w: 280, z: 12 });
-    const pots = pivot(k, k.part(sp, 'pots'));
+    const pots = k.pivot(k.part(sp, 'pots'));
     k.set([hero, sp], { opacity: 0 });
 
     // ---- The oven runs backwards.

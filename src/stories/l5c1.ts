@@ -8,7 +8,8 @@
  * of the sky for him. But whose birthday is it? Silky is lighting the
  * candles: maybe they will tell. Next: Candles in Tens.
  */
-import { C, defineStory, noiseBurst, now, piece, raw, rect, svg, tone, type Kit } from './kit';
+import { C, defineStory, noiseBurst, now, piece, rect, svg, tone, type Kit } from './kit';
+import { numberTag } from './bits';
 
 // ------------------------------------------------------------------ sounds
 
@@ -34,14 +35,6 @@ function floatUp(n: number): void {
 }
 
 // --------------------------------------------------------------------- art
-
-/** A torn paper tag with a number on it (the ten, the more, the total). */
-function tag(text: string, color: string, name: string): string {
-  return svg({ w: 120, h: 80, name: `l5c1-tag-${name}`, boil: false }, [
-    piece(rect(6, 6, 108, 68, 8), color, { rough: 0.7 }),
-    raw(`<text x="60" y="56" font-family="Andika, sans-serif" font-weight="700" font-size="46" fill="${C.ink}" text-anchor="middle">${text}</text>`),
-  ]);
-}
 
 /** A party blower: the mouthpiece and the paper tube, which unrolls (scaleX). */
 function partyBlower(): string {
@@ -114,9 +107,9 @@ export default defineStory({
     const row = Array.from({ length: 10 }, (_, i) => k.prop('balloon', { x: 120 + i * 66, y: 8, w: 70, z: 15 }));
     const more = [0, 1, 2].map((i) => k.prop('balloon', { x: 850 + i * 66, y: 8, w: 70, z: 15 }));
     [...row, ...more].forEach((b) => k.set(b, { y: 700, opacity: 0 }));
-    const ten = k.add(tag('10', C.goldLight, 'ten'), { x: 402, y: 92, w: 100, z: 16 });
-    const three = k.add(tag('3', C.sky, 'three'), { x: 901, y: 92, w: 100, z: 16 });
-    const sum = k.add(tag('13', C.pink, 'thirteen'), { x: 628, y: 88, w: 124, z: 16 });
+    const ten = k.add(numberTag('10', C.goldLight, 'l5c1-tag-ten'), { x: 402, y: 92, w: 100, z: 16 });
+    const three = k.add(numberTag('3', C.sky, 'l5c1-tag-three'), { x: 901, y: 92, w: 100, z: 16 });
+    const sum = k.add(numberTag('13', C.pink, 'l5c1-tag-thirteen'), { x: 628, y: 88, w: 124, z: 16 });
     [ten, three, sum].forEach((t) => k.set(t, { opacity: 0 }));
     const rise = async () => {
       for (const [i, b] of row.entries()) {

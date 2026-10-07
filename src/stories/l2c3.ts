@@ -9,7 +9,8 @@
  * are counted with a tick each. The keepsake is a teacup. Moon-Face sniffs:
  * buns baking. Next: the Back-to-Front Bakery.
  */
-import { band, C, circle, defineStory, ellipse, group, ink, type Kit, noiseBurst, now, piece, poly, raw, rect, svg, tone } from './kit';
+import { band, C, circle, defineStory, ellipse, group, ink, noiseBurst, now, piece, poly, raw, rect, svg, tone } from './kit';
+import { tick } from './bits';
 
 // ------------------------------------------------------------------ sounds
 
@@ -40,11 +41,6 @@ function plonk(): void {
   tone(330, t, { wave: 'triangle', peak: 0.18, attack: 0.003, decay: 0.28, glideTo: 300 });
   tone(660, t, { peak: 0.06, attack: 0.003, decay: 0.15 });
   tone(2500, t + 0.02, { peak: 0.04, attack: 0.002, decay: 0.2 });
-}
-
-/** A counting tick, rising with each cup counted. */
-function tick(i: number): void {
-  tone(560 * Math.pow(2, i / 6), now(), { wave: 'triangle', peak: 0.08, attack: 0.004, decay: 0.14 });
 }
 
 /** Two big sniffs. */
@@ -114,15 +110,6 @@ function sumCard(text: string): string {
   ]);
 }
 
-/** Sets SVG parts to turn about the pivot their art gave them. */
-function pivot(k: Kit, gs: SVGGElement[]): SVGGElement[] {
-  for (const g of gs) {
-    const [x, y] = g.style.transformOrigin.split(' ').map(parseFloat);
-    if (!Number.isNaN(x)) k.set(g, { svgOrigin: `${x} ${y}` });
-  }
-  return gs;
-}
-
 // ------------------------------------------------------------------- story
 
 const CUP = 80;
@@ -153,7 +140,7 @@ export default defineStory({
     const cushions = [430, 600].map((x) => k.prop('cushion', { x, y: 560, w: 110, z: 6 }));
     const hero = k.character('hero', { x: 70, y: 390, w: 250, z: 12 });
     const mf = k.character('moonface', { ...MF, z: 12 });
-    const mfArms = pivot(k, [...k.part(mf, 'armL'), ...k.part(mf, 'armR')]);
+    const mfArms = k.pivot([...k.part(mf, 'armL'), ...k.part(mf, 'armR')]);
     k.set([hero, mf], { opacity: 0 });
 
     // ---- The kitchen, and seven cups on the ceiling.

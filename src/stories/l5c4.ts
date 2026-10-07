@@ -11,7 +11,8 @@
  * Next: Musical Chairs.
  */
 import { balloon, bunting, hills, sceneSvg, sky } from '../art/lands/common';
-import { C, circle, defineStory, noiseBurst, now, piece, raw, rect, svg, tone, type Kit } from './kit';
+import { C, circle, defineStory, noiseBurst, now, piece, rect, svg, tone, type Kit } from './kit';
+import { numberTag } from './bits';
 
 // ------------------------------------------------------------------ sounds
 
@@ -66,14 +67,6 @@ function tray(): string {
   return svg({ w: 580, h: 150, name: 'l5c4-tray' }, [piece(rect(6, 6, 568, 138, 14), C.wood, { rough: 0.7 }), piece(rect(16, 16, 548, 118, 10), C.tan, { edge: 'cut', fibre: false, shadow: false }), ...dents]);
 }
 
-/** A torn paper tag with a number on it. */
-function tag(text: string, color: string, name: string): string {
-  return svg({ w: 120, h: 80, name: `l5c4-tag-${name}`, boil: false }, [
-    piece(rect(6, 6, 108, 68, 8), color, { rough: 0.7 }),
-    raw(`<text x="60" y="56" font-family="Andika, sans-serif" font-weight="700" font-size="46" fill="${C.ink}" text-anchor="middle">${text}</text>`),
-  ]);
-}
-
 // ------------------------------------------------------------------- story
 
 export default defineStory({
@@ -115,9 +108,9 @@ export default defineStory({
       plink(i);
     };
 
-    const eight = k.add(tag('8', C.goldLight, 'eight'), { x: TX + 160, y: TY - 82, w: 96, z: 16 });
-    const seven = k.add(tag('7', C.sky, 'seven'), { x: TX + 420, y: TY - 82, w: 96, z: 16 });
-    const fifteen = k.add(tag('15', C.pink, 'fifteen'), { x: TX + 230, y: TY - 90, w: 120, z: 17 });
+    const eight = k.add(numberTag('8', C.goldLight, 'l5c4-tag-eight'), { x: TX + 160, y: TY - 82, w: 96, z: 16 });
+    const seven = k.add(numberTag('7', C.sky, 'l5c4-tag-seven'), { x: TX + 420, y: TY - 82, w: 96, z: 16 });
+    const fifteen = k.add(numberTag('15', C.pink, 'l5c4-tag-fifteen'), { x: TX + 230, y: TY - 90, w: 120, z: 17 });
     [eight, seven, fifteen].forEach((t) => k.set(t, { opacity: 0 }));
 
     // ---- Eight from the host.

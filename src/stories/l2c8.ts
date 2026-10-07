@@ -20,8 +20,9 @@
  */
 import { landSeal } from '../art/keepsakes';
 import { house } from '../art/lands/common';
+import { moonRoom } from '../art/scenery';
 import { band, bell, C, circle, curve, defineStory, dot, ellipse, ink, noiseBurst, NOTE, now, piece, poly, rect, rng, svg, tone, type Node, type Pt } from './kit';
-import { flump, moonRoom, wave } from './l1c8';
+import { flump, wave } from './bits';
 
 // ------------------------------------------------------------------ sounds
 

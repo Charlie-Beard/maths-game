@@ -11,8 +11,9 @@
  * then cuts back to the heroes: the land is starting to spin! Next: the
  * finale, the Land Starts to Spin.
  */
-import { characters } from '../art/characters';
-import { band, C, circle, curve, defineStory, group, ink, type Kit, noiseBurst, now, piece, raw, rect, svg, tone, type Pt } from './kit';
+import { topsyTall } from '../art/characters';
+import { band, C, circle, defineStory, ink, type Kit, noiseBurst, now, piece, raw, rect, svg, tone, type Pt } from './kit';
+import { tick } from './bits';
 
 // ------------------------------------------------------------------ sounds
 
@@ -35,11 +36,6 @@ function clink(): void {
   const t = now();
   tone(2600, t, { peak: 0.07, attack: 0.002, decay: 0.3 });
   tone(3900, t, { peak: 0.03, attack: 0.002, decay: 0.18 });
-}
-
-/** A counting tick, rising with each cup counted. */
-function tick(i: number): void {
-  tone(560 * Math.pow(2, i / 6), now(), { wave: 'triangle', peak: 0.08, attack: 0.004, decay: 0.14 });
 }
 
 /** The first rumble of the land beginning to turn: deep, slow, growing, and a whirr on top. */
@@ -81,48 +77,12 @@ function spiral(): string {
   return svg({ w: 160, h: 160, name: 'l2c7-spiral', boil: false }, [piece(circle(80, 80, 72), C.topsyGreen, { rough: 0.8 }), ink(pts, { width: 7, color: C.topsyPink })]);
 }
 
-/**
- * The Topsy-Turvy Man with his legs up in the air (300 × 590; his portrait
- * sits at y 250). Parts: legL, legR, pivoting at the hips, and his own.
- */
-function topsyTall(): string {
-  const trousers = C.topsyGreen;
-  const boot = (x: number, dir: 1 | -1) => [
-    piece(curve([[x - 20, 84], [x - 22, 40], [x - 6 * dir, 30], [x + 30 * dir, 28], [x + 38 * dir, 46], [x + 20, 84]], 2), C.topsyPink),
-    piece(band([[x - 26, 30], [x + 40 * dir, 26]], 10), C.plum, { edge: 'cut', fibre: false }),
-  ];
-  const leg = (part: string, hip: Pt, foot: Pt, dir: 1 | -1) =>
-    group({ part, origin: hip }, [
-      piece(band([hip, [(hip[0] + foot[0]) / 2 - dir * 10, (hip[1] + foot[1]) / 2], [foot[0], foot[1] + 20]], 40), trousers),
-      ...[0.35, 0.65].map((s) => {
-        const p: Pt = [hip[0] + (foot[0] - hip[0]) * s, hip[1] + (foot[1] - hip[1]) * s];
-        return piece(band([[p[0] - 20, p[1]], [p[0] + 20, p[1]]], 7), C.topsyPink, { edge: 'cut', fibre: false, shadow: false });
-      }),
-      ...boot(foot[0], dir),
-    ]);
-  return svg({ w: 300, h: 590, name: 'l2-topsy-tall', label: 'The Topsy-Turvy Man' }, [
-    leg('legL', [112, 230], [96, 70], -1),
-    leg('legR', [188, 230], [206, 70], 1),
-    piece(curve([[66, 262], [72, 206], [150, 194], [228, 206], [234, 262]], 2), trousers),
-    raw(characters.topsy().replace('<svg ', '<svg x="0" y="250" width="300" height="340" style="width:300px;height:340px" ')),
-  ]);
-}
-
 /** A wide torn card with a number sentence. */
 function sumCard(text: string): string {
   return svg({ w: 400, h: 140, name: `l2c7-sum-${text}`, boil: false }, [
     piece(rect(8, 12, 384, 116, 28), C.lemonade, { rough: 1.2 }),
     raw(`<text x="200" y="98" font-family="Andika, sans-serif" font-weight="700" font-size="80" fill="${C.plum}" text-anchor="middle">${text}</text>`),
   ]);
-}
-
-/** Sets SVG parts to turn about the pivot their art gave them. */
-function pivot(k: Kit, gs: SVGGElement[]): SVGGElement[] {
-  for (const g of gs) {
-    const [x, y] = g.style.transformOrigin.split(' ').map(parseFloat);
-    if (!Number.isNaN(x)) k.set(g, { svgOrigin: `${x} ${y}` });
-  }
-  return gs;
 }
 
 // ------------------------------------------------------------------- story
@@ -156,9 +116,9 @@ export default defineStory({
 
     const sun = k.add(spiral(), { x: 940, y: 120, w: 160, z: 2 });
     const silky = k.character('silky', { x: 320, y: 214, w: 240, z: 5 });
-    const wings = pivot(k, [...k.part(silky, 'wingL'), ...k.part(silky, 'wingR')]);
+    const wings = k.pivot([...k.part(silky, 'wingL'), ...k.part(silky, 'wingR')]);
     const topsy = k.add(topsyTall(), { ...TOPSY, z: 5 });
-    const legs = pivot(k, [...k.part(topsy, 'legL'), ...k.part(topsy, 'legR')]);
+    const legs = k.pivot([...k.part(topsy, 'legL'), ...k.part(topsy, 'legR')]);
     k.add(table(), { x: 290, y: 440, w: 700, z: 6 });
     const pot = k.keepsake(k.chapter!.keepsake, { ...POT, z: 8 });
     const cups = CUPS_X.map((x, i) => k.prop('teacup', { x, y: CUP_Y, w: CUP, z: 9 + i }));

@@ -7,7 +7,7 @@
  * above each function.
  */
 import { C } from '../palette';
-import { band, circle, curve, dot, ellipse, group, ink, piece, poly, rect, type Node, type Pt } from '../paper';
+import { band, circle, curve, dot, ellipse, group, ink, piece, poly, raw, rect, svg, type Node, type Pt } from '../paper';
 import { arm, brows, cheeks, CUT, cx, cy, eyes, FLAT, floor, fluff, framed, mouthShape, nose, person, portrait, star, talkShape, torso } from './parts';
 
 /**
@@ -65,6 +65,36 @@ export function topsy(): string {
         piece(circle(204, 326, 8), C.yellow, CUT),
       ]),
     ])]),
+  ]);
+}
+
+/**
+ * The Topsy-Turvy Man with the rest of him, for stories: his portrait
+ * (standing on his hands) under a pair of legs that go up into the air,
+ * so his feet are on stage to balance things on. 300 × 590; the portrait
+ * sits at y 250. Not a portrait itself, so it isn't in `lands` below.
+ * Parts: legL, legR (kick them; pivots at the hips), plus all of his own.
+ */
+export function topsyTall(): string {
+  const trousers = C.topsyGreen;
+  const boot = (x: number, dir: 1 | -1) => [
+    piece(curve([[x - 20, 84], [x - 22, 40], [x - 6 * dir, 30], [x + 30 * dir, 28], [x + 38 * dir, 46], [x + 20, 84]], 2), C.topsyPink),
+    piece(band([[x - 26, 30], [x + 40 * dir, 26]], 10), C.plum, { edge: 'cut', fibre: false }),
+  ];
+  const leg = (part: string, hip: Pt, foot: Pt, dir: 1 | -1) =>
+    group({ part, origin: hip }, [
+      piece(band([hip, [(hip[0] + foot[0]) / 2 - dir * 10, (hip[1] + foot[1]) / 2], [foot[0], foot[1] + 20]], 40), trousers),
+      ...[0.35, 0.65].map((s) => {
+        const p: Pt = [hip[0] + (foot[0] - hip[0]) * s, hip[1] + (foot[1] - hip[1]) * s];
+        return piece(band([[p[0] - 20, p[1]], [p[0] + 20, p[1]]], 7), C.topsyPink, { edge: 'cut', fibre: false, shadow: false });
+      }),
+      ...boot(foot[0], dir),
+    ]);
+  return svg({ w: 300, h: 590, name: 'l2-topsy-tall', label: 'The Topsy-Turvy Man' }, [
+    leg('legL', [112, 230], [96, 70], -1),
+    leg('legR', [188, 230], [206, 70], 1),
+    piece(curve([[66, 262], [72, 206], [150, 194], [228, 206], [234, 262]], 2), trousers),
+    raw(topsy().replace('<svg ', '<svg x="0" y="250" width="300" height="340" style="width:300px;height:340px" ')),
   ]);
 }
 

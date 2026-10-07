@@ -10,7 +10,8 @@
  * his nightcap (the keepsake) and drops straight back to sleep. Then CLANK!
  * CLATTER! A saucepan tumbles past from above. Next: The Saucepan Man.
  */
-import { band, C, circle, curve, defineStory, dot, ellipse, ink, noiseBurst, NOTE, now, piece, raw, rect, rng, svg, tone, type Kit, type Node, type Pt } from './kit';
+import { band, C, circle, curve, defineStory, dot, ellipse, ink, noiseBurst, NOTE, now, piece, rect, rng, svg, tone, type Kit, type Node, type Pt } from './kit';
+import { roundTag } from './bits';
 
 // ------------------------------------------------------------------ sounds
 
@@ -96,13 +97,8 @@ function rope(): string {
   return svg({ w: 20, h: 500, name: 'l1c5-rope', boil: false }, [ink([[10, 0], [10, 500]], { width: 4, color: C.cream })]);
 }
 
-/** A number on a round paper tag (100 × 100). */
-function tag(n: number, color: string = C.cream): string {
-  return svg({ w: 100, h: 100, name: `l1c5-tag${n}${color}`, boil: false }, [
-    piece(circle(50, 50, 40), color, { rough: 0.8 }),
-    raw(`<text x="50" y="68" text-anchor="middle" font-family="Andika, sans-serif" font-size="54" font-weight="700" fill="${C.ink}">${n}</text>`),
-  ]);
-}
+/** A number on a round paper tag (100 × 100). The name keeps this story's own torn edges. */
+const tag = (n: number, color: string = C.cream): string => roundTag(n, color, `l1c5-tag${n}${color}`);
 
 /** A "Z" (60 × 60) that floats up from a snore. */
 function zed(): string {

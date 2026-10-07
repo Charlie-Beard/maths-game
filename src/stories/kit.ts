@@ -321,6 +321,19 @@ export class Kit<K extends string = string> {
     return [...el.querySelectorAll<SVGGElement>(`[data-part="${name}"]`)];
   }
 
+  /**
+   * Makes parts turn about their own joints (a leg at the hip, an arm at
+   * the shoulder). The art gives each part its pivot as a transform-origin;
+   * GSAP needs it as an svgOrigin to rotate about it. Returns the parts.
+   */
+  pivot(gs: SVGGElement[]): SVGGElement[] {
+    for (const g of gs) {
+      const [x, y] = g.style.transformOrigin.split(' ').map(parseFloat);
+      if (!Number.isNaN(x)) this.set(g, { svgOrigin: `${x} ${y}` });
+    }
+    return gs;
+  }
+
   /** A quick blink (portraits with `lids`). */
   async blink(el: HTMLElement): Promise<void> {
     const lids = this.part(el, 'lids');

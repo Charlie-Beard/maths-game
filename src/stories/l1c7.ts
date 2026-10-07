@@ -11,7 +11,8 @@
  * top: ready for the finale climb (Up to Moon-Face's Room).
  */
 import { tree } from '../art/scenery';
-import { C, circle, curve, defineStory, dot, ellipse, ink, noiseBurst, NOTE, now, piece, raw, rect, rng, svg, tone, type Kit, type Node } from './kit';
+import { C, circle, curve, defineStory, dot, ellipse, ink, noiseBurst, NOTE, now, piece, rect, rng, svg, tone, type Kit, type Node } from './kit';
+import { roundTag, sumStrip } from './bits';
 
 // ------------------------------------------------------------------ sounds
 
@@ -97,21 +98,8 @@ function plate(): string {
   ]);
 }
 
-/** A number on a round paper tag (100 × 100). */
-function tag(n: number, color: string = C.cream): string {
-  return svg({ w: 100, h: 100, name: `l1c7-tag${n}${color}`, boil: false }, [
-    piece(circle(50, 50, 40), color, { rough: 0.8 }),
-    raw(`<text x="50" y="68" text-anchor="middle" font-family="Andika, sans-serif" font-size="54" font-weight="700" fill="${C.ink}">${n}</text>`),
-  ]);
-}
-
-/** The sum on a torn paper strip (320 × 110). */
-function sumCard(text: string): string {
-  return svg({ w: 320, h: 110, name: 'l1c7-sum', boil: false }, [
-    piece(rect(8, 8, 304, 94, 10), C.cream, { rough: 1.2 }),
-    raw(`<text x="160" y="76" text-anchor="middle" font-family="Andika, sans-serif" font-size="64" font-weight="700" fill="${C.ink}">${text}</text>`),
-  ]);
-}
+/** A number on a round paper tag (100 × 100). The name keeps this story's own torn edges. */
+const tag = (n: number, color: string = C.cream): string => roundTag(n, color, `l1c7-tag${n}${color}`);
 
 // ---------------------------------------------------------------- helpers
 
@@ -193,7 +181,7 @@ export default defineStory({
     await k.all(k.say('oven', silky), bake());
 
     // ---- Six and two make eight.
-    const card = k.add(sumCard('6 + 2 = 8'), { x: 470, y: 170, w: 300, z: 26 });
+    const card = k.add(sumStrip('6 + 2 = 8', 'l1c7-sum'), { x: 470, y: 170, w: 300, z: 26 });
     k.set(card, { opacity: 0 });
     const sum = async () => {
       await k.wait(900);

@@ -8,8 +8,9 @@
  * and every hat comes tumbling down, all but one boot with a hat on it (the
  * keepsake). Clink, clink: teacups up on the ceiling. Next: Take Away Teacups.
  */
-import { characters } from '../art/characters';
-import { band, C, curve, defineStory, ellipse, group, type Kit, noiseBurst, now, piece, raw, rect, svg, tone, type Pt } from './kit';
+import { topsyTall } from '../art/characters';
+import { C, defineStory, noiseBurst, now, piece, raw, rect, svg, tone, type Pt } from './kit';
+import { numberCard, tick } from './bits';
 
 // ------------------------------------------------------------------ sounds
 
@@ -28,12 +29,6 @@ function flumps(n: number, gap = 0.14): void {
   }
 }
 
-/** A counting tick, one note up for each hat counted. */
-function tick(i: number): void {
-  const f = 520 * Math.pow(2, i / 6);
-  tone(f, now(), { wave: 'triangle', peak: 0.08, attack: 0.004, decay: 0.14 });
-}
-
 /** China clinking far above. */
 function clink(times = 3): void {
   const t = now();
@@ -46,56 +41,12 @@ function clink(times = 3): void {
 
 // --------------------------------------------------------------------- art
 
-/**
- * The Topsy-Turvy Man with his legs in the air (300 × 590; his portrait
- * sits at y 250). Parts: legL, legR, pivoting at the hips, and his own.
- */
-function topsyTall(): string {
-  const trousers = C.topsyGreen;
-  const boot = (x: number, dir: 1 | -1) => [
-    piece(curve([[x - 20, 84], [x - 22, 40], [x - 6 * dir, 30], [x + 30 * dir, 28], [x + 38 * dir, 46], [x + 20, 84]], 2), C.topsyPink),
-    piece(band([[x - 26, 30], [x + 40 * dir, 26]], 10), C.plum, { edge: 'cut', fibre: false }),
-  ];
-  const leg = (part: string, hip: Pt, foot: Pt, dir: 1 | -1) =>
-    group({ part, origin: hip }, [
-      piece(band([hip, [(hip[0] + foot[0]) / 2 - dir * 10, (hip[1] + foot[1]) / 2], [foot[0], foot[1] + 20]], 40), trousers),
-      ...[0.35, 0.65].map((s) => {
-        const p: Pt = [hip[0] + (foot[0] - hip[0]) * s, hip[1] + (foot[1] - hip[1]) * s];
-        return piece(band([[p[0] - 20, p[1]], [p[0] + 20, p[1]]], 7), C.topsyPink, { edge: 'cut', fibre: false, shadow: false });
-      }),
-      ...boot(foot[0], dir),
-    ]);
-  return svg({ w: 300, h: 590, name: 'l2-topsy-tall', label: 'The Topsy-Turvy Man' }, [
-    leg('legL', [112, 230], [96, 70], -1),
-    leg('legR', [188, 230], [206, 70], 1),
-    piece(curve([[66, 262], [72, 206], [150, 194], [228, 206], [234, 262]], 2), trousers),
-    raw(characters.topsy().replace('<svg ', '<svg x="0" y="250" width="300" height="340" style="width:300px;height:340px" ')),
-  ]);
-}
-
-/** A torn paper disc with a big number on it. */
-function numberCard(text: string, color: string = C.cream): string {
-  return svg({ w: 160, h: 160, name: `l2-card-${text}-${color}`, boil: false }, [
-    piece(ellipse(80, 80, 72, 72), color, { rough: 1.2 }),
-    raw(`<text x="80" y="112" font-family="Andika, sans-serif" font-weight="700" font-size="92" fill="${C.plum}" text-anchor="middle">${text}</text>`),
-  ]);
-}
-
 /** A little word tag ("more", "fewer") on a torn strip. */
 function wordTag(text: string, color: string): string {
   return svg({ w: 200, h: 80, name: `l2c2-tag-${text}`, boil: false }, [
     piece(rect(8, 10, 184, 60, 14), color, { rough: 1 }),
     raw(`<text x="100" y="54" font-family="Andika, sans-serif" font-weight="700" font-size="40" fill="${C.plum}" text-anchor="middle">${text}</text>`),
   ]);
-}
-
-/** Sets SVG parts to turn about the pivot their art gave them. */
-function pivot(k: Kit, gs: SVGGElement[]): SVGGElement[] {
-  for (const g of gs) {
-    const [x, y] = g.style.transformOrigin.split(' ').map(parseFloat);
-    if (!Number.isNaN(x)) k.set(g, { svgOrigin: `${x} ${y}` });
-  }
-  return gs;
 }
 
 // ------------------------------------------------------------------- story
@@ -127,7 +78,7 @@ export default defineStory({
 
     const hero = k.character('hero', { x: 90, y: 360, w: 260, z: 12 });
     const topsy = k.add(topsyTall(), { ...TOPSY, z: 10 });
-    const legs = pivot(k, [...k.part(topsy, 'legL'), ...k.part(topsy, 'legR')]);
+    const legs = k.pivot([...k.part(topsy, 'legL'), ...k.part(topsy, 'legR')]);
     const stack = (foot: number, n: number) =>
       Array.from({ length: n }, (_, i) =>
         k.prop('hat', { x: FEET[foot][0] - HAT / 2 + (i % 2 ? 4 : -4), y: FEET[foot][1] - HAT + 4 - i * STEP, w: HAT, z: 11 + i }),
@@ -160,14 +111,14 @@ export default defineStory({
     k.set([cardL, cardR], { opacity: 0 });
     const counting = async () => {
       for (const [i, h] of left.entries()) {
-        tick(i);
+        tick(i, 520);
         void k.pop(h, 1.25);
         await k.wait(330);
       }
       await k.appear(cardL, 0.3);
       await k.wait(250);
       for (const [i, h] of right.entries()) {
-        tick(i);
+        tick(i, 520);
         void k.pop(h, 1.25);
         await k.wait(330);
       }

@@ -11,7 +11,8 @@
  * The land is moving on! Next: The Birthday Wish (the land's finale).
  */
 import { balloon, bunting, sceneSvg, sky } from '../art/lands/common';
-import { bell, C, circle, curve, defineStory, ellipse, group, ink, NOTE, noiseBurst, now, piece, raw, rect, svg, tone, type Kit } from './kit';
+import { bell, C, circle, curve, defineStory, ellipse, group, ink, NOTE, noiseBurst, now, piece, rect, svg, tone, type Kit } from './kit';
+import { numberTag } from './bits';
 
 // ------------------------------------------------------------------ sounds
 
@@ -101,14 +102,6 @@ function wisp(n: number): string {
   return svg({ w: 40, h: 80, name: `l5c7-wisp-${n}`, boil: false }, [ink([[20, 78], [12, 60], [26, 42], [14, 22], [22, 4]], { width: 3, color: C.stoneLight, opacity: 0.8 })]);
 }
 
-/** A torn paper tag with a number on it. */
-function tag(text: string, color: string, name: string): string {
-  return svg({ w: 120, h: 80, name: `l5c7-tag-${name}`, boil: false }, [
-    piece(rect(6, 6, 108, 68, 8), color, { rough: 0.7 }),
-    raw(`<text x="60" y="56" font-family="Andika, sans-serif" font-weight="700" font-size="46" fill="${C.ink}" text-anchor="middle">${text}</text>`),
-  ]);
-}
-
 // ------------------------------------------------------------------- story
 
 export default defineStory({
@@ -143,9 +136,9 @@ export default defineStory({
     const hero = k.character('hero', { x: 905, y: 352, z: 20, flip: true });
     await k.all(k.enter(hostEl, 'left'), k.enter(hero, 'right'));
 
-    const sixteen = k.add(tag('16', C.goldLight, 'sixteen'), { x: 530, y: 560, w: 120, z: 17 });
-    const minus = k.add(tag('−10', C.sky, 'minus'), { x: 530, y: 560, w: 120, z: 17 });
-    const six = k.add(tag('6', C.pink, 'six'), { x: 540, y: 560, w: 100, z: 17 });
+    const sixteen = k.add(numberTag('16', C.goldLight, 'l5c7-tag-sixteen'), { x: 530, y: 560, w: 120, z: 17 });
+    const minus = k.add(numberTag('−10', C.sky, 'l5c7-tag-minus'), { x: 530, y: 560, w: 120, z: 17 });
+    const six = k.add(numberTag('6', C.pink, 'l5c7-tag-six'), { x: 540, y: 560, w: 100, z: 17 });
     [minus, six].forEach((t) => k.set(t, { opacity: 0 }));
     void k.pop(sixteen, 1.15);
     await k.say(`breath_${host}`, hostEl);

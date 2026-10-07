@@ -14,6 +14,7 @@
  */
 import { balloon, bunting, hills, sceneSvg, sky } from '../art/lands/common';
 import { C, circle, curve, defineStory, ink, NOTE, noiseBurst, now, piece, raw, rect, svg, tone, type Kit } from './kit';
+import { numberTag } from './bits';
 
 // ------------------------------------------------------------------ sounds
 
@@ -98,14 +99,6 @@ function birthdayList(): string {
   ]);
 }
 
-/** A torn paper tag with a number on it. */
-function tag(text: string, color: string, name: string): string {
-  return svg({ w: 120, h: 80, name: `l5c6-tag-${name}`, boil: false }, [
-    piece(rect(6, 6, 108, 68, 8), color, { rough: 0.7 }),
-    raw(`<text x="60" y="56" font-family="Andika, sans-serif" font-weight="700" font-size="46" fill="${C.ink}" text-anchor="middle">${text}</text>`),
-  ]);
-}
-
 // ------------------------------------------------------------------- story
 
 export default defineStory({
@@ -161,9 +154,9 @@ export default defineStory({
         slices.push(s);
       }
     });
-    const twelve = k.add(tag('12', C.goldLight, 'twelve'), { x: 420, y: 205, w: 100, z: 16 });
-    const eight = k.add(tag('8', C.sky, 'eight'), { x: 680, y: 205, w: 100, z: 16 });
-    const twenty = k.add(tag('20', C.pink, 'twenty'), { x: 530, y: 197, w: 120, z: 17 });
+    const twelve = k.add(numberTag('12', C.goldLight, 'l5c6-tag-twelve'), { x: 420, y: 205, w: 100, z: 16 });
+    const eight = k.add(numberTag('8', C.sky, 'l5c6-tag-eight'), { x: 680, y: 205, w: 100, z: 16 });
+    const twenty = k.add(numberTag('20', C.pink, 'l5c6-tag-twenty'), { x: 530, y: 197, w: 120, z: 17 });
     [eight, twenty].forEach((t) => k.set(t, { opacity: 0 }));
     await k.say('slices', mf);
 

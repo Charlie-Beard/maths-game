@@ -10,7 +10,8 @@
  * edge. She gives him a peg to keep (the keepsake). From the branch above
  * comes an enormous SNORE. Next: Mr Watzisname Snores.
  */
-import { C, circle, curve, defineStory, dot, ellipse, ink, noiseBurst, NOTE, now, piece, raw, rect, rng, svg, tone, type Kit, type Node, type Pt } from './kit';
+import { C, circle, curve, defineStory, dot, ellipse, ink, noiseBurst, NOTE, now, piece, rect, rng, svg, tone, type Kit, type Node, type Pt } from './kit';
+import { roundTag, sumStrip } from './bits';
 
 // ------------------------------------------------------------------ sounds
 
@@ -124,21 +125,8 @@ function pegArt(): string {
   return svg({ w: 30, h: 40, name: 'l1c4-peg', boil: false }, [piece(rect(8, 2, 14, 36, 4), C.wood, { edge: 'cut' }), ink([[15, 6], [15, 34]], { width: 2, color: C.brownDark })]);
 }
 
-/** A number on a round paper tag (100 × 100). */
-function tag(n: number, color: string = C.cream): string {
-  return svg({ w: 100, h: 100, name: `l1c4-tag${n}${color}`, boil: false }, [
-    piece(circle(50, 50, 40), color, { rough: 0.8 }),
-    raw(`<text x="50" y="68" text-anchor="middle" font-family="Andika, sans-serif" font-size="54" font-weight="700" fill="${C.ink}">${n}</text>`),
-  ]);
-}
-
-/** The sum on a torn paper strip (320 × 110). */
-function sumCard(text: string): string {
-  return svg({ w: 320, h: 110, name: 'l1c4-sum', boil: false }, [
-    piece(rect(8, 8, 304, 94, 10), C.cream, { rough: 1.2 }),
-    raw(`<text x="160" y="76" text-anchor="middle" font-family="Andika, sans-serif" font-size="64" font-weight="700" fill="${C.ink}">${text}</text>`),
-  ]);
-}
+/** A number on a round paper tag (100 × 100). The name keeps this story's own torn edges. */
+const tag = (n: number, color: string = C.cream): string => roundTag(n, color, `l1c4-tag${n}${color}`);
 
 /** A soap bubble (60 × 60). */
 function bubble(): string {
@@ -261,7 +249,7 @@ export default defineStory({
         void k.pop(items[i], 1.08);
         await k.wait(330);
       }
-      const card = k.add(sumCard('2 + 3 = 5'), { x: 470, y: 440, w: 300, z: 26 });
+      const card = k.add(sumStrip('2 + 3 = 5', 'l1c4-sum'), { x: 470, y: 440, w: 300, z: 26 });
       k.sfx.sparkle();
       await k.appear(card, 0.35);
       tags.push(card);

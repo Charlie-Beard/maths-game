@@ -10,7 +10,8 @@
  * clue inside. Next: Pass the Parcel.
  */
 import { balloon, bunting, sceneSvg, sky } from '../art/lands/common';
-import { bell, C, circle, curve, defineStory, ellipse, group, ink, NOTE, noiseBurst, now, piece, raw, rect, svg, tone, type Kit } from './kit';
+import { bell, C, circle, curve, defineStory, ellipse, group, ink, NOTE, noiseBurst, now, piece, rect, svg, tone, type Kit } from './kit';
+import { numberTag } from './bits';
 
 // ------------------------------------------------------------------ sounds
 
@@ -101,14 +102,6 @@ function candle(color: string, stripe: string, n: number): string {
   ]);
 }
 
-/** A torn paper tag with a number on it. */
-function tag(text: string, color: string, name: string): string {
-  return svg({ w: 120, h: 80, name: `l5c2-tag-${name}`, boil: false }, [
-    piece(rect(6, 6, 108, 68, 8), color, { rough: 0.7 }),
-    raw(`<text x="60" y="56" font-family="Andika, sans-serif" font-weight="700" font-size="46" fill="${C.ink}" text-anchor="middle">${text}</text>`),
-  ]);
-}
-
 // ------------------------------------------------------------------- story
 
 export default defineStory({
@@ -157,9 +150,9 @@ export default defineStory({
       k.set(flame(el), { opacity: 1, scale: 0.2, transformOrigin: '50% 100%' });
       await k.to(flame(el), 0.2, { scale: 1, ease: 'back.out(3)' });
     };
-    const tenTag = k.add(tag('10', C.goldLight, 'ten'), { x: 540, y: 560, w: 100, z: 16 });
-    const fourTag = k.add(tag('4', C.sky, 'four'), { x: 765, y: 240, w: 90, z: 16 });
-    const sumTag = k.add(tag('14', C.pink, 'fourteen'), { x: 530, y: 552, w: 120, z: 17 });
+    const tenTag = k.add(numberTag('10', C.goldLight, 'l5c2-tag-ten'), { x: 540, y: 560, w: 100, z: 16 });
+    const fourTag = k.add(numberTag('4', C.sky, 'l5c2-tag-four'), { x: 765, y: 240, w: 90, z: 16 });
+    const sumTag = k.add(numberTag('14', C.pink, 'l5c2-tag-fourteen'), { x: 530, y: 552, w: 120, z: 17 });
     [tenTag, fourTag, sumTag].forEach((t) => k.set(t, { opacity: 0 }));
     const tenRow = async () => {
       flap();

@@ -8,8 +8,8 @@
  * places. He takes a bite and the sherbet froths out everywhere. Then
  * something big wobbles in the distance: the Jelly Hill. Next: The Jelly Hill.
  */
-import { gsap } from 'gsap';
-import { C, cloud, defineStory, ellipse, noiseBurst, NOTE, now, piece, raw, rect, svg, tone, tune, type Kit } from './kit';
+import { C, cloud, defineStory, ellipse, noiseBurst, NOTE, now, piece, rect, svg, tone, tune, type Kit } from './kit';
+import { jump, sumCard } from './bits';
 
 // ------------------------------------------------------------------ sounds
 
@@ -62,35 +62,9 @@ function tray(): string {
   ]);
 }
 
-/** A torn paper card with a sum on it, in big Andika (420 × 130). */
-function sumCard(text: string, name: string): string {
-  return svg({ w: 420, h: 130, name }, [
-    piece(rect(10, 10, 400, 110, 10), C.cream, { rough: 1.2 }),
-    raw(`<text x="210" y="92" font-family="Andika, sans-serif" font-weight="700" font-size="76" fill="${C.ink}" text-anchor="middle">${text}</text>`),
-  ]);
-}
-
 /** A puff of sherbet froth (pink-white). */
 function froth(k: Kit, x: number, y: number): void {
   k.puff(x, y, 120 + Math.random() * 60, Math.random() > 0.5 ? C.white : C.sherbet);
-}
-
-// ------------------------------------------------------------------ helpers
-
-/** Where an actor really is now (its placed corner plus its tween offset). */
-function at(el: HTMLElement): [number, number] {
-  return [(parseFloat(el.style.left) || 0) + Number(gsap.getProperty(el, 'x')), (parseFloat(el.style.top) || 0) + Number(gsap.getProperty(el, 'y'))];
-}
-
-/** A hop along an arc to an absolute stage spot (the actor's top-left). */
-function jump(k: Kit, el: HTMLElement, x: number, y: number, height: number, seconds: number): Promise<void> {
-  const bx = parseFloat(el.style.left) || 0;
-  const by = parseFloat(el.style.top) || 0;
-  const peak = Math.min(at(el)[1], y) - height;
-  return k.all(
-    k.to(el, seconds, { x: x - bx, ease: 'none' }),
-    k.to(el, seconds / 2, { y: peak - by, ease: 'power2.out' }).then(() => k.to(el, seconds / 2, { y: y - by, ease: 'power2.in' })),
-  );
 }
 
 // -------------------------------------------------------------------- story
