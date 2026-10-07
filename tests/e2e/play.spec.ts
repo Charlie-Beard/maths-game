@@ -19,6 +19,11 @@ test('a first chapter plays end to end: choose, map, intro, 8 problems, story, r
   await settled(joe);
   await joe.click({ force: true });
 
+  // The opening film plays the first time: skip it.
+  const skipOpening = page.getByRole('button', { name: 'Skip the story' });
+  await expect(skipOpening).toBeVisible({ timeout: 20_000 });
+  await skipOpening.click({ force: true });
+
   // The map: the first stop glows.
   const first = page.locator('.map-stop.is-next');
   await expect(first).toHaveAttribute('data-chapter', 'l1c1');
@@ -35,6 +40,8 @@ test('a first chapter plays end to end: choose, map, intro, 8 problems, story, r
   await expect(scene).toBeVisible();
   for (let i = 0; i < 8; i++) {
     await expect(page.locator('.pdot.done')).toHaveCount(i, { timeout: 20_000 });
+    // The problem may still be building: wait until it says what the answer is.
+    await expect(scene).toHaveAttribute('data-answer', /.+/);
     const answer = await scene.getAttribute('data-answer');
     const card = page.locator(`.choice[data-value="${answer}"]`);
     await settled(card);
