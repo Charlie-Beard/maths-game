@@ -14,7 +14,7 @@
       "binding": "DB",
       "database_name": "faraway",
       // PLACEHOLDER: replace with the id printed by `npx wrangler d1 create faraway` (see README).
-      "database_id": "PASTE-THE-FARAWAY-DATABASE-ID-HERE",
+      "database_id": "cac54f0e-5038-4dfd-a575-923dc843be8f",
       "migrations_dir": "migrations"
     }
   ],
