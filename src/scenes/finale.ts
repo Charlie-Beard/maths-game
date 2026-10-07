@@ -350,8 +350,12 @@ export class FinaleScene extends PlayScene {
     this.set.append(this.land);
     // Whoever is after them.
     if (cfg.chaser && cfg.hazard === 'stomp') {
-      const g = puppet(cfg.chaser, 'finale-chaser finale-giant', 800, -70, 260);
-      this.set.insertBefore(g, this.land);
+      // Peering over the far side of the land, behind it (so the land's
+      // cloud hides where his portrait ends) and drifting away with it.
+      const g = puppet(cfg.chaser, 'finale-chaser finale-giant', 350, -68, 200);
+      g.style.zIndex = '-1';
+      gsap.set(this.land, { x: 0 }); // its own stacking context, so he stays inside it
+      this.land.prepend(g);
       this.chaser = [g];
     } else if (cfg.chaser && cfg.hazard === 'march') {
       this.chaser = [0, 1, 2].map((k) => puppet(cfg.chaser!, 'finale-chaser', 330 + k * 90, 70, 64));
@@ -453,7 +457,7 @@ export class FinaleScene extends PlayScene {
         if (!c) return;
         fx.stomp(2, 0.4);
         if (calm) return;
-        await sm(c, 0.3, { y: 30, ease: 'power2.in' });
+        await sm(c, 0.3, { y: 20, ease: 'power2.in' });
         this.shake(8);
         await sm(c, 0.4, { y: 0, ease: 'power1.out' });
         return;
