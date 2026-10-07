@@ -71,7 +71,7 @@ export class IntroScene extends Scene {
 
   private async speak(): Promise<void> {
     void pop(this.host, 1.03);
-    await voice.say(this.chapter.intro);
+    await voice.say(this.chapter.intro, this.chapter.host);
   }
 
   private start(): void {

@@ -321,7 +321,7 @@ export class ParentScene extends Scene {
     });
 
     this.body.append(
-      row('Player’s name', name, 'Shown and said in the game. The recorded voice says “Jasper”; other names are shown and spoken by the iPad’s own voice.'),
+      row('Player’s name', name, 'Shown in the game. The recorded voices say “Jasper”; with any other name they say the line without it (“You won the seal!”).'),
       row('Volume', vol),
       row('Calm mode', calm, 'Less movement: no paper jitter, no flickering windows, shorter animations, no cloud parting when a land arrives.'),
       row('Say the question again', idle, 'If nothing is tapped for a while.'),

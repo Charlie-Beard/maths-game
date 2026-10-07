@@ -2,6 +2,7 @@ import { createHash } from 'node:crypto';
 import { readdirSync, readFileSync, realpathSync, statSync } from 'node:fs';
 import { join, relative } from 'node:path';
 import { defineConfig, searchForWorkspaceRoot, type Plugin } from 'vite';
+import { voiceReview } from './scripts/voice/review-server.ts';
 
 /**
  * Writes sw.js after the build with every output file pre-cached, so the
@@ -78,8 +79,9 @@ export default defineConfig({
   build: {
     target: 'safari16',
     assetsInlineLimit: 0,
-    // Only the game is built. lab.html (the art gallery) is served by the
-    // dev server alone (npm run dev, then /lab.html?set=lands) and never ships.
+    // Only the game is built. lab.html (the art gallery) and review.html (the
+    // voice review) are served by the dev server alone (npm run dev, then
+    // /lab.html?set=lands or /review.html) and never ship.
     rollupOptions: { input: { main: 'index.html' } },
   },
   server: {
@@ -88,5 +90,5 @@ export default defineConfig({
     // dev server serve files (fonts) from wherever it really lives.
     fs: { allow: [searchForWorkspaceRoot(process.cwd()), realpathSync('node_modules')] },
   },
-  plugins: [serviceWorker()],
+  plugins: [serviceWorker(), voiceReview()],
 });

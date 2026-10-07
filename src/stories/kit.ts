@@ -260,10 +260,18 @@ export class Kit<K extends string = string> {
     const stopBob = speaker ? this.talk(speaker) : () => {};
     this.bed?.duck(true);
     // A stuck clip must never stall the show.
-    await Promise.race([voice.say(line.text), wait(1500 + text.length * 110)]);
+    await Promise.race([voice.say(line.text, this.voiceOf(line.who)), wait(1500 + text.length * 110)]);
     this.bed?.duck(false);
     stopBob();
     await this.wait(250);
+  }
+
+  /**
+   * Whose voice says a line: 'hero' lines are recorded once for each child,
+   * so they're said in the voice of the one he chose.
+   */
+  voiceOf(who: string): string {
+    return who === 'hero' ? this.hero : who;
   }
 
   /**
