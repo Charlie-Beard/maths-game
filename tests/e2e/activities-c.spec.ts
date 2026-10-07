@@ -121,6 +121,12 @@ test('every Visual kind draws through choose', async ({ page }) => {
       .poll(async () => (await page.locator('.map-stop').count()) > 0 || (await page.locator('.pdot.done').count()) === i, { timeout: 20_000 })
       .toBe(true);
     if (await page.locator('.map-stop').count()) break;
+    // Every dot done: the round is over and the map is on its way (on a busy
+    // machine it can take a while), so don't tap the last problem again.
+    if (i === (await page.locator('.pdot').count())) {
+      await expect(page.locator('.map-stop').first()).toBeVisible({ timeout: 20_000 });
+      break;
+    }
     await expect(page.locator('.activity-choose')).toBeVisible();
     const kind = await page.locator('.activity-choose .visual').getAttribute('data-kind');
     if (kind) kinds.add(kind);
