@@ -113,6 +113,39 @@ export interface Problem {
   placeholder?: boolean;
 }
 
+/** A piece of a question's speech: fixed words, or a slot's value. */
+export type SpeechPart = { piece: string } | { value: number | string; end: boolean };
+
+/**
+ * Splits "Moon-Face has {a} biscuits." into pieces and slots, the way the
+ * voice plays it back (and scripts/voice/export.ts records it). A slot's
+ * `end` is true when it ends the sentence, so it gets a falling tone.
+ *
+ * "£{n}" is written before the number but said after it, so it becomes
+ * "{n} pound(s)". Bits with no words ("?", ", ") are left out: there's
+ * nothing to say, and the gap between clips is the pause.
+ */
+export function speechParts(s: Speech): SpeechPart[] {
+  const text = s.text.replace(/£\{(\w+)\}/g, (m, k: string) => (s.vals?.[k] === undefined ? m : `{${k}} ${s.vals[k] === 1 ? 'pound' : 'pounds'}`));
+  const out: SpeechPart[] = [];
+  const said = (piece: string) => {
+    if (/[\p{L}\p{N}]/u.test(piece)) out.push({ piece });
+  };
+  const re = /\{(\w+)\}/g;
+  let last = 0;
+  let m: RegExpExecArray | null;
+  while ((m = re.exec(text))) {
+    said(text.slice(last, m.index).trim());
+    const v = s.vals?.[m[1]];
+    const rest = text.slice(m.index + m[0].length).trim();
+    if (v !== undefined) out.push({ value: v, end: !rest || /^[.!?…]/.test(rest) });
+    else out.push({ piece: m[0] });
+    last = m.index + m[0].length;
+  }
+  said(text.slice(last).trim());
+  return out;
+}
+
 /** Fills a speech's slots: "{a} and {b}" → "4 and 3". */
 export function speechText(s: Speech): string {
   return s.text.replace(/\{(\w+)\}/g, (m, k: string) => (s.vals && k in s.vals ? String(s.vals[k]) : m));

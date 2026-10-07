@@ -266,6 +266,33 @@ soft and bright, the Saucepan Man loud and deaf, Dame Snap icy and
 sharp). Generate, run `check.py`, review on `/review.html`, and re-record
 what's wrong. Fill `public/audio/manifest.json`.
 
+**Done so far:** every line knows its speaker (`voice.say(text, who)`, ids
+from `voiceId`), 'hero' lines are recorded for each of Beth, Joe and Fran,
+and intros are said by their host. The scripts are ported: `export.ts` →
+`lines.json` (about 760 lines, 1,400 pieces, 202 number clips, about
+90,000 characters), `generate.py`, `check.py`, `pick-voice.py`, and
+`/review.html`. `elevenlabs.json` holds stand-in voices.
+
+**Still to do**, once the stories are final (a changed line gets a new id
+and drops back to the iPad's voice):
+
+```bash
+python scripts/voice/pick-voice.py moonface --list                 # 1. the parent listens and picks
+python scripts/voice/pick-voice.py moonface --pick 2
+python scripts/voice/generate.py --speaker moonface --limit 5 --force   #    hear a few of his lines
+npx tsx scripts/voice/export.ts                                    # 2. hear the risky lines first
+python scripts/voice/generate.py --risky                           #    (~5,000 chars: "Zzz", "Hmph", CAPITALS)
+#    respell what's wrong with say_as in elevenlabs.json, then --risky --force
+python scripts/voice/generate.py --dry-run --quiet                 # 3. record everything
+python scripts/voice/generate.py                                   #    (checks the quota first; rerun to resume)
+python scripts/voice/check.py                                      # 4. check, review, redo
+npm run dev   # then /review.html
+python scripts/voice/generate.py --redo
+```
+
+All of it is precached by the service worker (an estimated 30 MB at
+64 kbps mono), so check the first load on the iPad.
+
 ### W9: polish
 
 App icons (from the game's own art), offline check, the 1180 × 760 Safari

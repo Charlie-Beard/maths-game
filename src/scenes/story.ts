@@ -98,7 +98,7 @@ export class StoryScene extends Scene {
       lines: story.lines,
       alive: () => this.alive && !this.finished,
     }));
-    void voice.preload({ lines: Object.values(story.lines).map((l) => l.text) });
+    void voice.preload({ lines: Object.values(story.lines).map((l) => ({ text: l.text, who: kit.voiceOf(l.who) })) });
 
     // Curtain up.
     sfx.fanfare();

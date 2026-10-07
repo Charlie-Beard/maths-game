@@ -1,7 +1,8 @@
 /**
  * The narrator and every character's voice.
  *
- *   lines     → audio/lines/<id>.mp3   (whole lines: phrases, story lines)
+ *   lines     → audio/lines/<id>.mp3   (whole lines: phrases, story lines;
+ *                                     the id includes the speaker, `voiceId`)
  *   pieces    → audio/pieces/<id>.mp3  (the fixed parts of question templates)
  *   numbers   → audio/numbers/<n>-mid.mp3 and <n>-end.mp3 (0–100, two intonations)
  *
@@ -10,8 +11,8 @@
  * ElevenLabs), everything falls back to the iPad's own British voice.
  * Only one voice clip plays at a time.
  */
-import { generic, lineId, personalise } from '../core/phrases';
-import { speechText, type Speech } from '../core/problem';
+import { generic, lineId, personalise, voiceId } from '../core/phrases';
+import { speechParts, speechText, type Speech } from '../core/problem';
 import { audio, buses } from './engine';
 
 interface Manifest {
@@ -126,6 +127,15 @@ function speak(text: string, rate = 0.85): Promise<void> {
   });
 }
 
+/**
+ * In development, once there are recordings, says in the console when
+ * something falls back to the iPad's voice: a line scripts/voice/export.ts
+ * missed, or one changed since it was recorded.
+ */
+function unrecorded(what: string): void {
+  if (import.meta.env.DEV && manifest.lines.length) console.warn(`[voice] not recorded, the iPad says it: ${what}`);
+}
+
 /** The `speech` sequence playing now (a new one, or stop(), ends it). */
 let speaking: object | null = null;
 
@@ -145,43 +155,31 @@ export function stop(): void {
 const lineUrl = (id: string) => `${base()}lines/${id}.mp3`;
 const pieceUrl = (id: string) => `${base()}pieces/${id}.mp3`;
 const numberUrl = (n: number, end: boolean) => `${base()}numbers/${n}-${end ? 'end' : 'mid'}.mp3`;
-
-/** Splits "Moon-Face has {a} biscuits." into pieces and slots. */
-export function speechParts(s: Speech): Array<{ piece: string } | { value: number | string; end: boolean }> {
-  const out: Array<{ piece: string } | { value: number | string; end: boolean }> = [];
-  const re = /\{(\w+)\}/g;
-  let last = 0;
-  let m: RegExpExecArray | null;
-  while ((m = re.exec(s.text))) {
-    const before = s.text.slice(last, m.index).trim();
-    if (before) out.push({ piece: before });
-    const v = s.vals?.[m[1]];
-    const rest = s.text.slice(m.index + m[0].length).trim();
-    if (v !== undefined) out.push({ value: v, end: !rest || /^[.!?]/.test(rest) });
-    else out.push({ piece: m[0] });
-    last = m.index + m[0].length;
-  }
-  const tail = s.text.slice(last).trim();
-  if (tail) out.push({ piece: tail });
-  return out;
-}
+/**
+ * A question piece's id: its words as written. (Not `personalise`d: with no
+ * name that would capitalise "is" into "Is", a different clip. A bare
+ * {name} slot is its own piece, the child's name.)
+ */
+const pieceId = (piece: string) => lineId(piece === '{name}' ? playerName : piece);
 
 export const voice = {
   /**
-   * Says a line. "{name}" is filled in with the child's name: the recording
+   * Says a line in a speaker's voice (a character id, default the
+   * narrator). "{name}" is filled in with the child's name: the recording
    * with his name is used if there is one, else the version without a name.
    */
-  async say(template: string): Promise<void> {
+  async say(template: string, who = 'narrator'): Promise<void> {
     stop();
     await loadManifest();
     const personal = personalise(template, playerName);
     for (const text of [personal, generic(template)]) {
-      const id = lineId(text);
+      const id = voiceId(text, who);
       if (manifest.lines.includes(id)) {
         const buf = await fetchBuffer(lineUrl(id));
         if (buf) return playBuffer(buf);
       }
     }
+    unrecorded(`${who}: “${generic(template)}”`);
     return speak(personal, 0.9);
   },
 
@@ -193,27 +191,31 @@ export const voice = {
     await loadManifest();
     const parts = speechParts(s);
     const recorded = parts.every((p) =>
-      'piece' in p ? manifest.pieces.includes(lineId(personalise(p.piece, playerName))) : typeof p.value === 'number' && manifest.numbers.includes(p.value),
+      'piece' in p ? manifest.pieces.includes(pieceId(p.piece)) : typeof p.value === 'number' && manifest.numbers.includes(p.value),
     );
     stop();
-    if (!recorded) return speak(personalise(speechText(s), playerName), 0.85);
+    if (!recorded) {
+      unrecorded(`question: “${s.text}” with ${JSON.stringify(s.vals ?? {})}`);
+      return speak(personalise(speechText(s), playerName), 0.85);
+    }
     const token = {};
     speaking = token;
     for (const p of parts) {
       if (speaking !== token) return;
-      const url = 'piece' in p ? pieceUrl(lineId(personalise(p.piece, playerName))) : numberUrl(p.value as number, p.end);
+      const url = 'piece' in p ? pieceUrl(pieceId(p.piece)) : numberUrl(p.value as number, p.end);
       const buf = await fetchBuffer(url);
       if (speaking !== token) return;
       if (buf) await playBuffer(buf);
     }
   },
 
-  /** Warms the cache so the first tap answers instantly. */
-  async preload(o: { lines?: string[] }): Promise<void> {
+  /** Warms the cache so the first tap answers instantly. Lines are the narrator's unless they say who. */
+  async preload(o: { lines?: Array<string | { text: string; who?: string }> }): Promise<void> {
     await loadManifest();
     const jobs: Promise<unknown>[] = [];
-    for (const t of o.lines ?? []) {
-      const id = [personalise(t, playerName), generic(t)].map(lineId).find((x) => manifest.lines.includes(x));
+    for (const l of o.lines ?? []) {
+      const { text: t, who } = typeof l === 'string' ? { text: l, who: undefined } : l;
+      const id = [personalise(t, playerName), generic(t)].map((x) => voiceId(x, who)).find((x) => manifest.lines.includes(x));
       if (id) jobs.push(fetchBuffer(lineUrl(id)));
     }
     await Promise.all(jobs);
