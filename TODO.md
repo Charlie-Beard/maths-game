@@ -18,9 +18,18 @@ into `main` yet.
 - The maths for land 11 (`tally`, `change`) and land 12 (`count-3s`, `time-5`).
 
 ## Still to merge
-1. **The land 13 maths (`turns`, `shapes-3d`) and the land 14 maths (`compare-measures`, `read-scales`).** These were still running in local worktrees under `.claude/worktrees/agent-*`, on branches named `worktree-agent-*`. Find them with `git branch --list "worktree-agent-*"`, and merge any that aren't merged yet. If they never finished, redo them from the M-13 and M-14 briefs in ROADMAP.md.
+1. **The land 13 maths (`turns`, `shapes-3d`) and the land 14 maths (`compare-measures`, `read-scales`).** Partial implementations are saved on `worktree-agent-afcf4f338c6789aa1` and `worktree-agent-aa41dfc1117779410`. Review and finish them, then merge.
 2. **The stories.** The S-11 to S-14 agents push to the remote branches `s11-stories`, `s12-stories`, `s13-stories` and `s14-stories`. Merge each one into `claude/new-lands`. If a branch is missing, that land's stories still need writing (brief in ROADMAP.md).
    - Story 13 also fixes the helter-skelter being clipped at the top of land 13's far view.
+   - Two unregistered story-helper drafts are saved on `worktree-agent-a3f846ff5d68b6f7e` (land 12) and `worktree-agent-aa6070d909c0d43d3` (land 14); the chapter stories still need writing.
+
+## Checkpoint (2026-10-08)
+
+- Land 13 maths/activity WIP: commit `b33a48c` on `worktree-agent-afcf4f338c6789aa1`.
+- Land 14 maths/activity WIP: commit `5813666` on `worktree-agent-aa41dfc1117779410`.
+- Story helper drafts: `7ac3f35` (land 12) and `6c6d944` (land 14).
+- Typecheck and full unit tests passed on the maths branches. The Playwright runs were stopped before completion; rerun them after picking up the branches.
+- Temporary `zz-shots.spec.ts` and `zz-dbg.spec.ts` files were intentionally not committed.
 
 ## Then
 - Run `npm run typecheck`, `npm test` and `npx playwright test --workers=8 --fully-parallel`.
