@@ -4,4 +4,5 @@ import type { Loader } from './types';
 export const L10: Record<string, Loader> = {
   l10c1: () => import('../l10c1'),
   l10c2: () => import('../l10c2'),
+  l10c3: () => import('../l10c3'),
 };
