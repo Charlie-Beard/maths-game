@@ -80,14 +80,17 @@ async function playThrough(page: Page, count: number, from = 0): Promise<void> {
   const skip = page.getByRole('button', { name: 'Skip the story' });
   const next = page.getByRole('button', { name: 'Next' });
   const map = page.locator('.map-stop').first();
+  // Skipping goes straight on to whatever follows, so skip each story in
+  // turn, waiting for the skipped one's button to go before looking again.
   for (let story = 0; story < 2; story++) {
     await expect(skip.or(next).first()).toBeVisible({ timeout: 40_000 });
-    if (await skip.isVisible()) await skip.click({ force: true });
-    await settled(next);
-    await next.click({ force: true });
-    await expect(map.or(skip)).toBeVisible({ timeout: 20_000 });
-    if (await map.isVisible()) break;
+    const button = await skip.elementHandle({ timeout: 1000 }).catch(() => null);
+    if (!button || !(await button.isVisible())) break;
+    await button.click({ force: true });
+    await button.waitForElementState('hidden', { timeout: 20_000 });
   }
+  await settled(next);
+  await next.click({ force: true });
   await expect(map).toBeVisible({ timeout: 20_000 });
 }
 
