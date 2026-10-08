@@ -46,13 +46,13 @@ export default defineStory({
     k.music('cosy');
 
     // The enormous saucepan, with the giant's spoon beside it.
-    const bigPan = k.prop('saucepan', { x: 760, y: 190, w: 400, z: 12 });
-    const spoon = k.keepsake('giantSpoon', { x: 1000, y: 330, w: 260, z: 14 });
+    const bigPan = k.prop('saucepan', { x: 810, y: 210, w: 360, z: 12 });
+    const spoon = k.keepsake('giantSpoon', { x: 1010, y: 360, w: 230, z: 14 });
     k.set(spoon, { opacity: 0 });
     k.set(bigPan, { opacity: 0 });
 
-    const pan = k.character('saucepan', { x: 20, y: 330, z: 20 });
-    const hero = k.character('hero', { x: 460, y: 340, z: 20 });
+    const pan = k.character('saucepan', { x: 20, y: 400, z: 20 });
+    const hero = k.character('hero', { x: 480, y: 430, z: 20 });
     await k.all(k.enter(pan, 'left'), k.enter(hero, 'bottom'), k.appear(bigPan, 0.6));
     void k.fade(spoon, 1, 0.4);
 
@@ -64,15 +64,15 @@ export default defineStory({
     const rows = async () => {
       await k.wait(300);
       for (let r = 0; r < 4; r++) {
-        await popRow(k, 'popBiscuit', 10, 330, 130 + r * 52, 40, 44, { startTick: 0, gap: 55 });
-        const t = k.add(countTag((r + 1) * 10, C.goldLight, `l6c3-tag-${r}`), { x: 250, y: 120 + r * 52, w: 64, z: 22 });
+        await popRow(k, 'popBiscuit', 10, 330, 124 + r * 58, 46, 52, { startTick: 0, gap: 55 });
+        const t = k.add(countTag((r + 1) * 10, C.goldLight, `l6c3-tag-${r}`), { x: 250, y: 118 + r * 58, w: 64, z: 22 });
         tags.push(t);
         void k.appear(t, 0.2);
         await k.wait(350);
       }
-      await popRow(k, 'popBiscuit', 7, 330, 130 + 4 * 52, 40, 44, { startTick: 0, gap: 120 });
+      await popRow(k, 'popBiscuit', 7, 330, 124 + 4 * 58, 46, 52, { startTick: 0, gap: 120 });
       tick(7);
-      const t = k.add(countTag('+7', C.sky, 'l6c3-tag-ones'), { x: 250, y: 120 + 4 * 52, w: 64, z: 22 });
+      const t = k.add(countTag('+7', C.sky, 'l6c3-tag-ones'), { x: 250, y: 118 + 4 * 58, w: 64, z: 22 });
       void k.appear(t, 0.2);
       tags.push(t);
       await k.wait(300);
