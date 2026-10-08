@@ -57,7 +57,8 @@ export default defineStory({
     const who = [hostEl, hero, snowman];
     const pileOf = [0, 2, 1]; // host, hero, snowman -> pile positions
     const tags = [0, 1, 2].map((i) => {
-      const t = k.add(numberTag('4', C.goldLight, `l9c2-four-${i}`), { x: PILE[i][0] + 6, y: PILE[i][1] - 90, w: 100, z: 18 });
+      // The children's shares sit above their heads; the snowman's on his tummy.
+      const t = k.add(numberTag('4', C.goldLight, `l9c2-four-${i}`), { x: PILE[i][0] - 30, y: i === 1 ? PILE[i][1] - 90 : 290, w: 100, z: 22 });
       k.set(t, { opacity: 0 });
       return t;
     });

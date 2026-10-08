@@ -50,8 +50,8 @@ export default defineStory({
       return b;
     });
     await k.wait(300);
-    const mine = k.add(numberTag('3', C.goldLight, 'l9c1-three-a'), { x: 230, y: 600, w: 110, z: 18 });
-    const yours = k.add(numberTag('3', C.goldLight, 'l9c1-three-b'), { x: 830, y: 600, w: 110, z: 18 });
+    const mine = k.add(numberTag('3', C.goldLight, 'l9c1-three-a'), { x: 230, y: 600, w: 110, z: 22 });
+    const yours = k.add(numberTag('3', C.goldLight, 'l9c1-three-b'), { x: 830, y: 600, w: 110, z: 22 });
     [mine, yours].forEach((t) => k.set(t, { opacity: 0 }));
     const dealing = async () => {
       await k.wait(300);
