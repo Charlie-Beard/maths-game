@@ -366,8 +366,9 @@ with a paper wipe. Every story is a script in its own file.
 ## 10. Visual style
 
 The same as Wizard Words: layered hand-torn paper on parchment, flat muted
-colours, soft shadows, a stop-motion boil at about 12 fps (paused while he's
-thinking), and **Andika** lettering (single-storey a and g). **Numbers are
+colours, soft shadows, smooth gentle movement (each paper piece is drawn
+once and held still: an earlier stop-motion "boil" made characters flicker
+on the iPad), and **Andika** lettering (single-storey a and g). **Numbers are
 big and clear**: Andika's digits, never handwriting-style, at 64 px or more
 for answers.
 
