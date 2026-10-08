@@ -32,7 +32,10 @@ test('measure: tap the heavier sack, the fuller jug, the hotter thermometer, and
   test.setTimeout(180_000);
   await page.goto('/?scene=fixtures&kind=measure&seed=1');
   await expect(page.locator('.activity-measure')).toBeVisible();
-  for (let i = 0; i < 8; i++) {
+  // A fixtures round is every fixture, not just eight.
+  const count = await page.locator('.pdot').count();
+  expect(count).toBeGreaterThanOrEqual(8);
+  for (let i = 0; i < count; i++) {
     await expect(page.locator('.pdot.done')).toHaveCount(i, { timeout: 20_000 });
     await expect(page.locator('.activity')).toBeVisible();
     await solve(page);

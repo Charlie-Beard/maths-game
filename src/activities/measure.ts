@@ -43,6 +43,9 @@ export function measure(p: Problem, ctx: ActivityContext): Activity {
 
   const picture = place(renderVisual(v, BOX.w, BOX.h), BOX.x, BOX.y, BOX.w, BOX.h);
   el.append(picture);
+  // The question is spoken, but he is only just reading: it is written big
+  // underneath too, so the words can be matched to what he hears.
+  el.append(place(h('div', { class: 'm-caption' }, p.say.text.replace(/\s*Tap it\.$/, '')), BOX.x, BOX.y + BOX.h + 40, BOX.w, 80));
 
   const thing = v.gauge === 'balance' ? 'sack' : v.gauge === 'jug' ? 'jug' : 'thermometer';
   const boxes = measureItems(v, BOX.w, BOX.h);
