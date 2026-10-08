@@ -196,7 +196,7 @@ export default defineStory({
   lines: {
     snapped: { who: 'narrator', text: 'Snap, snap, snap! Every one of Dame Snap’s rulers lay broken on the ground.' },
     cheer: { who: 'silky', text: 'You did it, {name}! I watched the whole thing!' },
-    deal: { who: 'enchanter', text: 'Hmph. I made her a magic lantern, for a deal. Oh, I wish I hadn’t.' },
+    deal: { who: 'enchanter', text: 'Hmph. I wrote her a deal. One lantern, one fairy. Oh, I wish I hadn’t.' },
     clack: { who: 'narrator', text: 'Then, out of the purple mist… clack. Clack. CLACK.' },
     take: { who: 'dameSnap', text: 'You snapped my rulers. So now I shall take something YOU love!' },
     lantern: { who: 'enchanter', text: 'No! That lantern catches anything with wings! Silky, fly!' },

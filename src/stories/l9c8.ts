@@ -7,11 +7,13 @@
  *
  *   1. The sun comes out over the Land of Snow: drip, drip, the Big Thaw.
  *      One last look at THE PLAN, drawn in the snow across the land's
- *      chapters (a key shape, the hour on the clock, the way past her
- *      gates, and Silky's cell), before it melts. The Saucepan Man mishears
+ *      chapters (the tree, Silky's cage, the key with icicle teeth, the
+ *      sledge, her gates, six o'clock and quarter past six), while Silky's
+ *      dewdrop glows, before it melts. The Saucepan Man mishears
  *      ("a snow-plan?"), and Mr Snowman, a little smaller already, gives
  *      them a snow globe and sends them off: he'll be back next winter.
- *   2. The melting edge of the land and the top of the ladder: down they
+ *   2. The sledge (the quick way home, from the plan) whisks them to the
+ *      melting edge of the land and the top of the ladder: down they
  *      go, and the land rises away, dripping, Mr Snowman waving.
  *   3. Home in Moon-Face's room: the snow globe, the seal, hot cocoa… and
  *      then the window goes dark and cold.
@@ -67,47 +69,117 @@ function pour(): void {
 
 // --------------------------------------------------------------------- art
 
-/** The trench colour of lines drawn in the snow with a stick. */
-const SNOWLINE = '#7f9bb4';
+/** The colour of lines scratched in the snow with a stick (as in l9c1 … l9c7). */
+const LINE = '#3f6a9a';
+
+/** A hand-drawn line in the snow. */
+const draw = (pts: Pt[], width = 5, closed = false): Node => ink(pts, { width, color: LINE, wobble: 1.2, closed });
+
+/** Points round a circle (for drawn rings). */
+const ring = (cx: number, cy: number, r: number, n = 18): Pt[] => Array.from({ length: n }, (_, i) => [cx + Math.cos((i / n) * Math.PI * 2) * r, cy + Math.sin((i / n) * Math.PI * 2) * r] as Pt);
+
+/** A five-pointed star outline (Silky on the map). */
+function starPoints(cx: number, cy: number, r: number): Pt[] {
+  return Array.from({ length: 10 }, (_, i) => {
+    const a = -Math.PI / 2 + (i / 10) * Math.PI * 2;
+    const rr = i % 2 ? r * 0.45 : r;
+    return [cx + Math.cos(a) * rr, cy + Math.sin(a) * rr] as Pt;
+  });
+}
+
+/** A drawn clock face (96 × 96) with its hands at a time; the quarter shaded for quarter past. */
+function drawnClock(hour: number, minute: number, shadeQuarter = false): Node[] {
+  const hDeg = ((hour % 12) * 30 + minute * 0.5) * (Math.PI / 180);
+  const mDeg = minute * 6 * (Math.PI / 180);
+  const tip = (r: number, a: number): Pt => [48 + Math.sin(a) * r, 48 - Math.cos(a) * r];
+  const wedge: Pt[] = [[48, 48], ...Array.from({ length: 8 }, (_, i) => tip(34, (i / 7) * (Math.PI / 2)))];
+  return [
+    piece(circle(48, 48, 44), C.snowShade, { edge: 'cut', fibre: false, shadow: false, opacity: 0.8 }),
+    ...(shadeQuarter ? [piece(poly(wedge), C.ice, { edge: 'cut', fibre: false, shadow: false, opacity: 0.9 })] : []),
+    draw(ring(48, 48, 42), 4, true),
+    ...[0, 3, 6, 9].map((n) => draw([tip(34, (n / 12) * Math.PI * 2), tip(40, (n / 12) * Math.PI * 2)], 4)),
+    draw([[48, 48], tip(24, hDeg)], 6),
+    draw([[48, 48], tip(36, mDeg)], 4),
+  ];
+}
 
 /**
- * THE PLAN, drawn in the snow (520 × 260): the key shape, the clock with
- * its hands at the hour, the gates with a path slipping round them, and
- * Silky's cell with a little star in it, joined by a dotted path.
+ * THE PLAN, finished, as the land 9 chapter stories drew it piece by piece
+ * in the snow (640 × 420, the same layout as their map): the tree, Silky in
+ * her cage, the key with its icicle teeth, the sledge (the quick way home),
+ * her gates (only half need open), six o'clock (when her land comes back)
+ * and quarter past six (when they creep in).
  */
-function snowMap(): string {
-  const line = (pts: Pt[], width = 6): Node => ink(pts, { width, color: SNOWLINE, wobble: 1.2 });
-  const dots: Node[] = [];
-  const path: Pt[] = [[110, 190], [170, 214], [230, 200], [300, 214], [360, 196], [420, 176]];
-  for (let i = 0; i < path.length - 1; i++) {
-    const [[x0, y0], [x1, y1]] = [path[i], path[i + 1]];
-    for (let k = 0.2; k < 1; k += 0.3) dots.push(dot(x0 + (x1 - x0) * k, y0 + (y1 - y0) * k, 4, SNOWLINE));
-  }
-  return svg({ w: 520, h: 260, name: 'l9c8-map', label: 'the plan, drawn in the snow' }, [
-    piece(curve([[20, 60], [140, 20], [300, 30], [480, 40], [510, 140], [470, 240], [260, 250], [60, 240], [10, 160]], 2), C.snow, { rough: 1.2 }),
-    piece(curve([[30, 200], [200, 236], [400, 230], [490, 190], [470, 240], [260, 250], [60, 240]], 2), C.snowShade, { edge: 'torn', fibre: false, shadow: false, opacity: 0.6 }),
-    // The key.
-    line(circle(80, 100, 24), 6),
-    line([[104, 100], [170, 100]]),
-    line([[150, 100], [150, 118]]),
-    line([[164, 100], [164, 114]]),
-    // The clock, its hands at the hour.
-    line(circle(250, 100, 40), 6),
-    ...[0, 1, 2, 3].map((q) => {
-      const a = (q * Math.PI) / 2;
-      return line([[250 + Math.sin(a) * 30, 100 - Math.cos(a) * 30], [250 + Math.sin(a) * 36, 100 - Math.cos(a) * 36]], 4);
-    }),
-    line([[250, 100], [250, 70]], 5),
-    line([[250, 100], [250, 78]], 7),
-    // The gates, and the way round them.
-    ...[340, 356, 372, 388].map((x) => line([[x, 66], [x, 132]], 5)),
-    line([[332, 66], [396, 66]], 4),
-    line([[326, 150], [364, 168], [404, 150], [410, 120]], 4),
-    line([[402, 128], [410, 118], [416, 130]], 4),
-    // Silky's cell, with a star in it.
-    line([[436, 64], [496, 64], [496, 124], [436, 124], [436, 64]], 5),
-    piece(poly([[466, 76], [471, 90], [486, 90], [474, 98], [478, 112], [466, 104], [454, 112], [458, 98], [446, 90], [461, 90]]), C.goldLight, { edge: 'cut', fibre: false }),
-    ...dots,
+function planMap(): string {
+  const at = (x: number, y: number, nodes: Node[]): Node => group({ transform: `translate(${x} ${y})` }, nodes);
+  return svg({ w: 640, h: 420, name: 'l9c8-plan', label: 'the plan, drawn in the snow' }, [
+    piece(rect(8, 8, 624, 404, 28), C.snowShade, { rough: 1.4 }),
+    piece(rect(18, 16, 604, 388, 24), C.white, { edge: 'cut', fibre: false, shadow: false, opacity: 0.9 }),
+    ...Array.from({ length: 12 }, (_, i) => dot(150 + i * 28, 250 - Math.sin(i / 3.2) * 40 - i * 4, 4, LINE, 0.45)),
+    // The tree.
+    at(24, 120, [
+      draw([[44, 218], [46, 120]], 6),
+      draw([[66, 218], [64, 120]], 6),
+      draw(ring(55, 76, 50, 20), 5, true),
+      draw([[55, 120], [40, 96], [34, 80]], 4),
+      draw([[55, 116], [72, 90], [80, 70]], 4),
+      piece(rect(48, 164, 14, 22, 4), C.goldLight, { edge: 'cut', fibre: false, shadow: false }),
+    ]),
+    // Silky in her cage.
+    at(488, 20, [
+      draw([[14, 140], [14, 56], [30, 22], [60, 10], [90, 22], [106, 56], [106, 140]], 5),
+      ...[34, 60, 86].map((x) => draw([[x, 140], [x, 18 + Math.abs(x - 60) * 0.5]], 4)),
+      draw([[10, 140], [110, 140]], 5),
+      piece(curve(starPoints(60, 84, 22), 1), C.goldLight, { edge: 'cut', fibre: false, shadow: false }),
+      piece(ellipse(34, 80, 12, 6, -30), C.white, { edge: 'cut', fibre: false, shadow: false, opacity: 0.9 }),
+      piece(ellipse(86, 80, 12, 6, 30), C.white, { edge: 'cut', fibre: false, shadow: false, opacity: 0.9 }),
+    ]),
+    // The key, with icicle teeth.
+    at(190, 28, [
+      draw(ring(28, 32, 22), 6, true),
+      draw([[50, 32], [140, 32]], 6),
+      ...[94, 112, 130].map((x, i) => piece(poly([[x - 7, 32], [x + 7, 32], [x, 60 - i * 3]]), C.ice, { edge: 'cut', fibre: C.white })),
+    ]),
+    // The sledge.
+    at(150, 322, [
+      draw([[14, 44], [96, 44], [112, 36], [122, 40]], 5),
+      draw([[10, 60], [110, 60], [124, 50]], 5),
+      draw([[36, 44], [36, 60]], 4),
+      draw([[84, 44], [84, 60]], 4),
+      draw([[22, 20], [100, 20]], 4),
+    ]),
+    // Her gates: one half shut, one half swung open, and the way through.
+    at(396, 176, [
+      draw([[10, 130], [10, 20]], 7),
+      ...[30, 50, 70].map((x) => draw([[x, 126], [x, 24]], 4)),
+      draw([[10, 24], [86, 24]], 5),
+      draw([[10, 126], [86, 126]], 5),
+      draw([[190, 130], [190, 20]], 7),
+      draw([[96, 124], [150, 100], [168, 40], [112, 66], [96, 124]], 4),
+      draw([[104, 110], [140, 120], [180, 110]], 4),
+      piece(poly([[176, 100], [192, 112], [174, 124]]), LINE, { edge: 'clean', fibre: false, shadow: false }),
+    ]),
+    // Six o'clock, and quarter past six.
+    at(316, 300, drawnClock(6, 0)),
+    at(426, 312, drawnClock(6, 15, true)),
+  ]);
+}
+
+/** Silky's dewdrop (60 × 80), kept since land 7; it glows when the sums go right. */
+function dewdrop(): string {
+  return svg({ w: 60, h: 80, name: 'l9c8-dew', boil: false, label: 'Silky’s dewdrop' }, [
+    piece(curve([[30, 6], [40, 30], [50, 50], [44, 70], [30, 76], [16, 70], [10, 50], [20, 30]], 2), C.dew, { edge: 'cut' }),
+    piece(ellipse(24, 52, 7, 12, 20), C.white, { edge: 'clean', fibre: false, shadow: false, opacity: 0.8 }),
+  ]);
+}
+
+/** The sledge (the quick way home), seen from the side, for riding (520 × 130). */
+function sledgeArt(): string {
+  return svg({ w: 520, h: 130, name: 'l9c8-sledge', label: 'a sledge' }, [
+    piece(rect(20, 20, 470, 56, 12), C.red, { rough: 0.6 }),
+    piece(rect(30, 34, 450, 8, 3), C.cream, { edge: 'cut', fibre: false, shadow: false, opacity: 0.7 }),
+    ...[90, 260, 430].map((x) => piece(rect(x, 74, 14, 34), C.greyDark, { edge: 'cut' })),
+    piece(band([[10, 112], [480, 112], [506, 100], [514, 80]], 10), C.greyDark, { edge: 'cut' }),
   ]);
 }
 
@@ -246,12 +318,12 @@ export default defineStory({
   lines: {
     thaw: { who: 'snowman', text: 'Drip, drip! The sun is out. It’s the Big Thaw! My land is melting!' },
     look: { who: 'moonface', text: 'Quick! One last look at our plan, before the snow map melts away.' },
-    recap: { who: 'hero', text: 'The key shape. The hour on the clock. And the secret way past her gates.' },
+    recap: { who: 'hero', text: 'The key with icicle teeth. Six o’clock, her land comes. Quarter past six, we creep in.' },
     remember: { who: 'narrator', text: '{name} looked hard at the map, and remembered every bit.' },
     eh: { who: 'saucepan', text: 'EH? A SNOW-PLAN? Don’t worry, I’ve packed some snow in my saucepan!' },
     globe: { who: 'snowman', text: 'Take this snow globe. Then you’ll always have a little snow with you.' },
     bye: { who: 'snowman', text: 'Don’t worry about me. I’ll be back next winter! Now run!' },
-    down: { who: 'moonface', text: 'Down the ladder, everyone! Before it all melts away!' },
+    down: { who: 'moonface', text: 'The sledge got us here, quick as a wink! Now down the ladder, before it melts!' },
     prize: { who: 'narrator', text: 'Home, safe and warm, with a snow globe and the seal of the Land of Snow.' },
     cocoa: { who: 'saucepan', text: 'Hot cocoa for everyone! Clank, clank!' },
     dark: { who: 'hero', text: 'Moon-Face… why has it gone so dark? And so cold?' },
@@ -265,7 +337,10 @@ export default defineStory({
     k.landScene(9);
     k.music('dreamy');
     const sun = k.light(1040, 210, 260, { color: '#fff3c4', strength: 0, z: 8 });
-    const map = k.add(snowMap(), { x: 380, y: 420, w: 520, z: 12 });
+    const map = k.add(planMap(), { x: 380, y: 250, w: 540, z: 12 });
+    const dew = k.add(dewdrop(), { x: 420, y: 600, w: 34, z: 22 });
+    const dewGlow = k.light(437, 625, 70, { color: C.dew, strength: 0.25, flicker: true, z: 21 });
+    k.float(dew, 4, 2.6);
     const mf = k.character('moonface', { x: 20, y: 360, w: 220, z: 20 });
     const hero = k.character('hero', { x: 190, y: 420, w: 200, z: 21 });
     const snowy = k.character('snowman', { x: 890, y: 320, w: 270, z: 18, flip: true });
@@ -278,11 +353,12 @@ export default defineStory({
     await k.all(k.say('thaw', snowy), k.to(snowy, 2, { scale: 0.95, y: 10, ease: 'sine.inOut' }));
     await k.all(k.say('look', mf), k.pop(map, 1.04));
     // Each part of the plan, pointed out in turn.
+    const S = 540 / 640;
     const marks = [
-      [470, 520],
-      [630, 520],
-      [750, 530],
-      [846, 516],
+      [380 + 265 * S, 250 + 60 * S],
+      [380 + 364 * S, 250 + 348 * S],
+      [380 + 474 * S, 250 + 360 * S],
+      [380 + 548 * S, 250 + 95 * S],
     ];
     const recap = k.say('recap', hero);
     for (const [x, y] of marks) {
@@ -291,13 +367,16 @@ export default defineStory({
       await k.wait(900);
     }
     await recap;
-    await k.all(k.say('remember'), k.camera({ zoom: 1.3, x: 640, y: 520 }, 1.6));
+    // Silky's dewdrop glows: the plan is a good one.
+    k.sparkle(437, 610, 8, 70);
+    await k.to(dewGlow, 0.6, { opacity: 0.7, ease: 'sine.out' });
+    await k.all(k.say('remember'), k.camera({ zoom: 1.3, x: 650, y: 430 }, 1.6));
     await k.camera({}, 0.8);
 
     // The map melts away into a puddle.
     k.music('cosy');
     drips(8);
-    const pool = k.add(puddle(), { x: 440, y: 580, w: 400, z: 11 });
+    const pool = k.add(puddle(), { x: 450, y: 560, w: 400, z: 11 });
     k.set(pool, { opacity: 0 });
     await k.all(k.to(map, 2, { scaleY: 0.4, y: 80, opacity: 0, ease: 'power1.in' }), k.fade(pool, 1, 2));
     k.remove(map);
@@ -322,43 +401,52 @@ export default defineStory({
     drips(6);
     await k.all(k.say('bye', snowy), k.to(snowy, 1.5, { scale: 0.88, y: 30 }));
     k.fx.whizz();
-    await k.all(k.exit(mf, 'right', 0.7), k.exit(hero, 'right', 0.7), k.wait(200).then(() => k.exit(sauce, 'right', 0.7)));
+    void k.fade(dewGlow, 0, 0.5);
+    await k.all(k.exit(mf, 'right', 0.7), k.exit(hero, 'right', 0.7), k.wait(200).then(() => k.exit(sauce, 'right', 0.7)), k.fade(dew, 0, 0.5));
 
-    // ------------------------------------------- scene 2: down the ladder
+    // ------------------------------------------- scene 2: the sledge, and the ladder
     let edge!: HTMLElement;
     let s2!: HTMLElement;
     let h2!: HTMLElement;
     let p2!: HTMLElement;
     let m2!: HTMLElement;
+    let sled!: HTMLElement;
     await k.cut(() => {
       k.backdrop(edgeSky());
       edge = k.add(landEdge(), { x: -20, y: 0, w: 800, h: 900, z: 4, still: true });
       k.add(ladderTop(), { x: 600, y: 420, w: 600, z: 26, still: true });
-      s2 = k.character('snowman', { x: 30, y: 330, w: 240, z: 6 });
-      h2 = k.character('hero', { x: 300, y: 380, w: 200, z: 20 });
-      p2 = k.character('saucepan', { x: 470, y: 370, w: 210, z: 20 });
-      m2 = k.character('moonface', { x: 790, y: 320, w: 200, z: 24, flip: true });
+      s2 = k.character('snowman', { x: 20, y: 330, w: 220, z: 6 });
+      // On the sledge: Moon-Face at the front, then the hero, then the Saucepan Man.
+      m2 = k.character('moonface', { x: 520, y: 360, w: 190, z: 20, flip: true });
+      h2 = k.character('hero', { x: 380, y: 380, w: 180, z: 20 });
+      p2 = k.character('saucepan', { x: 220, y: 360, w: 190, z: 19 });
+      sled = k.add(sledgeArt(), { x: 200, y: 540, w: 520, z: 22 });
       k.set(s2, { scale: 0.85, transformOrigin: '50% 100%' });
-      k.set(m2, { y: 240 });
     });
     k.music('adventure');
-    k.fx.boing();
-    await k.to(m2, 0.5, { y: 0, ease: 'back.out(1.6)' });
+    // Swish! The sledge slides in to the top of the ladder.
+    const riders = [sled, m2, h2, p2];
+    k.set(riders, { x: -760 });
+    k.fx.whizz();
+    await k.to(riders, 1.4, { x: 0, ease: 'power3.out' });
+    k.puff(720, 640, 140, C.snow);
     drips(5);
     dripDown(k, 420, 640, 5);
     await k.all(k.say('down', m2), wave(k, m2, 'armL', 2));
+    // Down the ladder, one after another.
     k.fx.whizz();
-    await k.to(m2, 0.4, { y: 300, ease: 'power2.in' });
-    await k.to(h2, 0.6, { x: 340, y: -40, ease: 'power1.out' });
-    await k.to(h2, 0.4, { y: 360, ease: 'power2.in' });
+    await k.to(m2, 0.5, { x: 175, y: -60, ease: 'power1.out' });
+    await k.to(m2, 0.4, { y: 400, ease: 'power2.in' });
+    await k.to(h2, 0.7, { x: 325, y: -60, ease: 'power1.out' });
+    await k.to(h2, 0.4, { y: 400, ease: 'power2.in' });
     snapSound.clank(3);
-    await k.to(p2, 0.7, { x: 170, y: -40, ease: 'power1.out' });
-    await k.to(p2, 0.4, { y: 360, ease: 'power2.in' });
+    await k.to(p2, 0.8, { x: 490, y: -60, ease: 'power1.out' });
+    await k.to(p2, 0.4, { y: 400, ease: 'power2.in' });
     // The land rises away, dripping, Mr Snowman waving goodbye.
     k.fx.rumble(3);
     drips(10);
     void wave(k, s2, 'armR', 4);
-    await k.all(k.to(edge, 5, { y: -780, ease: 'power1.in' }), k.to(s2, 5, { y: -780, ease: 'power1.in' }), k.wait(800).then(() => dripDown(k, 400, 300, 6)));
+    await k.all(k.to([edge, sled], 5, { y: -780, ease: 'power1.in' }), k.to(s2, 5, { y: -780, ease: 'power1.in' }), k.wait(800).then(() => dripDown(k, 400, 300, 6)));
 
     // ------------------------------------------- scene 3: home… and dark
     let h3!: HTMLElement;
