@@ -73,6 +73,7 @@ export class Game implements Nav {
         chapter: null,
         problems,
         rand,
+        signOff: true,
         onDone: () => this.map(),
       }),
     );

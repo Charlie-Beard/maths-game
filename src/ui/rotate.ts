@@ -22,7 +22,10 @@ export function installRotateScreen(stage: Stage, el: HTMLElement): void {
     document.body.classList.toggle('is-portrait', portrait);
     // Pause: freeze animation and sound until the iPad is turned back.
     if (portrait) {
+      // Cancel the iPad's own voice too, so nothing is spoken behind the
+      // "turn the iPad" screen; scenes hold their hint timers while it shows.
       voice.stop();
+      window.speechSynthesis?.cancel();
       gsap.globalTimeline.pause();
     } else {
       gsap.globalTimeline.resume();
