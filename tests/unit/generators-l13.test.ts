@@ -159,6 +159,8 @@ describe('land 13 generators', () => {
       expect(p.answer).toBe(expected[s]);
       expect(p.say.text).toContain(s);
       expect(p.explain.vals).toEqual({ n: p.answer });
+      // One flat face, not "1 flat faces".
+      expect(p.explain.text).toMatch(p.answer === 1 ? /flat face!/ : /flat faces!/);
     }
   });
 

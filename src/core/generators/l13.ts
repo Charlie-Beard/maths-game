@@ -74,12 +74,10 @@ function whichWay(tier: number, r: Rand): Problem {
     answer,
     choices: dirChoices(answer, facing, turn, dir, tier === 1 ? 3 : 4, r),
     visual: { type: 'turn', facing: angleOf(facing), turn, dir },
-    explain: { text: `${cap(AMOUNT[turn])} ${WAY[dir]} from ${facing}. It points ${POINTS[answer]}!` },
+    explain: { text: `The arrow turns ${AMOUNT[turn]} ${WAY[dir]}. It points ${POINTS[answer]}!` },
     key: `turns:way:${facing}:${turn}:${dir}`,
   };
 }
-
-const cap = (s: string): string => s.charAt(0).toUpperCase() + s.slice(1);
 
 /** "The faded arrow is where it started. Did it turn clockwise or anticlockwise?" */
 function clockOrNot(r: Rand): Problem {
@@ -94,7 +92,7 @@ function clockOrNot(r: Rand): Problem {
     answer,
     choices: r.shuffle<Answer>(['clockwise', 'anticlockwise']),
     visual: { type: 'turn', facing: angleOf(facing), turn: 90, dir, show: 'before-after' },
-    explain: { text: dir === 'cw' ? 'It went the way a clock goes. That is clockwise!' : 'It went the other way from a clock. That is anticlockwise!' },
+    explain: { text: dir === 'cw' ? 'It went the way a clock goes. That is clockwise!' : 'It went the other way to a clock’s hands. That is anticlockwise!' },
     key: `turns:which:${facing}:${dir}`,
   };
 }
@@ -165,7 +163,7 @@ function followPath(r: Rand): Problem {
     answer,
     choices: r.shuffle(flags.map((f) => f.id as Answer)),
     visual: { type: 'turn', facing: angleOf(facing), moves, grid: { cols: COLS, rows: ROWS, col: start.col, row: start.row, flags } },
-    explain: { text: `Forwards is one step. Left and right turn first. You land on the ${answer} flag!` },
+    explain: { text: `Forwards is one step. Left and right are turns, not steps. You land on the ${answer} flag!` },
     key: `turns:path:${facing}:${start.col}${start.row}:${route}`,
   };
 }
@@ -240,7 +238,7 @@ function countFaces(r: Rand): Problem {
     answer: n,
     choices: choicesFor(n, r, { min: 1, max: 8, likely: [n - 1, n + 1, 4] }),
     visual: { type: 'solid', solids: [solid], ask: 'faces' },
-    explain: { text: `A ${solid} has {n} flat faces!`, vals: { n } },
+    explain: { text: `A ${solid} has {n} flat ${n === 1 ? 'face' : 'faces'}!`, vals: { n } },
     key: `shapes-3d:faces:${solid}`,
   };
 }

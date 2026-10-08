@@ -20,7 +20,7 @@ export const FIXTURES_L13: Problem[] = [
     answer: 'right',
     choices: ['down', 'right', 'left'],
     visual: { type: 'turn', facing: 0, turn: 90, dir: 'cw' },
-    explain: { text: 'A quarter turn clockwise from up. It points to the right!' },
+    explain: { text: 'The arrow turns a quarter turn clockwise. It points to the right!' },
     key: 'fx-turn:up:90:cw',
   },
   {
@@ -31,7 +31,7 @@ export const FIXTURES_L13: Problem[] = [
     answer: 'anticlockwise',
     choices: ['clockwise', 'anticlockwise'],
     visual: { type: 'turn', facing: 0, turn: 90, dir: 'acw', show: 'before-after' },
-    explain: { text: 'It went the other way from a clock. That is anticlockwise!' },
+    explain: { text: 'It went the other way to a clock’s hands. That is anticlockwise!' },
     key: 'fx-turn:which:up:acw',
   },
   {
@@ -42,7 +42,7 @@ export const FIXTURES_L13: Problem[] = [
     answer: 'down',
     choices: ['up', 'right', 'down', 'left'],
     visual: { type: 'turn', facing: 90, turn: 270, dir: 'acw' },
-    explain: { text: 'Three quarters of a turn anticlockwise from right. It points down!' },
+    explain: { text: 'The arrow turns three quarters of a turn anticlockwise. It points down!' },
     key: 'fx-turn:right:270:acw',
   },
   {
@@ -69,7 +69,7 @@ export const FIXTURES_L13: Problem[] = [
         ],
       },
     },
-    explain: { text: 'Forwards is one step. Left and right turn first. You land on the blue flag!' },
+    explain: { text: 'Forwards is one step. Left and right are turns, not steps. You land on the blue flag!' },
     key: 'fx-turn:path:blue',
   },
   // ---------------- solid ----------------
