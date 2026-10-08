@@ -25,18 +25,18 @@ export default defineStory({
     k.music('cosy');
 
     const mf = k.character('moonface', { x: 20, y: 300, z: 20 });
-    const hero = k.character('hero', { x: 900, y: 300, z: 20, flip: true });
+    const hero = k.character('hero', { x: 940, y: 300, z: 20, flip: true });
     await k.all(k.enter(mf, 'left'), k.enter(hero, 'right'));
 
     // Three bundles of ten (the chapter's keepsake), tied up.
-    const bundleX = [290, 470, 650];
+    const bundleX = [250, 420, 590];
     const bundles = bundleX.map((x) => k.keepsake('bundle', { x, y: 380, w: 180, z: 15 }));
     bundles.forEach((b) => k.set(b, { opacity: 0 }));
     await k.say('hello', mf);
     for (const b of bundles) void k.appear(b, 0.3);
 
     // Four loose sticks lie on the grass.
-    const loose = [0, 1, 2, 3].map((i) => k.prop('stick', { x: 800 + i * 30, y: 470 + (i % 2) * 16, w: 120, z: 15 }));
+    const loose = [0, 1, 2, 3].map((i) => k.prop('stick', { x: 740 + i * 28, y: 470 + (i % 2) * 16, w: 120, z: 15 }));
     loose.forEach((s, i) => k.set(s, { opacity: 0, rotation: -20 + i * 12 }));
 
     const giant = giantHead(k, { x: 380, y: -150, w: 360 });
@@ -56,7 +56,7 @@ export default defineStory({
       for (let i = 0; i < 4; i++) {
         tick(3 + i);
         void k.appear(loose[i], 0.2);
-        const t = tag(String(31 + i), C.sky, 810 + i * 30, 410, `o${i}`);
+        const t = tag(String(31 + i), C.sky, 750 + i * 28, 330, `o${i}`);
         void k.appear(t, 0.2);
         await k.wait(i === 3 ? 600 : 650);
         void k.vanish(t, 0.2);

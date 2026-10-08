@@ -61,7 +61,7 @@ export default defineStory({
     void k.hop(hero, 40, 2);
 
     // ---- The giant booms the answer.
-    const giant = giantHead(k, { x: 330, y: -110, w: 320 });
+    const giant = giantHead(k, { x: 150, y: -110, w: 320 });
     k.set(giant, { opacity: 0 });
     await peek(k, giant);
     void k.quake(6);

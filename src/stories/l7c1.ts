@@ -44,7 +44,7 @@ export default defineStory({
       await k.wait(220);
     }
     await told;
-    const six = k.add(numberTag('6', C.goldLight, 'l7c1-six'), { x: 190, y: 330, w: 110, z: 19 });
+    const six = k.add(numberTag('6', C.goldLight, 'l7c1-six'), { x: 535, y: 215, w: 110, z: 19 });
     void k.pop(six, 1.2);
 
     // The wand waves, and a second row of six drops in below.
