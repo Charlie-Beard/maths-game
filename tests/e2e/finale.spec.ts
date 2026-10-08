@@ -75,14 +75,20 @@ async function playThrough(page: Page, count: number, from = 0): Promise<void> {
     await expect(page.locator('.pdot.done')).toHaveCount(i, { timeout: 30_000 });
     await solve(page);
   }
-  // The story (if it's written yet), then the reward.
+  // The story (if it's written yet), then the reward. After the very last
+  // finale a second story follows (the ending film) before the reward.
   const skip = page.getByRole('button', { name: 'Skip the story' });
   const next = page.getByRole('button', { name: 'Next' });
-  await expect(skip.or(next).first()).toBeVisible({ timeout: 40_000 });
-  if (await skip.isVisible()) await skip.click({ force: true });
-  await settled(next);
-  await next.click({ force: true });
-  await expect(page.locator('.map-stop').first()).toBeVisible({ timeout: 20_000 });
+  const map = page.locator('.map-stop').first();
+  for (let story = 0; story < 2; story++) {
+    await expect(skip.or(next).first()).toBeVisible({ timeout: 40_000 });
+    if (await skip.isVisible()) await skip.click({ force: true });
+    await settled(next);
+    await next.click({ force: true });
+    await expect(map.or(skip)).toBeVisible({ timeout: 20_000 });
+    if (await map.isVisible()) break;
+  }
+  await expect(map).toBeVisible({ timeout: 20_000 });
 }
 
 test('climb: up the tree to Moon-Face’s door, then the reward', async ({ page }) => {

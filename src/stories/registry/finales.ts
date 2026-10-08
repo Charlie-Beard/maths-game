@@ -11,4 +11,5 @@ export const FINALES: Record<string, Loader> = {
   l7c8: () => import('../l7c8'),
   l8c8: () => import('../l8c8'),
   l9c8: () => import('../l9c8'),
+  l10c8: () => import('../l10c8'),
 };
