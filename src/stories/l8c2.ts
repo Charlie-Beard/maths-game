@@ -31,8 +31,8 @@ export default defineStory({
 
     // ---- Three rows of five, one row at a time.
     const ROW_Y = [340, 430, 520];
-    const rows = ROW_Y.map((y) => Array.from({ length: 5 }, (_, i) => k.prop('soldier', { x: 340 + i * 96, y, w: 88, z: 16 })));
-    const sums = [5, 10, 15].map((n, r) => k.add(numberTag(String(n), [C.pink, C.goldLight, C.sky][r], `l8c2-tag-${n}`), { x: 820, y: ROW_Y[r] + 4, w: 90, z: 18 }));
+    const rows = ROW_Y.map((y) => Array.from({ length: 5 }, (_, i) => k.prop('soldier', { x: 450 + i * 52, y, w: 80, z: 16 })));
+    const sums = [5, 10, 15].map((n, r) => k.add(numberTag(String(n), [C.pink, C.goldLight, C.sky][r], `l8c2-tag-${n}`), { x: 770, y: ROW_Y[r] + 4, w: 90, z: 18 }));
     rows.flat().forEach((s) => k.set(s, { opacity: 0 }));
     sums.forEach((t) => k.set(t, { opacity: 0 }));
     const filling = async () => {
