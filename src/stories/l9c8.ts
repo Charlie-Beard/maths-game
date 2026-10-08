@@ -435,12 +435,12 @@ export default defineStory({
     await k.all(k.say('down', m2), wave(k, m2, 'armL', 2));
     // Down the ladder, one after another.
     k.fx.whizz();
-    await k.to(m2, 0.5, { x: 175, y: -60, ease: 'power1.out' });
+    await k.to(m2, 0.5, { x: 230, y: -60, ease: 'power1.out' });
     await k.to(m2, 0.4, { y: 400, ease: 'power2.in' });
-    await k.to(h2, 0.7, { x: 325, y: -60, ease: 'power1.out' });
+    await k.to(h2, 0.7, { x: 375, y: -60, ease: 'power1.out' });
     await k.to(h2, 0.4, { y: 400, ease: 'power2.in' });
     snapSound.clank(3);
-    await k.to(p2, 0.8, { x: 490, y: -60, ease: 'power1.out' });
+    await k.to(p2, 0.8, { x: 530, y: -60, ease: 'power1.out' });
     await k.to(p2, 0.4, { y: 400, ease: 'power2.in' });
     // The land rises away, dripping, Mr Snowman waving goodbye.
     k.fx.rumble(3);
