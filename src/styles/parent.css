@@ -407,3 +407,39 @@
   color: var(--ink-500);
   opacity: 0.7;
 }
+
+/* Settings: who he climbs with. Each portrait is a button well over 72 px. */
+.p-avatars {
+  display: flex;
+  gap: 14px;
+}
+.p-avatar {
+  width: 104px;
+  min-height: 132px;
+  padding: 6px 4px 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  font-size: 18px;
+  font-weight: 700;
+  background: var(--parchment-300);
+  border-radius: 14px;
+  border: 4px solid transparent;
+  box-shadow: 0 3px 0 rgba(90, 62, 30, 0.35);
+}
+.p-avatar.on {
+  border-color: var(--emerald-500);
+  background: var(--parchment-100);
+}
+.p-avatar-art {
+  display: block;
+  width: 80px;
+  height: 90px;
+}
+.p-avatar-art svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+  pointer-events: none;
+}

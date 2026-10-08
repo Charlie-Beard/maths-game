@@ -7,7 +7,7 @@
  *             by strand
  *   Levels    unlock every chapter, unlock up to a chapter, or lock the
  *             ones after a chapter again
- *   Settings  the player's name, volume, calm mode, the idle hint, new
+ *   Settings  the player's name, who he climbs with, volume, calm mode, the idle hint, new
  *             chapters per day, start again
  *   Profiles  switch between Jasper, a demo and others; add or delete
  *             (Jasper's can never be deleted)
@@ -18,16 +18,18 @@
 import { setVolumes } from '../audio/engine';
 import { sfx } from '../audio/sfx';
 import { setPlayerName } from '../audio/voice';
+import { characterArt } from '../art/characters';
 import { C } from '../art/palette';
 import { parchment } from '../art/ui';
 import { activeProfile, createProfile, deleteProfile, JASPER, listProfiles, type ProfileInfo } from '../cloud/api';
 import { CloudProfile, freshProgress, type SyncState } from '../cloud/profile';
-import { ALL_CHAPTERS, LANDS } from '../core/curriculum';
+import { ALL_CHAPTERS, AVATARS, LANDS, type Avatar } from '../core/curriculum';
 import { currentIndex, type Progress } from '../core/progress';
 import { SKILL_IDS, SKILLS, tierCount, type SkillId, type Strand } from '../core/skills';
 import { setCalm } from '../ui/anim';
 import { h, place } from '../ui/dom';
 import { Scene } from '../ui/scene';
+import { AVATAR_NAMES } from './choose';
 
 type Tab = 'progress' | 'levels' | 'settings' | 'profiles';
 
@@ -320,8 +322,35 @@ export class ParentScene extends Scene {
       this.show('settings');
     });
 
+    // Who he climbs with. The Choose scene only appears while this is
+    // empty, so without this row the only way to change it was Start again,
+    // which wipes everything. Big portraits (88 px wide) so they are easy to hit.
+    const climb = h('div', { class: 'p-avatars', role: 'radiogroup', 'aria-label': 'Climbing with' });
+    const picks = new Map<Avatar, HTMLElement>();
+    const mark = () => picks.forEach((b, a) => {
+      b.classList.toggle('on', p.avatar === a);
+      b.setAttribute('aria-checked', String(p.avatar === a));
+    });
+    for (const a of AVATARS) {
+      const b = h('button', { class: 'p-avatar', role: 'radio', 'aria-label': AVATAR_NAMES[a], 'data-avatar': a }, [
+        h('span', { class: 'p-avatar-art', html: characterArt(a) }),
+        h('span', {}, AVATAR_NAMES[a]),
+      ]);
+      b.addEventListener('click', () => {
+        if (p.avatar === a) return;
+        p.avatar = a;
+        sfx.tap();
+        save();
+        mark();
+      });
+      picks.set(a, b);
+      climb.append(b);
+    }
+    mark();
+
     this.body.append(
       row('Player’s name', name, 'Shown in the game. The recorded voices say “Jasper”; with any other name they say the line without it (“You won the seal!”).'),
+      h('div', { class: 'p-row' }, [h('div', {}, [h('strong', {}, 'Climbing with'), h('small', {}, 'Who goes up the tree with him. Keeps all his progress.')]), climb]),
       row('Volume', vol),
       row('Calm mode', calm, 'Less movement: no paper jitter, no flickering windows, shorter animations, no cloud parting when a land arrives.'),
       row('Say the question again', idle, 'If nothing is tapped for a while.'),
