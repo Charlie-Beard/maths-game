@@ -61,8 +61,8 @@ export default defineStory({
     const sl = k.add(slateSum('60 + ? = 100', SLATE.w, 'c5'), { ...SLATE, z: 35 });
     k.set(sl, { opacity: 0 });
 
-    const hero = k.character('hero', { x: 300, y: 480, w: 220, z: 38 });
-    const mf = k.character('moonface', { x: 660, y: 480, w: 220, z: 38, flip: true });
+    const hero = k.character('hero', { x: 300, y: 410, w: 220, z: 38 });
+    const mf = k.character('moonface', { x: 660, y: 410, w: 220, z: 38, flip: true });
     k.set([hero, mf], { opacity: 0 });
     await k.all(k.enter(hero, 'left', 0.9), k.enter(mf, 'right', 0.9));
 

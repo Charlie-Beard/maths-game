@@ -29,7 +29,7 @@ export default defineStory({
   lines: {
     back: { who: 'narrator', text: 'Six o’clock, the coldest hour. Her land was back: a prison of black stone.' },
     cages: { who: 'dameSnap', text: 'Washalot! Pixie! Watzisname! Into my CAGES, all of you!' },
-    pixie: { who: 'pixie', text: 'Put me DOWN, you crows! I’ll pull out your tail feathers!' },
+    pixie: { who: 'pixie', text: 'Put me DOWN, you crows! You great flapping feather dusters!' },
     follow: { who: 'moonface', text: 'Silky is up there too. We’re going after them, {name}.' },
     rungs: { who: 'narrator', text: 'Up the ladder. Thirty rungs, then twenty more. Fifty rungs!' },
     bars: { who: 'hero', text: 'The gate is locked. But look… the bars have numbers on them!' },

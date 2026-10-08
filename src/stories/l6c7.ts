@@ -2,7 +2,7 @@
  * Land 6, chapter 7: The Giant's Buttons.
  *
  * Fran (or Beth, if he climbs with Fran) has found two heaps of the
- * giant's buttons, each button as big as a table. The left heap is two
+ * giant's buttons ("as big as tables" in the chapter's intro). The left heap is two
  * rows of ten and seven more (27); the right is three rows of ten and five
  * more (35). Count the tens first: three tens beat two tens, so 35 is more
  * than 27 (the chapter's comparing, and tens and ones). Then a great face
@@ -16,8 +16,8 @@ import { countTag, giantHead, meadow, peek, popRow, strip } from './giants';
 
 export default defineStory({
   lines: {
-    ask_fran: { who: 'fran', text: 'These buttons are as big as tables! Which pile has more?' },
-    ask_beth: { who: 'beth', text: 'These buttons are as big as tables! Which pile has more?' },
+    ask_fran: { who: 'fran', text: 'Look at all the giant’s buttons! Which pile has more?' },
+    ask_beth: { who: 'beth', text: 'Look at all the giant’s buttons! Which pile has more?' },
     count: { who: 'narrator', text: 'Count the tens first. Two tens and seven. Three tens and five.' },
     more: { who: 'hero', text: 'Three tens beat two tens. Thirty-five is more than twenty-seven!' },
     crumbs: { who: 'giant', text: 'Ooh! Little crumbs! Talking crumbs! Come here, crumbs, I have a biscuit!' },

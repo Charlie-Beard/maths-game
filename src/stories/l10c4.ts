@@ -53,8 +53,8 @@ export default defineStory({
     const cage = caged(k, 'pixie', { ...CAGE, z: 34, lock: '? ? ?', flip: true });
     k.set(cage.all, { transformOrigin: '50% 0%' });
 
-    const hero = k.character('hero', { x: 40, y: 480, w: 220, z: 20 });
-    const mf = k.character('moonface', { x: 560, y: 470, w: 220, z: 20 });
+    const hero = k.character('hero', { x: 70, y: 400, w: 220, z: 20 });
+    const mf = k.character('moonface', { x: 560, y: 400, w: 220, z: 20 });
     k.set([hero, mf], { opacity: 0 });
     await k.all(k.enter(hero, 'left', 0.8), k.enter(mf, 'left', 1.0));
     prisonSound.rattle(3);

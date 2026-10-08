@@ -294,6 +294,8 @@ export function mapBoard(k: Kit, chapter: number, o: { x?: number; y?: number; z
 export function clockFace(name: string, hour = 12, minute = 0): string {
   const hDeg = (hour % 12) * 30 + minute * 0.5;
   const mDeg = minute * 6;
+  /** The point `r` along a hand at `deg` clockwise from twelve. */
+  const at = (deg: number, r: number): [number, number] => [100 + Math.sin((deg * Math.PI) / 180) * r, 100 - Math.cos((deg * Math.PI) / 180) * r];
   const tick = (i: number): Node => {
     const a = (i / 12) * Math.PI * 2;
     const r0 = i % 3 ? 70 : 62;
@@ -315,8 +317,11 @@ export function clockFace(name: string, hour = 12, minute = 0): string {
     piece(circle(100, 100, 80), C.ice, { edge: 'cut', fibre: false, shadow: false, opacity: 0.25 }),
     ...Array.from({ length: 12 }, (_, i) => tick(i)),
     ...numerals,
-    group({ part: 'hourHand', origin: [100, 100], transform: `rotate(${hDeg} 100 100)` }, [piece(band([[100, 104], [100, 60]], 11), C.ink, { edge: 'cut', shadow: false })]),
-    group({ part: 'minHand', origin: [100, 100], transform: `rotate(${mDeg} 100 100)` }, [piece(band([[100, 106], [100, 34]], 7), C.ink, { edge: 'cut', shadow: false })]),
+    // Each hand is drawn already pointing at its time, not turned with a
+    // transform: the group's CSS transform-origin would apply on top of an
+    // SVG rotate's own centre and throw the hand off the clock.
+    group({ part: 'hourHand', origin: [100, 100] }, [piece(band([at(hDeg, -4), at(hDeg, 40)], 11), C.ink, { edge: 'cut', shadow: false })]),
+    group({ part: 'minHand', origin: [100, 100] }, [piece(band([at(mDeg, -6), at(mDeg, 66)], 7), C.ink, { edge: 'cut', shadow: false })]),
     piece(circle(100, 100, 8), C.ink, { edge: 'clean', shadow: false }),
   ]);
 }
