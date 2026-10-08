@@ -408,9 +408,9 @@ export class Kit<K extends string = string> {
   async shake(el: HTMLElement, amount = 10, times = 3): Promise<void> {
     if (this.calm) amount = Math.min(amount, 3);
     for (let i = 0; i < times; i++) {
-      await this.to(el, 0.08, { x: `+=${amount}`, rotation: '+=3', ease: 'none' });
-      await this.to(el, 0.08, { x: `-=${amount * 2}`, rotation: '-=6', ease: 'none' });
-      await this.to(el, 0.08, { x: `+=${amount}`, rotation: '+=3', ease: 'none' });
+      await this.to(el, 0.1, { x: `+=${amount}`, rotation: '+=3', ease: 'sine.out' });
+      await this.to(el, 0.16, { x: `-=${amount * 2}`, rotation: '-=6', ease: 'sine.inOut' });
+      await this.to(el, 0.1, { x: `+=${amount}`, rotation: '+=3', ease: 'sine.in' });
     }
   }
 
@@ -451,7 +451,7 @@ export class Kit<K extends string = string> {
   /** Shakes the whole stage (a big stomp or crash). Gentle and short. */
   async quake(amount = 8): Promise<void> {
     if (this.calm) return;
-    for (const dx of [amount, -amount, amount * 0.6, -amount * 0.6]) await this.to(this.root, 0.06, { x: `+=${dx}`, ease: 'none' });
+    for (const dx of [amount, -amount, amount * 0.6, -amount * 0.6]) await this.to(this.root, 0.08, { x: `+=${dx}`, ease: 'sine.inOut' });
   }
 
   // -------------------------------------------------------------- particles
@@ -649,7 +649,7 @@ export class Kit<K extends string = string> {
 
   /**
    * Moves the camera: zooms in on a point of the world (zoom 1 = the whole
-   * stage, 1.4 = a close-up), as a slow stop-motion push-in or pan. Edges
+   * stage, 1.4 = a close-up), as a slow, smooth push-in or pan. Edges
    * never show. `camera({})` goes back to the wide shot.
    */
   camera(o: { zoom?: number; x?: number; y?: number }, seconds = 1.4): Promise<void> {

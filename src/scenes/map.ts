@@ -315,7 +315,7 @@ export class MapScene extends Scene {
 
   /**
    * A new land arrives: the cloud parts, and the land drifts down into it
-   * and settles. About three seconds, all at 12 fps.
+   * and settles. About three seconds.
    */
   private async arrive(): Promise<void> {
     const box = TREE_SPOTS.cloud;

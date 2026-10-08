@@ -9,11 +9,10 @@ svg.paper {
 
 /*
  * Global paper grain over the whole stage. It is plain alpha: a dark,
- * see-through speckle (made from the grain texture by bakeGrain in
- * ui/director.ts). It once used mix-blend-mode: multiply, which on Safari
- * makes the whole stage re-blend every time anything under it moves.
- * Multiplying by a light grey is the same as laying black over it at an
- * alpha, so the look is the same and the cost is gone.
+ * see-through speckle (made by installGrain in art/grain.ts). It once used
+ * mix-blend-mode: multiply, which on Safari makes the whole stage re-blend
+ * every time anything under it moves. Laying the speckle over looks the
+ * same, without the cost.
  */
 .grain {
   position: absolute;
