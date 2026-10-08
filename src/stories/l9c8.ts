@@ -26,7 +26,7 @@
  */
 import { landSeal } from '../art/keepsakes';
 import { moonRoom, tree, TREE_SPOTS } from '../art/scenery';
-import { band, bell, C, circle, curve, defineStory, dot, ellipse, group, ink, noiseBurst, NOTE, now, piece, poly, rect, rng, svg, tone, type Kit, type Node, type Pt } from './kit';
+import { band, bell, C, circle, curve, defineStory, dot, ellipse, group, ink, NOTE, now, piece, poly, rect, rng, svg, tone, type Kit, type Node, type Pt } from './kit';
 import { blackSheet, flump, sting, together, wave } from './bits';
 import { snapSound } from './snapSchool';
 
