@@ -23,7 +23,7 @@
  * recorded; until it is, the iPad's own voice reads it. `{name}` is filled in
  * with the child's name.
  *
- * Movement is stop-motion (12 fps, see ui/anim.ts) and follows calm mode:
+ * Movement is smooth (see ui/anim.ts) and follows calm mode:
  * motion is shortened and particles are skipped. Nothing flashes.
  */
 import { gsap } from 'gsap';
@@ -297,7 +297,7 @@ export class Kit<K extends string = string> {
     this.captionEl.classList.add('on');
   }
 
-  /** Makes an actor bob as if talking, until the returned stopper is called. */
+  /** Makes an actor bob gently as if talking, until the returned stopper is called. */
   talk(el: HTMLElement): () => void {
     // The mouth opens and shuts (portraits with a `mouthOpen` part), even in calm mode.
     const shut = this.part(el, 'mouth');
@@ -311,8 +311,11 @@ export class Kit<K extends string = string> {
         shut.forEach((m) => (m.style.opacity = isOpen ? '0' : '1'));
       }, 170);
     }
-    const tw = this.calm ? null : gsap.to(el, { y: '-=6', rotation: '+=2', duration: 0.17, yoyo: true, repeat: -1, ease: 'steps(1)' });
+    const tw = this.calm ? null : gsap.to(el, { y: '-=6', rotation: '+=2', duration: 0.4, yoyo: true, repeat: -1, ease: 'sine.inOut' });
+    let stopped = false;
     return () => {
+      if (stopped) return;
+      stopped = true;
       if (flap) clearInterval(flap);
       open.forEach((m) => (m.style.opacity = '0'));
       shut.forEach((m) => (m.style.opacity = '1'));
@@ -353,7 +356,7 @@ export class Kit<K extends string = string> {
 
   // ----------------------------------------------------------------- motion
 
-  /** A stop-motion tween (12 fps). Resolves when it ends. */
+  /** A smooth eased tween. Resolves when it ends. */
   to(el: gsap.TweenTarget, seconds: number, vars: gsap.TweenVars & { ease?: string }): Promise<void> {
     if (!this.alive()) return never();
     const d = this.calm ? Math.min(seconds, 0.3) : seconds;

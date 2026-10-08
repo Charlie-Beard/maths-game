@@ -87,13 +87,13 @@ export function removeCard(card: HTMLElement, calm: boolean): void {
     card.remove();
     return;
   }
-  gsap.to(card, { opacity: 0, scale: 0.6, duration: 0.25, ease: 'steps(3)', onComplete: () => card.remove() });
+  gsap.to(card, { opacity: 0, scale: 0.6, duration: 0.25, ease: 'power2.in', onComplete: () => card.remove() });
 }
 
 /** Cards slide up into place when the problem appears. */
 export function enter(els: Element[], calm: boolean): void {
   if (calm || !els.length) return;
-  gsap.from(els, { y: 60, opacity: 0, duration: 0.3, stagger: 0.06, ease: 'steps(4)' });
+  gsap.from(els, { y: 60, opacity: 0, duration: 0.3, stagger: 0.06, ease: 'power2.out' });
 }
 
 export { pop, wobble };

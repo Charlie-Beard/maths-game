@@ -95,7 +95,7 @@ export default defineStory({
       const el = k.add(chalkText(s, { w: 290, size: 50 }), { x: 540, y: 448 + i * 70, w: 290, z: 25 });
       k.set(el, { opacity: 0 });
       snapSound.chalk(0.5);
-      await k.all(k.fade(el, 1, 0.5), k.to(well, 0.25, { rotation: -12, yoyo: true, repeat: 1, ease: 'none' }));
+      await k.all(k.fade(el, 1, 0.5), k.to(well, 0.25, { rotation: -12, yoyo: true, repeat: 1, ease: 'sine.inOut' }));
       k.fx.pop();
       await k.wait(200);
     }

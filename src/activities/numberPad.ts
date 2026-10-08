@@ -92,7 +92,7 @@ export function numberPad(p: Problem, ctx: ActivityContext): Activity {
     keys.forEach((k) => (k.disabled = true));
     const goPad = () => pad.remove();
     if (ctx.calm) goPad();
-    else gsap.to(pad, { opacity: 0, y: 40, duration: 0.25, ease: 'steps(3)', onComplete: goPad });
+    else gsap.to(pad, { opacity: 0, y: 40, duration: 0.25, ease: 'power2.in', onComplete: goPad });
     typed = '';
     show();
     // One wrong card is gone already.
@@ -111,7 +111,7 @@ export function numberPad(p: Problem, ctx: ActivityContext): Activity {
     el: shell.el,
     show() {
       if (ctx.calm) return;
-      gsap.from(keys, { y: 50, opacity: 0, duration: 0.3, stagger: 0.025, ease: 'steps(4)' });
+      gsap.from(keys, { y: 50, opacity: 0, duration: 0.3, stagger: 0.025, ease: 'power2.out' });
     },
     wrong(val: Answer) {
       cards?.wrong(val);
