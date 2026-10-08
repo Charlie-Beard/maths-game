@@ -438,7 +438,7 @@ export function caged(k: Kit, who: string, at: { x: number; y: number; w: number
   return { back, who: el, front, all: [back, el, front] };
 }
 
-/** Wide iron bars across the front of a cell, 440 × 500, with a lock in the middle. */
+/** Wide iron bars across the front of a cell, 440 × 500, with a lock low in the middle. */
 export function cellBars(name: string, lock?: string): string {
   const bars: Node[] = [];
   for (let i = 0; i < 8; i++) bars.push(piece(rect(14 + i * 58, 20, 16, 470, 4), C.iron, { edge: 'cut' }));
@@ -446,11 +446,12 @@ export function cellBars(name: string, lock?: string): string {
     ...bars,
     piece(rect(0, 10, 440, 24, 4), C.iron, { edge: 'cut' }),
     piece(rect(0, 466, 440, 24, 4), C.iron, { edge: 'cut' }),
-    piece(rect(0, 236, 440, 18, 3), C.iron, { edge: 'cut' }),
-    piece(rect(186, 220, 68, 64, 10), C.ironLight, { edge: 'cut' }),
-    piece(circle(220, 244, 8), C.snapInk, { edge: 'clean', shadow: false }),
-    piece(rect(216, 244, 8, 22), C.snapInk, { edge: 'clean', shadow: false }),
-    ...(lock ? [piece(rect(130, 290, 180, 60, 6), C.chalk, { edge: 'cut' }), text(220, 336, lock, 40, C.snapInk)] : []),
+    // The crossbar and lock sit low, so a face behind the bars stays clear.
+    piece(rect(0, 346, 440, 18, 3), C.iron, { edge: 'cut' }),
+    piece(rect(186, 330, 68, 60, 10), C.ironLight, { edge: 'cut' }),
+    piece(circle(220, 352, 8), C.snapInk, { edge: 'clean', shadow: false }),
+    piece(rect(216, 352, 8, 20), C.snapInk, { edge: 'clean', shadow: false }),
+    ...(lock ? [piece(rect(130, 396, 180, 60, 6), C.chalk, { edge: 'cut' }), text(220, 442, lock, 40, C.snapInk)] : []),
   ]);
 }
 
