@@ -40,7 +40,7 @@ export default defineStory({
 
     // ---- Twelve snowballs, in a row along the top.
     const balls = Array.from({ length: 12 }, (_, i) => {
-      const b = k.prop('snowball', { x: 254 + i * 56, y: 50, w: 56, z: 15 });
+      const b = k.prop('snowball', { x: 254 + i * 56, y: 42, w: 74, z: 15 });
       k.set(b, { opacity: 0 });
       return b;
     });
@@ -88,7 +88,7 @@ export default defineStory({
     ];
     const keying = async () => {
       for (let i = 0; i < balls.length; i++) {
-        void k.to(balls[i], 0.7, { x: KEY[i][0] - 28 - parseFloat(balls[i].style.left), y: KEY[i][1] - 28 - parseFloat(balls[i].style.top), ease: 'power2.inOut' });
+        void k.to(balls[i], 0.7, { x: KEY[i][0] - 37 - parseFloat(balls[i].style.left), y: KEY[i][1] - 37 - parseFloat(balls[i].style.top), ease: 'power2.inOut' });
         await k.wait(70);
       }
       await k.wait(700);

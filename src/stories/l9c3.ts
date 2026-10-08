@@ -49,14 +49,14 @@ export default defineStory({
     const drop = dewdrop(k);
 
     // ---- Four empty sledges in a row, and eight friends waiting at the top.
-    const SX = [300, 450, 600, 750];
+    const SX = [290, 440, 590, 740];
     const sleds = SX.map((x) => {
-      const s = k.prop('sledge', { x, y: 470, w: 150, z: 14 });
+      const s = k.prop('sledge', { x, y: 470, w: 160, z: 14 });
       k.set(s, { opacity: 0 });
       return s;
     });
     const riders = COATS.map(([coat, hat], i) => {
-      const r = k.add(rider(coat, hat, `l9c3-rider-${i}`), { x: 290 + i * 80, y: 150, w: 62, z: 16 });
+      const r = k.add(rider(coat, hat, `l9c3-rider-${i}`), { x: 280 + i * 80, y: 150, w: 84, z: 16 });
       k.set(r, { opacity: 0 });
       return r;
     });
@@ -66,7 +66,7 @@ export default defineStory({
 
     // ---- Two hop on each sledge, and the sledges are counted.
     const tags = SX.map((x, n) => {
-      const t = k.add(roundTag(n + 1, C.goldLight, `l9c3-tag-${n + 1}`), { x: x + 35, y: 330, w: 80, z: 18 });
+      const t = k.add(roundTag(n + 1, C.goldLight, `l9c3-tag-${n + 1}`), { x: x + 40, y: 340, w: 80, z: 18 });
       k.set(t, { opacity: 0 });
       return t;
     });
@@ -76,8 +76,8 @@ export default defineStory({
         const pair = [riders[n * 2], riders[n * 2 + 1]];
         await k.all(
           ...pair.map((r, j) => {
-            const tx = SX[n] + 18 + j * 52;
-            return k.to(r, 0.5, { x: tx - parseFloat(r.style.left), y: 405 - parseFloat(r.style.top), ease: 'power2.inOut' });
+            const tx = SX[n] + 8 + j * 62;
+            return k.to(r, 0.5, { x: tx - parseFloat(r.style.left), y: 452 - parseFloat(r.style.top), ease: 'power2.inOut' });
           }),
         );
         tickNote(n);

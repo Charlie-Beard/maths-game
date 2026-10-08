@@ -39,16 +39,16 @@ export default defineStory({
     const dew = dewdrop(k);
 
     // ---- Two full rows of ten icicles, and a short row of four.
-    const spot = (i: number): [number, number] => [280 + (i % 10) * 62, 30 + Math.floor(i / 10) * 74];
+    const spot = (i: number): [number, number] => [276 + (i % 10) * 62, 6 + Math.floor(i / 10) * 88];
     const make = (i: number): HTMLElement => {
       const [x, y] = spot(i);
-      const e = k.prop('icicle', { x, y, w: 64, z: 15 });
+      const e = k.prop('icicle', { x, y, w: 88, z: 15 });
       k.set(e, { opacity: 0 });
       return e;
     };
     const icicles: HTMLElement[] = [];
-    const total = k.add(sumStrip('20 + 4', 'l9c7-sum-a'), { x: 450, y: 262, w: 270, z: 25 });
-    const total2 = k.add(sumStrip('24 + 5 = 29', 'l9c7-sum-b'), { x: 405, y: 262, w: 370, z: 25 });
+    const total = k.add(sumStrip('20 + 4', 'l9c7-sum-a'), { x: 450, y: 290, w: 270, z: 25 });
+    const total2 = k.add(sumStrip('24 + 5 = 29', 'l9c7-sum-b'), { x: 405, y: 290, w: 370, z: 25 });
     [total, total2].forEach((t) => k.set(t, { opacity: 0 }));
     void k.say('icicles', snowman);
     for (let i = 0; i < 24; i++) {
