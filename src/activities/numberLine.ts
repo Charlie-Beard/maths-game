@@ -3,7 +3,7 @@
  * number under every rung.
  *
  * Moon-Face stands on the start rung. Each tap of "hop on" or "hop back"
- * moves him one rung (stop-motion hop), says the number he lands on, and
+ * moves him one rung (a smooth hop), says the number he lands on, and
  * draws the hop as an arc with its count (1, 2, 3 …) so he can see how far
  * he's gone. Hopping back over the last arc rubs it out. He answers by
  * tapping the number he landed on, or the tick ("here!").
@@ -185,7 +185,7 @@ export function numberLine(p: Problem, ctx: ActivityContext): Activity {
     el: shell.el,
     show() {
       enter([ladderEl, hopper, ...tags.values()], ctx.calm);
-      if (!ctx.calm) gsap.from([back, tick, on], { y: 60, opacity: 0, duration: 0.3, stagger: 0.06, ease: 'steps(4)' });
+      if (!ctx.calm) gsap.from([back, tick, on], { y: 60, opacity: 0, duration: 0.3, stagger: 0.06, ease: 'power2.out' });
     },
     wrong(val: Answer) {
       const t = lastPick ?? tags.get(Number(val));

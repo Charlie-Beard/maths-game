@@ -41,7 +41,7 @@ export default defineStory({
     // Moon-Face writes lines; she looms behind, tapping her ruler.
     const snap = k.snap('loom', { x: 760, y: 130, w: 330, z: 16 });
     const ruler = k.part(snap, 'ruler');
-    if (!k.calm) void k.to(ruler, 0.3, { rotation: -10, yoyo: true, repeat: 7, ease: 'none' });
+    if (!k.calm) void k.to(ruler, 0.3, { rotation: -10, yoyo: true, repeat: 7, ease: 'sine.inOut' });
     const chalkLines = [0, 1, 2].map((i) => {
       const el = k.add(chalkText('I must not smile.', { w: 400, size: 40 }), { x: BIG.x + 35, y: BIG.y + 30 + i * 62, w: 400, z: 8 });
       k.set(el, { opacity: 0 });

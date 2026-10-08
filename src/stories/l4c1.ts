@@ -44,7 +44,7 @@ export default defineStory({
 
     // The Saucepan Man mishears.
     snapSound.clank(3);
-    void k.to(k.part(pan, 'pots'), 0.12, { rotation: 6, yoyo: true, repeat: 5, ease: 'none' });
+    void k.to(k.part(pan, 'pots'), 0.12, { rotation: 6, yoyo: true, repeat: 5, ease: 'sine.inOut' });
     await k.all(k.say('pool', pan), k.hop(pan, 30, 2));
     await k.shake(hero, 6, 1);
 

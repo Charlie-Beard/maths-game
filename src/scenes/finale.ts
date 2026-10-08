@@ -693,7 +693,7 @@ export class FinaleScene extends PlayScene {
     fx.stomp(3, 0.4);
     if (!calm) {
       gsap.set(this.snap, { x: 300 });
-      await sm(this.snap, 1.2, { x: 0, ease: 'steps(3)' });
+      await sm(this.snap, 1.2, { x: 0, ease: 'power2.inOut' });
     }
     this.setPose('shriek');
     sfx.ominous();
@@ -769,7 +769,7 @@ export class FinaleScene extends PlayScene {
       // She storms off, vowing revenge.
       this.setPose('stomp');
       fx.stomp(4, 0.3);
-      await sm(this.snap, calm ? 0.25 : 1.2, { x: 520, ease: 'steps(4)' });
+      await sm(this.snap, calm ? 0.25 : 1.2, { x: 520, ease: 'power2.in' });
       gsap.set(this.snap, { opacity: 0 });
     }
     sfx.fanfare();

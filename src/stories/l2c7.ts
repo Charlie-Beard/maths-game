@@ -199,7 +199,7 @@ export default defineStory({
     const dark = k.dim(0, '#2a1440');
     void k.fade(dark, 0.3, 2);
     rattle(1.6);
-    void k.to([...cups, extra], 0.08, { x: '+=3', yoyo: true, repeat: 15, ease: 'none' });
+    void k.to([...cups, extra], 0.08, { x: '+=3', yoyo: true, repeat: 15, ease: 'sine.inOut' });
     void k.to(sun, 6, { rotation: -720, ease: 'power1.in' });
     void k.camera({ zoom: 1.3, x: 920, y: 400 }, 1.2);
     await k.all(k.say('spin', topsy), k.shake(topsy, 5, 3));

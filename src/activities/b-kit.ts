@@ -2,7 +2,7 @@
  * Shared pieces for workstream W2b's activities (compare, tensOnes, groups,
  * share, fraction): the activity layer with tap handling and locking, big
  * answer cards, the OK seal for "build it" answers, and small helpers for
- * help steps and stop-motion movement.
+ * help steps and smooth movement.
  *
  * Every answer target carries `data-value` (what tapping it would answer),
  * so the e2e tests can find it. The OK seal's `data-value` follows what he
@@ -194,8 +194,8 @@ export function sumText(k: Kit, text: string | undefined, y = 470): HTMLElement 
 // ---------------------------------------------------------------------------
 
 /**
- * Moves an element (already in its final place) in from a point, in held
- * stop-motion frames: dx, dy is where it starts relative to where it ends.
+ * Moves an element (already in its final place) in from a point, smoothly:
+ * dx, dy is where it starts relative to where it ends.
  */
 export function flyIn(el: HTMLElement, dx: number, dy: number, ctx: ActivityContext, duration = 0.4): Promise<void> {
   return new Promise((resolve) => {

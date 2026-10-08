@@ -106,7 +106,7 @@
   height: 100%;
 }
 .tile.glowing .glow {
-  animation: glow-pulse 1.6s steps(8, end) infinite;
+  animation: glow-pulse 1.6s ease-in-out infinite;
 }
 /* The hint must be impossible to miss: gold edge, bright halo, a little bounce. */
 .tile.glowing .card-face {
@@ -116,7 +116,7 @@
 }
 .tile.glowing .glyph {
   color: #7a4a10;
-  animation: hint-bounce 1.2s steps(6, end) infinite;
+  animation: hint-bounce 1.2s ease-in-out infinite;
 }
 @keyframes hint-bounce {
   0%,
@@ -622,7 +622,7 @@
 }
 .stop.current .halo {
   opacity: 1;
-  animation: halo 2s steps(10, end) infinite;
+  animation: halo 2s ease-in-out infinite;
 }
 .calm .stop.current .halo {
   animation: none;
@@ -941,7 +941,7 @@
   border-radius: 16px;
   background: var(--parchment-300);
   padding: 10px;
-  animation: turn 2.4s steps(12, end) infinite;
+  animation: turn 2.4s ease-in-out infinite;
 }
 .rotate-ipad .screen {
   width: 100%;

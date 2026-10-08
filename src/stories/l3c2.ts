@@ -156,7 +156,7 @@ export default defineStory({
     void k.camera({ zoom: 1.15, x: 500, y: 430 }, 0.01);
     clank(6);
     const pots = k.part(sp, 'pots');
-    if (!k.calm) gsap.to(pots, { rotation: 4, duration: 0.17, yoyo: true, repeat: 7, ease: 'steps(1)' });
+    if (!k.calm) gsap.to(pots, { rotation: 4, duration: 0.35, yoyo: true, repeat: 3, ease: 'sine.inOut' });
     await k.enter(sp, 'left', 1.0);
     void k.enter(hero, 'right');
     void k.camera({}, 1.2);

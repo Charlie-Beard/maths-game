@@ -238,7 +238,7 @@ export class PlayScene extends Scene {
     await voice.say(PHRASES.silkyHere);
     if (!this.alive) return;
     await voice.speech(this.round.current.explain);
-    if (!isCalm()) gsap.to(this.silky, { x: 0, y: 0, scale: 1, duration: 0.6, ease: 'steps(7)' });
+    if (!isCalm()) gsap.to(this.silky, { x: 0, y: 0, scale: 1, duration: 0.6, ease: 'power2.out' });
   }
 
   private async cheer(): Promise<void> {

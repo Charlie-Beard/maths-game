@@ -367,8 +367,8 @@ export default defineStory({
     topHum();
     const spinTop = (async () => {
       for (let i = 0; i < 6; i++) {
-        await k.to(top, 0.18, { scaleX: -1, rotation: 4, ease: 'none' });
-        await k.to(top, 0.18, { scaleX: 1, rotation: -4, ease: 'none' });
+        await k.to(top, 0.18, { scaleX: -1, rotation: 4, ease: 'sine.inOut' });
+        await k.to(top, 0.18, { scaleX: 1, rotation: -4, ease: 'sine.inOut' });
       }
       await k.to(top, 0.3, { rotation: 0 });
     })();

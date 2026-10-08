@@ -119,14 +119,16 @@ export function count(p: Problem, ctx: ActivityContext): Activity {
         v.groups.forEach((_, gi) =>
           tidy.spots[gi].forEach((s) => {
             const o = objs[k++];
-            const dx = s.x - parseFloat(o.el.style.left);
-            const dy = s.y - parseFloat(o.el.style.top);
+            // Scale about the centre (not width/height) so the move runs on the GPU.
+            const cur = parseFloat(o.el.style.width) || tidy.size;
+            const dx = s.x + tidy.size / 2 - (parseFloat(o.el.style.left) + cur / 2);
+            const dy = s.y + tidy.size / 2 - (parseFloat(o.el.style.top) + cur / 2);
             const done = () => {
-              gsap.set(o.el, { x: 0, y: 0 });
+              gsap.set(o.el, { x: 0, y: 0, scale: 1 });
               place1(o.el, s, tidy.size);
             };
             if (ctx.calm) done();
-            else sm(o.el, 0.5, { x: dx, y: dy, width: tidy.size, height: tidy.size, rotation: 0, onComplete: done });
+            else sm(o.el, 0.5, { x: dx, y: dy, scale: tidy.size / cur, rotation: 0, onComplete: done });
           }),
         );
         cards.dropOne();
