@@ -198,8 +198,8 @@ export const LANDS: Land[] = [
     ['Broth for Breakfast', 'saucepan', ['change'], [1, 2], 'EH? BROTH? I’ve got the saucepans! Who’s got the pennies?', 'brothBowl'],
     ['The Bread Shop', 'beth', ['change', 'coins'], [1, 3], 'A loaf for every child! Let’s pay, and count the change.', 'loaf'],
     ['Bedtime in the Toe', 'fran', ['tally', 'share'], [3, 4], 'Time for bed! Who sleeps where? Let’s look at the chart.', 'nightlight'],
-    ['A Red Cap in the Laces', 'silky', ['change', 'tally'], [2, 3], 'Did you see that? A little red cap, hiding in the laces…', 'redCap'],
-    ['The Shoe Walks Away!', 'oldWoman', ['tally', 'change', 'add-2d1d', 'times-2'], [2, 3], 'Oh my! The land is moving on! Run along home, my dears!', 'shoeBuckle'],
+    ['A Red Cap in the Laces', 'silky', ['change', 'tally'], [2, 3], 'Buns for breakfast! Let’s count the change. Keep your eyes open…', 'redCap'],
+    ['The Shoe Walks Away!', 'oldWoman', ['tally', 'change', 'add-2d1d', 'times-2'], [2, 3], 'Oh my! The shoe wants to walk! Run along home, my dears!', 'shoeBuckle'],
   ]),
   land(12, 'The Land of Music', 'Music', '#2f8a84', 'Counting in 3s and time to 5 minutes', 'escape', [
     ['Oom-Pah-Pah!', 'oomboom', ['count-3s'], [1, 2], 'Oom boom boom! This is MY land! Music here goes in threes!', 'baton'],
