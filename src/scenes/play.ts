@@ -44,11 +44,6 @@ export interface PlayOptions {
   signOff?: boolean;
 }
 
-/**
- * The "back to the tree" question. These two are not in PHRASES (core is
- * not ours to edit here), so until they are recorded the iPad's voice says them.
- */
-const LEAVE_ASK = 'Back to the tree?';
 const portrait = (): boolean => document.body.classList.contains('is-portrait');
 
 export class PlayScene extends Scene {
@@ -298,7 +293,7 @@ export class PlayScene extends Scene {
     this.activity?.lock(true);
     const veil = h('div', { class: 'play-veil' });
     const card = place(h('div', { class: 'play-card', html: parchment(600, 400, 'play-leave') }), 290, 190, 600, 400);
-    card.append(place(h('div', { class: 'play-card-title' }, LEAVE_ASK), 40, 50, 520, 80));
+    card.append(place(h('div', { class: 'play-card-title' }, PHRASES.leaveAsk), 40, 50, 520, 80));
     const yes = sealButton('tick', { x: 90, y: 170, size: 140, color: C.green, label: 'Yes', aria: 'Yes, back to the tree', name: 'leave-yes' });
     const keep = sealButton('play', { x: 370, y: 170, size: 140, color: C.red, label: 'Keep playing', aria: 'Keep playing', name: 'leave-keep' });
     card.append(yes, keep);
@@ -321,7 +316,7 @@ export class PlayScene extends Scene {
       sfx.tap();
       close();
     });
-    void voice.say(LEAVE_ASK);
+    void voice.say(PHRASES.leaveAsk);
   }
 
   /** Practice ends with Silky's well done and the toffees earned, then one big button. */
