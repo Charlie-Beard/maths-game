@@ -3,4 +3,5 @@ import type { Loader } from './types';
 
 export const FILMS: Record<string, Loader> = {
   opening: () => import('../opening'),
+  ending: () => import('../ending'),
 };
