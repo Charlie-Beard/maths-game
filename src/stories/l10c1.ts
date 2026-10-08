@@ -1,10 +1,10 @@
 /**
  * Land 10, chapter 1: Dame Snap's Return.
  *
- * Night on the Faraway Tree, and her land is back in the cloud: a prison of
- * black stone. Heels clack down the branches. Dame Snap looms at the top
- * and snaps her ruler, once for each of the Folk: Dame Washalot, the Angry
- * Pixie and Mr Watzisname. Each time, an iron cage drops round them with a
+ * Six o'clock, the coldest hour (just as the plan from the snow said), and
+ * her land is back in the cloud: a prison of black stone. Heels clack
+ * down the branches. Dame Snap looms at the top and snaps her ruler, once
+ * for each of the Folk: Dame Washalot, the Angry Pixie and Mr Watzisname. Each time, an iron cage drops round them with a
  * CLANG (nobody is touched), and her crows carry the cages up into the
  * prison, the Pixie shouting all the way. Cut back to {name} and Moon-Face
  * at the bottom: Silky is up there too. They follow, up the long ladder,
@@ -27,7 +27,7 @@ const CAGE_W = 190;
 
 export default defineStory({
   lines: {
-    back: { who: 'narrator', text: 'Her land was back. A prison of black stone, high in the cloud.' },
+    back: { who: 'narrator', text: 'Six o’clock, the coldest hour. Her land was back: a prison of black stone.' },
     cages: { who: 'dameSnap', text: 'Washalot! Pixie! Watzisname! Into my CAGES, all of you!' },
     pixie: { who: 'pixie', text: 'Put me DOWN, you crows! I’ll pull out your tail feathers!' },
     follow: { who: 'moonface', text: 'Silky is up there too. We’re going after them, {name}.' },

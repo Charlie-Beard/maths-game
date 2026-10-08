@@ -1,8 +1,9 @@
 /**
  * Land 10, chapter 2: Through the Bars.
  *
- * At the prison gate, by moonlight. Two sums are chalked on slates beside
- * it: 45 + 3 and 52 − 4 (the chapter's adding and taking away a one-digit
+ * At the prison gate, by moonlight, at quarter past six (while she's busy
+ * settling in, as the plan they made in the snow said). Only one half of
+ * her gate needs opening, and two sums are chalked on slates beside it: 45 + 3 and 52 − 4 (the chapter's adding and taking away a one-digit
  * number). Both make 48, so bar 48 is the one: {name} counts on along the
  * bars, 46, 47, 48, and it bends with a creak. Somewhere above, her heels
  * clack and a crow lands on the gate; everyone freezes until it flaps off.
@@ -22,8 +23,8 @@ const BAR_Y = GAP.y - 10;
 
 export default defineStory({
   lines: {
-    sums_joe: { who: 'joe', text: 'Two sums on the gate. Both answers are the same. That’s our bar!' },
-    sums_beth: { who: 'beth', text: 'Two sums on the gate. Both answers are the same. That’s our bar!' },
+    sums_joe: { who: 'joe', text: 'Quarter past six, like our plan. Two sums, one answer. That bar is our way in!' },
+    sums_beth: { who: 'beth', text: 'Quarter past six, like our plan. Two sums, one answer. That bar is our way in!' },
     bar: { who: 'narrator', text: '45 add 3 is 48. 52 take away 4 is 48 too. Bar 48!' },
     freeze: { who: 'narrator', text: 'Clack, clack, up above. A crow! Nobody moved a muscle.' },
     squeeze: { who: 'moonface', text: 'Breathe in, Moon-Face. I’m very round, you know… OOF!' },
