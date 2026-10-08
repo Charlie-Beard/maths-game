@@ -63,7 +63,7 @@ export function numberLine(name: string, from: number, to: number, label: number
     ink([[40, 90], [860, 90]], { width: 5, color: C.plum }),
     ...marks.map((n) => ink([[mx(n), 78], [mx(n), 102]], { width: 4, color: C.plum })),
     ...label.map((n) =>
-      raw(`<text x="${mx(n)}" y="132" text-anchor="middle" font-family="Andika, sans-serif" font-weight="700" font-size="34" fill="${C.ink}">${n}</text>`),
+      raw(`<text x="${mx(n)}" y="132" text-anchor="middle" font-family="Andika, sans-serif" font-weight="700" font-size="44" fill="${C.ink}">${n}</text>`),
     ),
   ]);
 }
@@ -82,7 +82,7 @@ export function tornPage(name: string, lines: string[]): string {
     piece(poly([[14, 20], [120, 8], [200, 22], [300, 6], [346, 30], [336, 120], [350, 190], [332, 280], [230, 292], [140, 276], [60, 290], [12, 270], [24, 160]]), '#efe2c4', { rough: 1.4 }),
     ...lines.map((t, i) =>
       raw(
-        `<text x="180" y="${88 + i * 62}" text-anchor="middle" font-family="Andika, sans-serif" font-weight="700" font-size="${i === lines.length - 1 ? 52 : 38}" fill="#8b1c2c" transform="rotate(${i % 2 ? 2 : -3} 180 ${88 + i * 62}) skewX(-10)">${t}</text>`,
+        `<text x="180" y="${88 + i * 62}" text-anchor="middle" font-family="Andika, sans-serif" font-weight="700" font-size="${i === lines.length - 1 ? 44 : 34}" fill="#8b1c2c" transform="rotate(${i % 2 ? 2 : -3} 180 ${88 + i * 62}) skewX(-10)">${t}</text>`,
       ),
     ),
   ]);

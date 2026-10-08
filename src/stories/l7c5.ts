@@ -9,7 +9,7 @@
  * FAIRY." The Enchanter snatches it away and says it is nothing. Hint four
  * of Dame Snap: her hand, and a bargain. Next: The Missing Ingredient.
  */
-import { buddy, jump } from './bits';
+import { buddy, jump, numberTag } from './bits';
 import { C, defineStory, type Kit } from './kit';
 import { hopArc, lineX, numberLine, rustle, snapSound, spellChime, tornPage } from './spells';
 
@@ -62,10 +62,7 @@ export default defineStory({
       void k.appear(arc, 0.3);
       spellChime(3);
       await jump(k, marker, px(to) - 32, markY, 50, 0.9);
-      const tag = k.add(
-        `<svg viewBox="0 0 100 60" xmlns="http://www.w3.org/2000/svg"><text x="50" y="46" text-anchor="middle" font-family="Andika, sans-serif" font-weight="700" font-size="46" fill="${color}">${label}</text></svg>`,
-        { x: px(to) + width / 2 - 50, y: LY - 40, w: 100, z: 23 },
-      );
+      const tag = k.add(numberTag(label, color === C.red ? C.pink : C.sky, `l7c5-tag-${label}`), { x: px(to) + width / 2 - 55, y: LY - 60, w: 110, z: 23 });
       void k.pop(tag, 1.2);
       await k.wait(500);
     };

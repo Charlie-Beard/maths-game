@@ -75,6 +75,9 @@ export default defineStory({
       bloop(2);
       await k.wait(750);
     }
+    const done = k.add(sumStrip('9 + 3 = 12', 'l7c6-sum-done'), { x: 430, y: 520, w: 320, z: 23 });
+    k.set(done, { opacity: 0 });
+    void k.appear(done, 0.4);
     spellChime(5);
     void k.fade(glow, 0.45, 0.8);
     k.sparkle(590, 220, 18, 200);
