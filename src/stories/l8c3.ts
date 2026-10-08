@@ -40,12 +40,12 @@ export default defineStory({
     const dew = dewdrop(k);
     await k.all(k.enter(hostEl, 'left'), k.enter(hero, 'right'));
 
-    const tray = k.add(box(), { x: 330, y: 470, w: 520, z: 14 });
+    const tray = k.add(box(), { x: 330, y: 330, w: 520, z: 14 });
     k.set(tray, { opacity: 0 });
     await k.all(k.appear(tray, 0.5), k.say(`open_${host}`, hostEl));
 
     // ---- Three rows of four teddies, a row at a time.
-    const ROW_Y = [496, 580, 664];
+    const ROW_Y = [356, 440, 524];
     const teds = ROW_Y.map((y) => Array.from({ length: 4 }, (_, i) => k.prop('teddy', { x: 366 + i * 104, y, w: 84, z: 16 })));
     const sums = [4, 8, 12].map((n, r) => k.add(numberTag(String(n), [C.pink, C.goldLight, C.sky][r], `l8c3-tag-${n}`), { x: 790, y: ROW_Y[r] + 4, w: 90, z: 18 }));
     teds.flat().forEach((t) => k.set(t, { opacity: 0 }));

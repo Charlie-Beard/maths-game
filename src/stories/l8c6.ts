@@ -27,7 +27,7 @@ export default defineStory({
     const ob = k.character('oomboom', { x: 20, y: 300, z: 14 });
     const hero = k.character('hero', { x: 905, y: 352, z: 20, flip: true });
     const dew = dewdrop(k);
-    k.add(counter(), { x: 150, y: 560, w: 700, z: 18 });
+    k.add(counter(), { x: 150, y: 430, w: 700, z: 18 });
     const train = k.add(toyTrain(), { x: 230, y: 20, w: 260, z: 12 });
     const trainTag = k.add(numberTag('10p', C.pink, 'l8c6-train-price'), { x: 300, y: 130, w: 110, z: 13 });
     k.set([train, trainTag], { opacity: 0 });
@@ -35,17 +35,17 @@ export default defineStory({
     await k.say('shop', ob);
 
     // ---- The teddy on the counter, with its price.
-    const teddy = k.prop('teddy', { x: 420, y: 470, w: 130, z: 19 });
-    const price = k.add(numberTag('7p', C.goldLight, 'l8c6-price'), { x: 560, y: 480, w: 110, z: 19 });
+    const teddy = k.prop('teddy', { x: 420, y: 340, w: 130, z: 19 });
+    const price = k.add(numberTag('7p', C.goldLight, 'l8c6-price'), { x: 560, y: 350, w: 110, z: 19 });
     k.set([teddy, price], { opacity: 0 });
     void k.appear(teddy, 0.4);
     void k.appear(price, 0.4);
     await k.say('price', ob);
 
     // ---- Five pence, then two pence: seven.
-    const five = k.add(coin(5), { x: 720, y: 440, w: 90, z: 22 });
-    const two = k.add(coin(2), { x: 820, y: 440, w: 90, z: 22 });
-    const sum = k.add(numberTag('7p', C.sky, 'l8c6-sum'), { x: 760, y: 340, w: 110, z: 23 });
+    const five = k.add(coin(5), { x: 720, y: 310, w: 90, z: 22 });
+    const two = k.add(coin(2), { x: 820, y: 310, w: 90, z: 22 });
+    const sum = k.add(numberTag('7p', C.sky, 'l8c6-sum'), { x: 760, y: 200, w: 110, z: 23 });
     k.set([five, two, sum], { opacity: 0 });
     const paying = async () => {
       await k.wait(900);

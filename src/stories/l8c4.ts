@@ -39,8 +39,8 @@ export default defineStory({
     await k.all(k.enter(ob, 'left'), k.enter(hero, 'right'));
 
     // ---- Twos: each beat lays down a pair, and the running total follows.
-    const pairs = Array.from({ length: 5 }, (_, i) => k.add(pair(i), { x: 330 + i * 110, y: 640, w: 100, z: 16 }));
-    const tags = Array.from({ length: 5 }, (_, i) => k.add(roundTag((i + 1) * 2, i % 2 ? C.goldLight : C.pink, `l8c4-tag-${i}`), { x: 345 + i * 110, y: 545, w: 78, z: 18 }));
+    const pairs = Array.from({ length: 5 }, (_, i) => k.add(pair(i), { x: 330 + i * 110, y: 520, w: 100, z: 16 }));
+    const tags = Array.from({ length: 5 }, (_, i) => k.add(roundTag((i + 1) * 2, i % 2 ? C.goldLight : C.pink, `l8c4-tag-${i}`), { x: 345 + i * 110, y: 430, w: 78, z: 18 }));
     [...pairs, ...tags].forEach((e) => k.set(e, { opacity: 0 }));
     const drumming = async (arms: SVGGElement[]) => {
       await k.wait(1500);
@@ -59,8 +59,8 @@ export default defineStory({
 
     // ---- Tens: three big booms, one little drum each.
     void k.all(...pairs.map((p) => k.fade(p, 0, 0.4)), ...tags.map((t) => k.fade(t, 0, 0.4)));
-    const drums = [0, 1, 2].map((i) => k.keepsake('drum', { x: 400 + i * 150, y: 560, w: 130, z: 16 }));
-    const tenTags = [10, 20, 30].map((n, i) => k.add(roundTag(n, [C.pink, C.goldLight, C.sky][i], `l8c4-ten-${n}`), { x: 425 + i * 150, y: 470, w: 80, z: 18 }));
+    const drums = [0, 1, 2].map((i) => k.keepsake('drum', { x: 400 + i * 150, y: 440, w: 130, z: 16 }));
+    const tenTags = [10, 20, 30].map((n, i) => k.add(roundTag(n, [C.pink, C.goldLight, C.sky][i], `l8c4-ten-${n}`), { x: 425 + i * 150, y: 350, w: 80, z: 18 }));
     [...drums, ...tenTags].forEach((e) => k.set(e, { opacity: 0 }));
     const booming = async () => {
       await k.wait(1100);

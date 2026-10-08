@@ -32,8 +32,8 @@ export default defineStory({
     await k.say('cheer', tin);
 
     // ---- Click, click: the key turns and the soldiers march out in a line.
-    const soldiers = Array.from({ length: 5 }, (_, i) => k.prop('soldier', { x: 350 + i * 100, y: 610, w: 100, z: 16 }));
-    const tags = Array.from({ length: 5 }, (_, i) => k.add(roundTag((i + 1) * 2, i % 2 ? C.goldLight : C.pink, `l8c1-tag-${i}`), { x: 360 + i * 100, y: 520, w: 80, z: 18 }));
+    const soldiers = Array.from({ length: 5 }, (_, i) => k.prop('soldier', { x: 350 + i * 100, y: 440, w: 100, z: 16 }));
+    const tags = Array.from({ length: 5 }, (_, i) => k.add(roundTag((i + 1) * 2, i % 2 ? C.goldLight : C.pink, `l8c1-tag-${i}`), { x: 360 + i * 100, y: 350, w: 80, z: 18 }));
     soldiers.forEach((s) => k.set(s, { x: -560, opacity: 1 }));
     tags.forEach((t) => k.set(t, { opacity: 0 }));
     const key = k.pivot(k.part(tin, 'key'));

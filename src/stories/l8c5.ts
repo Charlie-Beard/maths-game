@@ -28,7 +28,7 @@ export default defineStory({
     await k.all(k.enter(tin, 'left'), k.enter(hero, 'right'));
 
     // ---- Four rows of five march in, one row after another.
-    const ROW_Y = [510, 584, 658, 732];
+    const ROW_Y = [330, 400, 470, 540];
     const rows = ROW_Y.map((y) => Array.from({ length: 5 }, (_, i) => k.prop('soldier', { x: 340 + i * 98, y, w: 80, z: 16 })));
     const totals = [5, 10, 15, 20].map((n) => k.add(numberTag(String(n), C.goldLight, `l8c5-tag-${n}`), { x: 535, y: 130, w: 140, z: 30 }));
     rows.flat().forEach((s) => k.set(s, { x: -560, opacity: 1 }));

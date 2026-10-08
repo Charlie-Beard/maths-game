@@ -31,9 +31,9 @@ export default defineStory({
     const hostEl = k.character(host, { x: 20, y: 352, z: 20 });
     const hero = k.character('hero', { x: 905, y: 352, z: 20, flip: true });
     const dew = dewdrop(k);
-    const desk = k.add(counter(), { x: 240, y: 600, w: 700, z: 13 });
-    const train = k.add(toyTrain(), { x: 380, y: 440, w: 380, z: 14 });
-    const price = k.add(numberTag('10p', C.pink, 'l8c7-price'), { x: 540, y: 330, w: 110, z: 15 });
+    const desk = k.add(counter(), { x: 240, y: 480, w: 700, z: 13 });
+    const train = k.add(toyTrain(), { x: 330, y: 360, w: 380, z: 14 });
+    const price = k.add(numberTag('10p', C.pink, 'l8c7-price'), { x: 560, y: 300, w: 100, z: 15 });
     k.set([desk, train, price], { opacity: 0 });
     await k.all(k.enter(hostEl, 'left'), k.enter(hero, 'right'));
     void k.appear(desk, 0.3);
@@ -42,8 +42,8 @@ export default defineStory({
     await k.say(`train_${host}`, hostEl);
 
     // ---- Five 2p coins in a row: the tag counts in twos.
-    const twos = Array.from({ length: 5 }, (_, i) => k.add(coin(2), { x: 300 + i * 100, y: 130, w: 84, z: 22 }));
-    const counts = Array.from({ length: 5 }, (_, i) => k.add(numberTag(String((i + 1) * 2), C.goldLight, `l8c7-two-${i}`), { x: 276 + i * 100, y: 220, w: 100, z: 22 }));
+    const twos = Array.from({ length: 5 }, (_, i) => k.add(coin(2), { x: 300 + i * 100, y: 100, w: 84, z: 22 }));
+    const counts = Array.from({ length: 5 }, (_, i) => k.add(numberTag(String((i + 1) * 2), C.goldLight, `l8c7-two-${i}`), { x: 276 + i * 100, y: 190, w: 100, z: 22 }));
     [...twos, ...counts].forEach((e) => k.set(e, { opacity: 0 }));
     const laying = async () => {
       await k.wait(1000);
@@ -59,8 +59,8 @@ export default defineStory({
 
     // ---- Swap for two 5p coins: five and five.
     void k.all(...twos.map((c) => k.fade(c, 0, 0.4)), ...counts.map((c) => k.fade(c, 0, 0.4)));
-    const fives = [0, 1].map((i) => k.add(coin(5), { x: 410 + i * 200, y: 130, w: 110, z: 22 }));
-    const ten = k.add(numberTag('5 + 5', C.sky, 'l8c7-fives'), { x: 475, y: 245, w: 230, z: 23 });
+    const fives = [0, 1].map((i) => k.add(coin(5), { x: 410 + i * 200, y: 100, w: 110, z: 22 }));
+    const ten = k.add(numberTag('5 + 5', C.sky, 'l8c7-fives'), { x: 475, y: 200, w: 230, z: 23 });
     [...fives, ten].forEach((e) => k.set(e, { opacity: 0 }));
     const swapping = async () => {
       await k.wait(1200);
@@ -75,10 +75,10 @@ export default defineStory({
     await k.all(k.say(`fives_${host}`, hostEl), swapping());
 
     // ---- Sold! The train toots and the dewdrop glows.
-    const ob = k.character('oomboom', { x: 600, y: 300, w: 220, z: 12 });
+    const ob = k.character('oomboom', { x: 650, y: 250, w: 200, z: 12 });
     k.set(ob, { opacity: 0 });
     void k.all(...fives.map((c) => k.fade(c, 0, 0.4)), k.fade(ten, 0, 0.4));
-    void k.enter(ob, 'top', 0.6);
+    void k.appear(ob, 0.5);
     await k.say('sold', ob);
     toot();
     k.sfx.reveal();
