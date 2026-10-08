@@ -83,7 +83,7 @@ export function cardRow(shell: Shell, values: Answer[], answer: Answer, onPick: 
     cards,
     show(calm) {
       if (calm) return;
-      gsap.from([...cards.values()], { y: 60, opacity: 0, duration: 0.3, stagger: 0.06, ease: 'steps(4)', clearProps: 'opacity' });
+      gsap.from([...cards.values()], { y: 60, opacity: 0, duration: 0.3, stagger: 0.06, ease: 'back.out(1.4)', clearProps: 'opacity' });
     },
     wrong(v) {
       const card = cards.get(String(v));
@@ -94,7 +94,7 @@ export function cardRow(shell: Shell, values: Answer[], answer: Answer, onPick: 
       const gone = v === null ? undefined : cards.get(String(v));
       if (!gone) return;
       gone.classList.add('going');
-      gsap.to(gone, { opacity: 0, scale: 0.6, duration: 0.25, ease: 'steps(3)', onComplete: () => gone.remove() });
+      gsap.to(gone, { opacity: 0, scale: 0.6, duration: 0.25, ease: 'power2.in', onComplete: () => gone.remove() });
     },
     showAnswer() {
       cards.get(String(answer))?.classList.add('hint-answer');

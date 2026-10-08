@@ -125,7 +125,7 @@ export function partWhole(p: Problem, ctx: ActivityContext): Activity {
         gsap.set(gap.value, { y: 0, opacity: 1 });
       };
       if (ctx.calm) clear();
-      else gsap.to(gap.value, { y: -24, opacity: 0, duration: 0.25, delay: 0.3, ease: 'steps(3)', onComplete: clear });
+      else gsap.to(gap.value, { y: -24, opacity: 0, duration: 0.25, delay: 0.3, ease: 'power2.in', onComplete: clear });
     },
     async right() {
       gap.el.classList.add('is-right');

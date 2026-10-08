@@ -1,0 +1,40 @@
+/*
+ * Pictures of paper art (src/art/raster.ts). Same boxes as the inline SVG
+ * they replace, so nothing moves.
+ */
+
+.raster {
+  display: block;
+  pointer-events: none;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+/* A full-stage backdrop. */
+.backdrop-wrap > .raster {
+  width: 100%;
+  height: 100%;
+}
+
+/*
+ * Art given a margin all round (rasterHtml's pad = 0.1) is 120% of its box,
+ * pulled back by 10% each side, so any overhanging paper still shows.
+ */
+.raster-pad {
+  width: 120%;
+  height: 120%;
+  max-width: none;
+  margin: -10%;
+}
+
+/* Keepsakes and seals still to find are dark silhouettes, as they were. */
+.keepsake-item.missing .raster,
+.seal-item.missing .seal-pic .raster {
+  filter: brightness(0) opacity(0.3);
+}
+
+/* The Treasure Room's tab icons are the same size as their SVG was. */
+.tab-icon > .raster {
+  width: 120%;
+  height: 120%;
+}

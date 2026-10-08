@@ -1,7 +1,7 @@
 # Up the Faraway Tree: notes for agents
 
 A Magic Faraway Tree maths game for one 6-year-old (autistic, possibly
-ADHD) on an iPad in landscape, in torn-paper stop-motion. Read
+ADHD) on an iPad in landscape, in torn paper. Read
 [docs/PLAN.md](docs/PLAN.md) (the design) and
 [docs/ROADMAP.md](docs/ROADMAP.md) (your workstream's brief) before
 changing anything. The engine is shared with Wizard Words
@@ -47,7 +47,8 @@ Look at screenshots of anything visual you change, using Playwright at
 ## Code conventions
 
 - TypeScript, strict, no framework. GSAP for motion through `ui/anim.ts`
-  (`sm`, `stepped`) so it steps at 12 fps like stop-motion.
+  (`sm`, `stepped`), moving smoothly at the screen's own rate. No `steps()`
+  eases and no boil frames: held frames read as flicker on the iPad.
 - `src/core/` is **pure** (no DOM, no audio) and unit-tested. Randomness
   comes in as a `Rand` (`core/random.ts`), never `Math.random`, so problems
   are repeatable.

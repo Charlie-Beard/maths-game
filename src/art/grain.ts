@@ -3,6 +3,12 @@ import { rng } from './paper';
 /**
  * Generates a tileable paper-grain texture once at startup (no image file
  * to download) and exposes it as the --grain-url CSS variable.
+ *
+ * It also makes --grain-alpha-url, the version the stage-wide .grain
+ * overlay uses: a see-through warm-dark speckle. Laying it over the stage
+ * darkens it just as multiplying by the grey grain at 0.32 would (black at
+ * alpha 0.32 × (1 − grey) is the same sum), but without mix-blend-mode,
+ * which on Safari re-blends the whole stage whenever anything under it moves.
  */
 export function installGrain(root: HTMLElement = document.documentElement): void {
   const size = 256;
@@ -50,4 +56,16 @@ export function installGrain(root: HTMLElement = document.documentElement): void
   }
 
   root.style.setProperty('--grain-url', `url(${canvas.toDataURL('image/png')})`);
+
+  const d = g.getImageData(0, 0, size, size);
+  for (let i = 0; i < d.data.length; i += 4) {
+    const grey = (d.data[i] + d.data[i + 1] + d.data[i + 2]) / 3;
+    // A warm near-black: paper loses a little more blue than red.
+    d.data[i] = 24;
+    d.data[i + 1] = 16;
+    d.data[i + 2] = 0;
+    d.data[i + 3] = Math.round(0.32 * (255 - grey));
+  }
+  g.putImageData(d, 0, 0);
+  root.style.setProperty('--grain-alpha-url', `url(${canvas.toDataURL('image/png')})`);
 }

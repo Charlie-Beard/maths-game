@@ -62,7 +62,7 @@ export default defineStory({
 
     // The Pixie, furious, steaming.
     const puff = k.part(pixie, 'puff');
-    if (!k.calm) void k.to(puff, 0.25, { scale: 1.25, yoyo: true, repeat: 9, ease: 'none' });
+    if (!k.calm) void k.to(puff, 0.35, { scale: 1.25, yoyo: true, repeat: 6, ease: 'sine.inOut' });
     await k.wait(300);
     await k.all(k.say('furious'), k.shake(pixie, 5, 3));
 
@@ -101,7 +101,7 @@ export default defineStory({
       k.set(el, { opacity: 0 });
       snapSound.chalk(0.4);
       await k.fade(el, 1, 0.4);
-      await k.to(theBell, 0.12, { rotation: 10, yoyo: true, repeat: 1, ease: 'none' });
+      await k.to(theBell, 0.12, { rotation: 10, yoyo: true, repeat: 1, ease: 'sine.inOut' });
     }
     ding();
     void k.to(theBell, 0.2, { rotation: 18, yoyo: true, repeat: 5, ease: 'sine.inOut' });

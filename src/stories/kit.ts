@@ -23,7 +23,7 @@
  * recorded; until it is, the iPad's own voice reads it. `{name}` is filled in
  * with the child's name.
  *
- * Movement is stop-motion (12 fps, see ui/anim.ts) and follows calm mode:
+ * Movement is smooth (see ui/anim.ts) and follows calm mode:
  * motion is shortened and particles are skipped. Nothing flashes.
  */
 import { gsap } from 'gsap';
@@ -297,7 +297,7 @@ export class Kit<K extends string = string> {
     this.captionEl.classList.add('on');
   }
 
-  /** Makes an actor bob as if talking, until the returned stopper is called. */
+  /** Makes an actor bob gently as if talking, until the returned stopper is called. */
   talk(el: HTMLElement): () => void {
     // The mouth opens and shuts (portraits with a `mouthOpen` part), even in calm mode.
     const shut = this.part(el, 'mouth');
@@ -311,8 +311,11 @@ export class Kit<K extends string = string> {
         shut.forEach((m) => (m.style.opacity = isOpen ? '0' : '1'));
       }, 170);
     }
-    const tw = this.calm ? null : gsap.to(el, { y: '-=6', rotation: '+=2', duration: 0.17, yoyo: true, repeat: -1, ease: 'steps(1)' });
+    const tw = this.calm ? null : gsap.to(el, { y: '-=6', rotation: '+=2', duration: 0.4, yoyo: true, repeat: -1, ease: 'sine.inOut' });
+    let stopped = false;
     return () => {
+      if (stopped) return;
+      stopped = true;
       if (flap) clearInterval(flap);
       open.forEach((m) => (m.style.opacity = '0'));
       shut.forEach((m) => (m.style.opacity = '1'));
@@ -353,7 +356,7 @@ export class Kit<K extends string = string> {
 
   // ----------------------------------------------------------------- motion
 
-  /** A stop-motion tween (12 fps). Resolves when it ends. */
+  /** A smooth eased tween. Resolves when it ends. */
   to(el: gsap.TweenTarget, seconds: number, vars: gsap.TweenVars & { ease?: string }): Promise<void> {
     if (!this.alive()) return never();
     const d = this.calm ? Math.min(seconds, 0.3) : seconds;
@@ -405,9 +408,9 @@ export class Kit<K extends string = string> {
   async shake(el: HTMLElement, amount = 10, times = 3): Promise<void> {
     if (this.calm) amount = Math.min(amount, 3);
     for (let i = 0; i < times; i++) {
-      await this.to(el, 0.08, { x: `+=${amount}`, rotation: '+=3', ease: 'none' });
-      await this.to(el, 0.08, { x: `-=${amount * 2}`, rotation: '-=6', ease: 'none' });
-      await this.to(el, 0.08, { x: `+=${amount}`, rotation: '+=3', ease: 'none' });
+      await this.to(el, 0.1, { x: `+=${amount}`, rotation: '+=3', ease: 'sine.out' });
+      await this.to(el, 0.16, { x: `-=${amount * 2}`, rotation: '-=6', ease: 'sine.inOut' });
+      await this.to(el, 0.1, { x: `+=${amount}`, rotation: '+=3', ease: 'sine.in' });
     }
   }
 
@@ -448,7 +451,7 @@ export class Kit<K extends string = string> {
   /** Shakes the whole stage (a big stomp or crash). Gentle and short. */
   async quake(amount = 8): Promise<void> {
     if (this.calm) return;
-    for (const dx of [amount, -amount, amount * 0.6, -amount * 0.6]) await this.to(this.root, 0.06, { x: `+=${dx}`, ease: 'none' });
+    for (const dx of [amount, -amount, amount * 0.6, -amount * 0.6]) await this.to(this.root, 0.08, { x: `+=${dx}`, ease: 'sine.inOut' });
   }
 
   // -------------------------------------------------------------- particles
@@ -646,7 +649,7 @@ export class Kit<K extends string = string> {
 
   /**
    * Moves the camera: zooms in on a point of the world (zoom 1 = the whole
-   * stage, 1.4 = a close-up), as a slow stop-motion push-in or pan. Edges
+   * stage, 1.4 = a close-up), as a slow, smooth push-in or pan. Edges
    * never show. `camera({})` goes back to the wide shot.
    */
   camera(o: { zoom?: number; x?: number; y?: number }, seconds = 1.4): Promise<void> {
@@ -658,7 +661,13 @@ export class Kit<K extends string = string> {
       this.set(this.root, to);
       return Promise.resolve();
     }
-    return this.to(this.root, seconds, { ...to, ease: 'sine.inOut' });
+    // Hint the browser to keep the world as one GPU layer while it moves, so a
+    // push-in slides a picture instead of redrawing every piece each frame.
+    // Dropped afterwards so the still shot is redrawn sharp at its new size.
+    this.root.style.willChange = 'transform';
+    return this.to(this.root, seconds, { ...to, ease: 'sine.inOut' }).then(() => {
+      this.root.style.willChange = '';
+    });
   }
 
   // ------------------------------------------------------------------- cuts
@@ -680,6 +689,7 @@ export class Kit<K extends string = string> {
     const sheet = h('div', { class: 'story-wipe', html: parchment(1500, 1000, 'story-wipe', C.sand, 3) });
     this.stage.insertBefore(sheet, this.captionEl);
     sfx.page();
+    sheet.style.willChange = 'transform';
     this.set(sheet, { x: 1240, rotation: 3 });
     await this.to(sheet, 0.42, { x: -160, rotation: -1, ease: 'power2.in' });
     this.clear();

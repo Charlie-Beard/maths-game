@@ -199,7 +199,7 @@ export default defineStory({
         const n = k.add(tag(i + 1), { x: x + w / 2 - 28, y: y - w * 0.6 - 62, w: 56, z: 25 });
         void k.appear(n, 0.25).then(() => k.wait(900)).then(() => k.fade(n, 0, 0.4));
         // The sibling counts along, a little nod per toadstool.
-        void k.to(sib, 0.12, { rotation: i % 2 ? -3 : 3, ease: 'none' }).then(() => k.to(sib, 0.12, { rotation: 0 }));
+        void k.to(sib, 0.2, { rotation: i % 2 ? -3 : 3, ease: 'sine.inOut' }).then(() => k.to(sib, 0.2, { rotation: 0, ease: 'sine.inOut' }));
         await k.wait(430);
       }
     };

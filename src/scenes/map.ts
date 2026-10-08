@@ -25,6 +25,7 @@ import { landSeal } from '../art/keepsakes';
 import { cloudBank } from '../art/lands/common';
 import { C } from '../art/palette';
 import { svg } from '../art/paper';
+import { picturesReady, rasterHtml } from '../art/raster';
 import { tree, TREE_HOOKS, TREE_PLACES, TREE_SPOTS } from '../art/scenery';
 import { waxSeal } from '../art/ui';
 import { ALL_CHAPTERS, LANDS, type Chapter } from '../core/curriculum';
@@ -119,7 +120,10 @@ export class MapScene extends Scene {
     const animate = this.arriving && !isCalm();
 
     // The tree, with the land in its cloud (or an empty cloud, for the land to arrive into).
-    this.backdrop = h('div', { class: 'backdrop-wrap', html: tree('map-tree', { landN: this.landN }) });
+    // Nothing in it moves, so it is one picture. Only when a land is arriving does the
+    // land's group have to stay live SVG (arrive() drifts it down into the cloud).
+    const art = tree('map-tree', { landN: this.landN });
+    this.backdrop = h('div', { class: 'backdrop-wrap', html: animate ? art : rasterHtml(art) });
     r.append(this.backdrop);
 
     // Finished lands' seals, hung on strings from the branch tips (behind the stops).
@@ -174,6 +178,7 @@ export class MapScene extends Scene {
   }
 
   async enter(): Promise<void> {
+    await picturesReady(this.root);
     const land = LANDS[this.landN - 1];
     if (this.arriving) {
       if (!isCalm()) await this.arrive();
@@ -315,7 +320,7 @@ export class MapScene extends Scene {
 
   /**
    * A new land arrives: the cloud parts, and the land drifts down into it
-   * and settles. About three seconds, all at 12 fps.
+   * and settles. About three seconds.
    */
   private async arrive(): Promise<void> {
     const box = TREE_SPOTS.cloud;

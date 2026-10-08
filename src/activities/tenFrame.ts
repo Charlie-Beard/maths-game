@@ -220,7 +220,7 @@ export function tenFrame(p: Problem, ctx: ActivityContext): Activity {
       if (numberAll) cells[i].classList.add('ghost');
       const el = c.el;
       if (ctx.calm) el.remove();
-      else gsap.to(el, { scale: 0.4, opacity: 0, duration: 0.2, ease: 'steps(3)', onComplete: () => el.remove() });
+      else gsap.to(el, { scale: 0.4, opacity: 0, duration: 0.2, ease: 'power2.in', onComplete: () => el.remove() });
       afterFill();
       return;
     }
