@@ -18,6 +18,7 @@ import { characterArt } from '../art/characters';
 import { keepsakeArt, landSeal } from '../art/keepsakes';
 import { C } from '../art/palette';
 import { circle, ellipse, ink, piece, rect, svg } from '../art/paper';
+import { picturesReady, rasterHtml } from '../art/raster';
 import { waxSeal } from '../art/ui';
 import { ALL_CHAPTERS, LANDS, type Chapter } from '../core/curriculum';
 import { CHARACTER_NAMES } from '../core/names';
@@ -42,6 +43,13 @@ export const CARD_HOSTS: string[] = [...new Set(ALL_CHAPTERS.map((c) => c.host))
 
 /** The tab he was last on, so coming back from a story lands where he was. */
 let lastTab: Tab = 'keepsakes';
+
+/**
+ * Keepsakes and seals on the shelves are shown as pictures, not live SVG: 80
+ * of them is over a thousand paths to keep and repaint while he scrolls. A
+ * tenth of margin all round keeps any paper that overhangs its box.
+ */
+const PAD = 0.1;
 
 /** Moon-Face's room: warm round wooden walls, a round window on the night, a rug. */
 function room(): string {
@@ -72,7 +80,7 @@ export class AlbumScene extends Scene {
   build(): void {
     const r = this.root;
     r.classList.add('album');
-    r.append(h('div', { class: 'backdrop-wrap', html: room() }));
+    r.append(h('div', { class: 'backdrop-wrap', html: rasterHtml(room()) }));
     r.append(banner('Moon-Face’s Treasure Room', { x: 290, y: 14, w: 640, h: 92, size: 40 }));
 
     const back = sealButton('map', { x: 92, y: 16, size: 76, color: C.slate, aria: 'Back to the map', name: 'album-back' });
@@ -102,14 +110,19 @@ export class AlbumScene extends Scene {
     this.show(lastTab);
   }
 
+  /** Waits for the pictures to decode, so the room never shows up bare and then fills in. */
+  async enter(): Promise<void> {
+    await picturesReady(this.root);
+  }
+
   leave(): void {
     voice.stop();
   }
 
   private tabIcon(t: Tab): string {
-    if (t === 'keepsakes') return keepsakeArt(ALL_CHAPTERS[0].keepsake);
+    if (t === 'keepsakes') return rasterHtml(keepsakeArt(ALL_CHAPTERS[0].keepsake), PAD);
     if (t === 'cards') return folkCard(characterArt('moonface'), '', { w: 58 }).outerHTML;
-    if (t === 'seals') return landSeal(1);
+    if (t === 'seals') return rasterHtml(landSeal(1), PAD);
     return waxSeal('play', C.red, 80, 'tab-stories');
   }
 
@@ -134,7 +147,7 @@ export class AlbumScene extends Scene {
       for (const c of land.chapters) {
         const have = p.keepsakes.includes(c.keepsake);
         const name = keepsakeName(c.keepsake);
-        const b = h('button', { class: `keepsake-item${have ? '' : ' missing'}`, 'aria-label': have ? name : 'Not found yet', 'data-id': c.keepsake, html: keepsakeArt(c.keepsake) });
+        const b = h('button', { class: `keepsake-item${have ? '' : ' missing'}`, 'aria-label': have ? name : 'Not found yet', 'data-id': c.keepsake, html: rasterHtml(keepsakeArt(c.keepsake), PAD) });
         this.tap(b, () => (have ? this.hold(name, keepsakeArt(c.keepsake), 'keepsake', c) : this.notYet(b)));
         items.append(b);
       }
@@ -169,7 +182,7 @@ export class AlbumScene extends Scene {
     for (const land of LANDS) {
       const have = p.seals.includes(land.n);
       const b = h('button', { class: `seal-item${have ? '' : ' missing'}`, 'aria-label': have ? `${land.title} seal` : 'Not won yet', 'data-land': String(land.n) });
-      b.append(h('div', { class: 'seal-pic', html: landSeal(land.n) }), h('span', {}, have ? land.short : '?'));
+      b.append(h('div', { class: 'seal-pic', html: rasterHtml(landSeal(land.n), PAD) }), h('span', {}, have ? land.short : '?'));
       this.tap(b, () => (have ? this.hold(land.title, landSeal(land.n), 'seal') : this.notYet(b)));
       grid.append(b);
     }
