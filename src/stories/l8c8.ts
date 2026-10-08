@@ -352,15 +352,15 @@ export default defineStory({
     toot();
     chuff(14, 0.3);
     boom(2);
-    await k.all(go(1300, 4.2, 'power1.in'), rattle(k, riders, 10, 0.4), k.wait(1500).then(() => k.say('ride')));
+    await k.all(go(1000, 4.2, 'power1.in'), rattle(k, riders, 10, 0.4), k.wait(1500).then(() => k.say('ride')));
     // The soldiers salute as they pass.
     soldiers.forEach((s, i) => void k.wait(i * 60).then(() => k.hop(s, 14, 1)));
     boom(4);
-    await k.all(go(900, 2.4), rattle(k, riders, 6, 0.4));
+    await k.all(go(700, 2.4), rattle(k, riders, 6, 0.4));
 
     // Running down: the train slows to a stop.
     windDown(2);
-    await go(400, 2, 'power2.out');
+    await go(300, 2, 'power2.out');
     k.silence();
     void k.shake(t2, 4, 1);
     await k.say('rundown', t2);
@@ -382,7 +382,7 @@ export default defineStory({
     k.music('adventure');
     chuff(10, 0.22);
     void k.hop(h2, 24, 1);
-    await k.all(go(1000, 2.6, 'power2.in'), rattle(k, riders, 8, 0.32));
+    await k.all(go(560, 2.6, 'power2.in'), rattle(k, riders, 8, 0.32));
 
     // ------------------------------------------- scene 3: the edge of the land
     let edge!: HTMLElement;
@@ -394,7 +394,7 @@ export default defineStory({
     await k.cut(() => {
       k.backdrop(edgeSky());
       edge = k.add(landEdge(), { x: -20, y: 0, w: 800, h: 900, z: 4, still: true });
-      for (let i = 0; i < 5; i++) row.push(k.prop('soldier', { x: 290 + i * 70, y: 500, w: 80, z: 5 }));
+      for (let i = 0; i < 5; i++) row.push(k.prop('soldier', { x: 20 + i * 66, y: 590, w: 80, z: 22 }));
       k.add(ladderTop(), { x: 600, y: 420, w: 600, z: 26, still: true });
       t3 = k.character('toySoldier', { x: 60, y: 330, w: 210, z: 20 });
       h3 = k.character('hero', { x: 300, y: 360, w: 200, z: 21 });
@@ -437,15 +437,15 @@ export default defineStory({
       k.backdrop(moonRoom('l8c8-room'));
       k.light(590, 236, 230, { color: '#c9d4ff', strength: 0.25 });
       k.ambient('dust', { count: 12 });
-      h4 = k.character('hero', { x: 200, y: 360, w: 240, z: 20 });
-      o4 = k.character('oomboom', { x: 430, y: 330, w: 240, z: 19 });
-      m4 = k.character('moonface', { x: 760, y: 350, w: 250, z: 20, flip: true });
+      h4 = k.character('hero', { x: 110, y: 360, w: 240, z: 20 });
+      o4 = k.character('oomboom', { x: 340, y: 330, w: 240, z: 19 });
+      m4 = k.character('moonface', { x: 880, y: 350, w: 250, z: 20, flip: true });
     });
     k.music('cosy');
     flump();
     await together(k, [h4, o4, m4], 0.3, { y: '+=10' });
     await together(k, [h4, o4, m4], 0.3, { y: '-=10' });
-    const keep = k.keepsake(k.chapter!.keepsake, { x: 440, y: 520, w: 150, z: 24 });
+    const keep = k.keepsake(k.chapter!.keepsake, { x: 560, y: 520, w: 140, z: 24 });
     const seal = k.add(landSeal(8), { x: 480, y: 70, w: 220, z: 30 });
     k.set([keep, seal], { opacity: 0 });
     k.fx.pop();
@@ -457,16 +457,16 @@ export default defineStory({
     boom(2);
     await k.all(k.say('prize'), k.hop(h4, 30, 2));
     // Silky's ribbon and dewdrop, glowing a little brighter.
-    const ribbon = k.add(keepsakeArt('silkyRibbon'), { x: 640, y: 510, w: 130, z: 24 });
-    const dew = k.add(dewdrop(), { x: 692, y: 548, w: 28, z: 25 });
-    const dewGlow = k.light(706, 566, 90, { color: C.dew, strength: 0, flicker: true, z: 23 });
+    const ribbon = k.add(keepsakeArt('silkyRibbon'), { x: 700, y: 530, w: 120, z: 24 });
+    const dew = k.add(dewdrop(), { x: 746, y: 568, w: 28, z: 25 });
+    const dewGlow = k.light(760, 588, 90, { color: C.dew, strength: 0, flicker: true, z: 23 });
     k.set([ribbon, dew], { opacity: 0 });
     k.fx.twinkle();
     await k.all(k.fade(ribbon, 1, 0.5), k.fade(dew, 1, 0.5));
     const glowing = (async () => {
       for (const s of [0.3, 0.5, 0.75]) {
         await k.fade(dewGlow, s, 0.6);
-        k.sparkle(706, 560, 6, 70);
+        k.sparkle(760, 580, 6, 70);
         await k.wait(500);
       }
     })();
