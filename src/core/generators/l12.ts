@@ -215,7 +215,7 @@ function readExplain(h: number, minute: number): Speech {
   if (minute === 0) return { text: 'The big hand is on {b}. The little hand is on {h}. It’s {h} o’clock!', vals: { b: big, h } };
   if (minute === 30) return { text: 'The big hand is on {b}, half way round. It’s half past {h}!', vals: { b: big, h } };
   if (minute === 15) return { text: 'The big hand is on {b}, a quarter of the way round. It’s quarter past {h}!', vals: { b: big, h } };
-  if (minute === 45) return { text: 'The big hand is on {b}. A quarter more to go until {n}. It’s quarter to {n}!', vals: { b: big, n: nx } };
+  if (minute === 45) return { text: 'The big hand is on {b}. Nearly {n} o’clock! It’s quarter to {n}!', vals: { b: big, n: nx } };
   if (minute < 30) return { text: 'The big hand is on {b}. That’s {m} minutes past {h}. It’s {m} past {h}!', vals: { b: big, m: minute, h } };
   return { text: 'The big hand is on {b}. That’s {m} minutes to {n}. It’s {m} to {n}!', vals: { b: big, m: 60 - minute, n: nx } };
 }

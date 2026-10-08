@@ -186,7 +186,7 @@ test('the Treasure Room shows keepsakes (unfound ones dark), cards, seals and st
   await expect(page.locator('.treasure-tab.on')).toHaveAttribute('data-tab', 'keepsakes');
   await expect(page.locator('.shelf-row')).toHaveCount(LANDS.length);
   await expect(page.locator('.keepsake-item:not(.missing)')).toHaveCount(27);
-  await expect(page.locator('.keepsake-item.missing')).toHaveCount(53);
+  await expect(page.locator('.keepsake-item.missing')).toHaveCount(ALL_CHAPTERS.length - 27);
 
   // Tap a keepsake: it's held up close with its name.
   const first = ALL_CHAPTERS[0].keepsake;
@@ -198,12 +198,12 @@ test('the Treasure Room shows keepsakes (unfound ones dark), cards, seals and st
   await expect(page.locator('.treasure-zoom')).toHaveCount(0);
 
   await page.locator('[data-tab="cards"]').click({ force: true });
-  await expect(page.locator('.card-item')).toHaveCount(17);
+  await expect(page.locator('.card-item')).toHaveCount(new Set(ALL_CHAPTERS.map((c) => c.host)).size);
   await expect(page.locator('.card-item .frog-card:not(.locked)')).toHaveCount(11);
 
   await page.locator('[data-tab="seals"]').click({ force: true });
   await expect(page.locator('.seal-item:not(.missing)')).toHaveCount(3);
-  await expect(page.locator('.seal-item.missing')).toHaveCount(7);
+  await expect(page.locator('.seal-item.missing')).toHaveCount(LANDS.length - 3);
 
   // Stories: only the ones that exist and have been unlocked (l1c1's, here).
   await page.locator('[data-tab="stories"]').click({ force: true });
