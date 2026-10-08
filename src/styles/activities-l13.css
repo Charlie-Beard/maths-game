@@ -1,0 +1,56 @@
+/*
+ * Land 13 (Roundabouts): the picture-card activities `turn` and `solid`
+ * (activities/turn.ts, activities/solid.ts, activities/l13-kit.ts).
+ */
+
+/* A drawing inside a torn card; the svg fills it. */
+.l13-pic {
+  position: absolute;
+  inset: 14px;
+}
+.l13-pic svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.l13-caption {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 12px;
+  text-align: center;
+  font-size: 30px;
+  font-weight: 700;
+  color: var(--ink-900);
+}
+.l13-turn-pic > svg.paper,
+.l13-solid-pic > svg.paper,
+.l13-sign > svg.paper {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.l13-turn-pic text,
+.l13-solid-pic text,
+.l13-sign text {
+  font-family: var(--font-body);
+  user-select: none;
+}
+
+/* The flags on the grid: an invisible tap target over the square, gold when helping. */
+.l13-flag {
+  background: transparent;
+  border: 0;
+  border-radius: 14px;
+  padding: 0;
+}
+.l13-flag.hint-answer {
+  filter: none;
+  background: rgba(255, 231, 163, 0.55);
+  box-shadow: inset 0 0 0 5px var(--gold-500);
+}
+.l13-flag.is-right {
+  background: rgba(150, 210, 150, 0.5);
+}
