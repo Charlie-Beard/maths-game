@@ -146,6 +146,10 @@ const LANDS: { n: number; mode: string; count: number; piece: string; pieces: nu
   { n: 8, mode: 'escape', count: 10, piece: '.finale-chaser', pieces: 3 }, // march: toy soldiers
   { n: 9, mode: 'escape', count: 10, piece: '.finale-chaser', pieces: 1 }, // melt: the snowman
   { n: 10, mode: 'snap', count: 12, piece: '.finale-rule', pieces: 4 }, // rules, cages, rulers
+  { n: 11, mode: 'escape', count: 10, piece: '.finale-chaser', pieces: 1 }, // chase: the Old Woman
+  { n: 12, mode: 'escape', count: 10, piece: '.finale-chaser', pieces: 3 }, // march: red goblins with the drum
+  { n: 13, mode: 'escape', count: 10, piece: '.finale-ladder', pieces: 1 }, // spin
+  { n: 14, mode: 'escape', count: 10, piece: '.finale-chaser', pieces: 1 }, // chase: the Red Goblin
 ];
 
 /** Collects anything the page throws or logs as an error (a missing voice clip is fine). */

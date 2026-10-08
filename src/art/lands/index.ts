@@ -1,5 +1,5 @@
 /**
- * The art for every land, by land number (1 … 10).
+ * The art for every land, by land number (1 … 14).
  *
  *   far(name)    the land in its cloud, 600 × 180 (the map's cloud, finales)
  *   scene(name)  a 1180 × 820 ground-level backdrop for stories and finales
@@ -17,6 +17,10 @@ import * as l7 from './l7';
 import * as l8 from './l8';
 import * as l9 from './l9';
 import * as l10 from './l10';
+import * as l11 from './l11';
+import * as l12 from './l12';
+import * as l13 from './l13';
+import * as l14 from './l14';
 
 export interface LandArt {
   far: (name: string) => string;
@@ -41,6 +45,10 @@ export const LAND_ART: Record<number, LandArt> = {
   8: art(l8),
   9: art(l9),
   10: art(l10),
+  11: art(l11),
+  12: art(l12),
+  13: art(l13),
+  14: art(l14),
 };
 
 export { FAR_H, FAR_W, SCENE_H, SCENE_W } from './common';

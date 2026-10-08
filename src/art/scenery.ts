@@ -11,7 +11,7 @@
  * sits in the cloud above.
  *
  * TREE_PLACES gives the map its 8 stops (one per chapter, bottom to top)
- * in stage coordinates; TREE_HOOKS gives 10 branch tips where finished
+ * in stage coordinates; TREE_HOOKS gives a branch tip for each land where finished
  * lands' seals can hang; TREE_SPOTS marks the slide's ends and the cloud.
  *
  * Moon-Face's round room, inside, is here too: every land's finale comes
@@ -42,7 +42,7 @@ export const TREE_PLACES: TreePlace[] = [
   { id: 'moonface', label: 'Moon-Face’s room', x: 596, y: 214 },
 ];
 
-/** Ten branch tips where a finished land's seal can hang (W4 hangs land n on hook n-1). */
+/** A branch tip for each land's seal (the map hangs land n on hook n-1). */
 export const TREE_HOOKS: { x: number; y: number }[] = [
   { x: 180, y: 600 },
   { x: 1000, y: 650 },
@@ -54,6 +54,11 @@ export const TREE_HOOKS: { x: number; y: number }[] = [
   { x: 930, y: 220 },
   { x: 140, y: 250 },
   { x: 1060, y: 380 },
+  // The second adventure (lands 11–14).
+  { x: 1080, y: 560 },
+  { x: 100, y: 360 },
+  { x: 1090, y: 250 },
+  { x: 240, y: 180 },
 ];
 
 /** Other places on the tree the map may want. */

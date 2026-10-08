@@ -21,6 +21,10 @@ export const CHARACTER_NAMES: Record<string, string> = {
   enchanter: 'The Enchanter',
   toySoldier: 'Captain Tin',
   snowman: 'Mr Snowman',
+  // The second adventure (lands 11–14)
+  oldWoman: 'The Old Woman in the Shoe',
+  whirligig: 'Mr Whirligig',
+  redGoblin: 'The Red Goblin',
   // The villain
   dameSnap: 'Dame Snap',
 };

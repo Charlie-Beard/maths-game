@@ -1,5 +1,6 @@
 /**
- * The whole game: 10 lands × 8 chapters. Chapter 8 of each land is its
+ * The whole game: 14 lands × 8 chapters (lands 1–10 end with Dame Snap
+ * beaten; 11–14 are a second adventure). Chapter 8 of each land is its
  * finale. This is the source of truth for the order of the maths and the
  * story (docs/PLAN.md §3–4); tests/unit/curriculum.test.ts checks it.
  *
@@ -184,9 +185,61 @@ export const LANDS: Land[] = [
     ['Silky’s Cell', 'fran', ['add-2d2d', 'sub-2d2d', 'times-5', 'fractions'], [2, 3], 'I can hear Silky singing! She’s behind that door!', 'silkyWing'],
     ['The Last Snap', 'dameSnap', ['add-2d2d', 'sub-2d2d', 'missing-100', 'bridge-add', 'times-10'], [2, 3], 'NO child has EVER finished my sums. NOT ONE!', 'crown'],
   ]),
+  // The second adventure (lands 11–14), after Dame Snap is beaten. New lands
+  // keep coming to the top of the tree; the Red Goblins steal Mr Oom Boom
+  // Boom's big drum (land 12), carry off the Saucepan Man as the Land of
+  // Roundabouts spins away (land 13), and are outwitted in their own caves
+  // (land 14). The rest of Year 2: data, change, 3s, time to 5 minutes,
+  // turns, 3D shapes and measures.
+  land(11, 'The Old Woman’s Shoe', 'The Shoe', '#8c5a32', 'Tally charts, pictograms and change', 'escape', [
+    ['A House Made of a Shoe', 'oldWoman', ['tally'], [1, 2], 'Hello, my dear! I live in a shoe, with SO many children. Help me count them!', 'bootLace'],
+    ['So Many Children!', 'joe', ['tally', 'count-2s-5s'], [1, 2], 'Children everywhere! Let’s make a tally, five at a time.', 'tallyStick'],
+    ['Socks on the Line', 'washalot', ['tally'], [2, 3], 'Socks, socks, socks! One picture for every sock. How many?', 'sock'],
+    ['Broth for Breakfast', 'saucepan', ['change'], [1, 2], 'EH? BROTH? I’ve got the saucepans! Who’s got the pennies?', 'brothBowl'],
+    ['The Bread Shop', 'beth', ['change', 'coins'], [1, 3], 'A loaf for every child! Let’s pay, and count the change.', 'loaf'],
+    ['Bedtime in the Toe', 'fran', ['tally', 'share'], [3, 4], 'Time for bed! Who sleeps where? Let’s look at the chart.', 'nightlight'],
+    ['A Red Cap in the Laces', 'silky', ['change', 'tally'], [2, 3], 'Did you see that? A little red cap, hiding in the laces…', 'redCap'],
+    ['The Shoe Walks Away!', 'oldWoman', ['tally', 'change', 'add-2d1d', 'times-2'], [2, 3], 'Oh my! The land is moving on! Run along home, my dears!', 'shoeBuckle'],
+  ]),
+  land(12, 'The Land of Music', 'Music', '#2f8a84', 'Counting in 3s and time to 5 minutes', 'escape', [
+    ['Oom-Pah-Pah!', 'oomboom', ['count-3s'], [1, 2], 'Oom boom boom! This is MY land! Music here goes in threes!', 'baton'],
+    ['Three Beats to a Bar', 'saucepan', ['count-3s'], [1, 2], 'EH? A BAR? Oh, beats! One, two, three! Count with me!', 'triangleBell'],
+    ['Trumpets in Threes', 'joe', ['count-3s', 'groups'], [1, 3], 'The trumpets sit in threes. How many altogether?', 'trumpet'],
+    ['When Does the Band Play?', 'moonface', ['time-5'], [1, 2], 'The band plays at five past! Or was it ten past? Let’s look.', 'pocketWatch'],
+    ['Five Minutes to Showtime', 'beth', ['time-5', 'time'], [1, 3], 'Hurry! The show starts soon. What time is it now?', 'showTicket'],
+    ['The Big Drum is Gone!', 'oomboom', ['count-3s', 'time-5'], [2, 3], 'My big drum! Somebody has taken my big drum!', 'drumstick'],
+    ['Little Red Footprints', 'fran', ['time-5', 'count-3s'], [2, 4], 'Little red footprints, in threes! They went that way!', 'muddyPrint'],
+    ['The Grand Parade', 'oomboom', ['count-3s', 'time-5', 'times-5', 'add-2d2d'], [2, 3], 'The land is moving on! March, march, down the ladder!', 'bigDrum'],
+  ]),
+  land(13, 'The Land of Roundabouts', 'Roundabouts', '#e07b39', 'Turns, directions and 3D shapes', 'escape', [
+    ['Round and Round', 'whirligig', ['turns'], [1, 2], 'Roll up, roll up! Everything here goes round and round!', 'carouselHorse'],
+    ['Clockwise, Anticlockwise', 'silky', ['turns'], [1, 3], 'This way round, like a clock. That way round, backwards!', 'compass'],
+    ['The Spinning Teacups', 'saucepan', ['turns', 'fractions'], [2, 3], 'EH? SPINNING? My saucepans are spinning too! Whee!', 'spinningCup'],
+    ['Rolling Shapes', 'joe', ['shapes-3d'], [1, 2], 'Some shapes roll, and some shapes stack. Which is which?', 'rollingBall'],
+    ['The Helter-Skelter', 'beth', ['shapes-3d', 'shapes-2d'], [2, 3], 'Up the helter-skelter! Count the faces on the way down.', 'helterMat'],
+    ['Left, Right, Forwards', 'fran', ['turns', 'shapes-3d'], [2, 4], 'Follow the arrows to the big wheel! Left, right, forwards!', 'signpost'],
+    ['Goblins at the Fair', 'moonface', ['turns', 'shapes-3d', 'time-5'], [2, 4], 'Red goblins, at the fair! Keep the Saucepan Man close, {name}.', 'goblinRope'],
+    ['The Roundabout Spins Away', 'whirligig', ['turns', 'shapes-3d', 'count-3s', 'change'], [2, 3], 'The land is spinning away! Hold on, and down the ladder!', 'roundaboutTicket'],
+  ]),
+  land(14, 'The Land of the Red Goblins', 'Red Goblins', '#a32a2a', 'Heavier, fuller, hotter: reading scales', 'escape', [
+    ['Down the Goblin Hole', 'moonface', ['compare-measures'], [1, 2], 'The goblins took him down here. Quiet now, {name}. Which sack is heavier?', 'goldSack'],
+    ['Sacks of Gold', 'pixie', ['compare-measures', 'read-scales'], [1, 2], 'Goblin gold! Heavy, heavy! Let’s weigh it.', 'goblinGold'],
+    ['The Goblin Kitchen', 'washalot', ['read-scales'], [1, 2], 'Jugs and jugs of goblin soup! How many litres?', 'goblinJug'],
+    ['Hot Caves, Cold Caves', 'joe', ['read-scales', 'compare-measures'], [2, 3], 'This cave is hot! That one is cold! Look at the thermometer.', 'thermometer'],
+    ['The Goblins’ Scales', 'beth', ['read-scales'], [3, 4], 'The goblins weigh everything! Can you read their scales?', 'goblinScales'],
+    ['Clank! Clank!', 'silky', ['read-scales', 'missing-100'], [2, 3], 'Listen! Clank, clank! That’s the Saucepan Man!', 'glowWorm'],
+    ['The Saucepan Man is Free!', 'saucepan', ['compare-measures', 'read-scales', 'add-2d2d', 'time-5'], [2, 4], 'EH? FREE? I’M FREE! Thank you, {name}! Now, let’s get out of here!', 'saucepanLid'],
+    ['Run from the Red Goblins!', 'redGoblin', ['compare-measures', 'read-scales', 'tally', 'turns', 'count-3s'], [2, 3], 'Come BACK here! Nobody leaves the goblin caves!', 'goblinHat'],
+  ]),
 ];
 
 export const ALL_CHAPTERS: Chapter[] = LANDS.flatMap((l) => l.chapters);
+
+/**
+ * The ending film (the party after Dame Snap is beaten) plays after this
+ * chapter. The second adventure (lands 11–14) carries on after it.
+ */
+export const ENDING_AFTER = 'l10c8';
 
 export function findChapter(id: string): { land: Land; chapter: Chapter } | null {
   for (const land of LANDS) {

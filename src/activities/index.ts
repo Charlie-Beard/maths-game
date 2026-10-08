@@ -8,6 +8,10 @@ import { choose } from './choose';
 import { SET_A } from './set-a';
 import { SET_B } from './set-b';
 import { SET_C } from './set-c';
+import { SET_L11 } from './set-l11';
+import { SET_L12 } from './set-l12';
+import { SET_L13 } from './set-l13';
+import { SET_L14 } from './set-l14';
 import type { Activity, ActivityContext, ActivityFactory } from './types';
 
 const ACTIVITIES: Partial<Record<ActivityKind, ActivityFactory>> = {
@@ -16,6 +20,10 @@ const ACTIVITIES: Partial<Record<ActivityKind, ActivityFactory>> = {
   ...SET_A,
   ...SET_B,
   ...SET_C,
+  ...SET_L11,
+  ...SET_L12,
+  ...SET_L13,
+  ...SET_L14,
 };
 
 export function makeActivity(p: Problem, ctx: ActivityContext): Activity {

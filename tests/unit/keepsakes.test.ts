@@ -24,7 +24,7 @@ describe('props', () => {
 describe('keepsakes', () => {
   it('has art and a name for every chapter keepsake', () => {
     const ids = ALL_CHAPTERS.map((c) => c.keepsake);
-    expect(new Set(ids).size).toBe(80);
+    expect(new Set(ids).size).toBe(112);
     for (const id of ids) {
       expect(KEEPSAKE_IDS, id).toContain(id);
       expect(KEEPSAKE_NAMES[id], id).toBeTruthy();
@@ -51,8 +51,8 @@ describe('keepsakes', () => {
 });
 
 describe('land seals', () => {
-  it('draws a 240 seal for each of the 10 lands, in its colour', () => {
-    expect(LANDS).toHaveLength(10);
+  it('draws a 240 seal for each of the 14 lands, in its colour', () => {
+    expect(LANDS).toHaveLength(14);
     const seals = new Set<string>();
     for (const l of LANDS) {
       const s = landSeal(l.n);
@@ -60,6 +60,6 @@ describe('land seals', () => {
       expect(s).toContain(`fill="${l.color}"`);
       seals.add(s);
     }
-    expect(seals.size).toBe(10);
+    expect(seals.size).toBe(14);
   });
 });

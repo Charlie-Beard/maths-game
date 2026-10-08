@@ -14,6 +14,10 @@ import { choicesFor, type Generator } from './helpers';
 import { ADDSUB } from './addsub';
 import { MORE } from './more';
 import { NUMBER } from './number';
+import { L11 } from './l11';
+import { L12 } from './l12';
+import { L13 } from './l13';
+import { L14 } from './l14';
 
 export type { Generator } from './helpers';
 
@@ -46,6 +50,10 @@ const BUILT: Partial<Record<SkillId, Generator>> = {
   ...NUMBER,
   ...ADDSUB,
   ...MORE,
+  ...L11,
+  ...L12,
+  ...L13,
+  ...L14,
 };
 
 export const GENERATORS: Record<SkillId, Generator> = Object.fromEntries(

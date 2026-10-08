@@ -12,6 +12,9 @@ import { family } from './family';
 import { folk } from './folk';
 import { lands } from './lands';
 import { snap } from './snap';
+import { L11_CHARACTERS } from './l11';
+import { L13_CHARACTERS } from './l13';
+import { L14_CHARACTERS } from './l14';
 
 export { dameSnapPose, type SnapPose } from './snap';
 export { topsyTall } from './lands';
@@ -21,6 +24,9 @@ export const characters: Record<string, () => string> = {
   ...family,
   ...lands,
   ...snap,
+  ...L11_CHARACTERS,
+  ...L13_CHARACTERS,
+  ...L14_CHARACTERS,
 };
 
 export const characterArt = (id: string): string => (characters[id] ?? characters.moonface)();

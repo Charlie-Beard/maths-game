@@ -5,9 +5,10 @@
  *                                                  ↑______________________________________|
  *
  * plus Practice with Silky, the Treasure Room and the grown-ups' corner.
- * After the last finale, the ending film plays before the reward.
+ * After Dame Snap's last finale (l10c8), the ending film plays before the
+ * reward. The second adventure (lands 11–14) carries on after it.
  */
-import { ALL_CHAPTERS, findChapter, LANDS, type Chapter, type Land } from './core/curriculum';
+import { ENDING_AFTER, findChapter, LANDS, type Chapter, type Land } from './core/curriculum';
 import { finishChapter } from './core/progress';
 import { makeRand, randomSeed } from './core/random';
 import { buildPractice, buildRound, makeProblems } from './core/round';
@@ -95,7 +96,7 @@ export class Game implements Nav {
 
   story(id: string, back: () => void): void {
     const found = findChapter(id);
-    const land = found?.land ?? (id === 'ending' ? LANDS[LANDS.length - 1] : LANDS[0]);
+    const land = found?.land ?? (id === 'ending' ? findChapter(ENDING_AFTER)!.land : LANDS[0]);
     const title = found?.chapter.title ?? (id === 'opening' ? 'Up the Faraway Tree' : id === 'ending' ? 'The Biggest Birthday' : id);
     if (!hasStory(id)) return back();
     void this.app.go(new StoryScene(this.app, { id, title, land, chapter: found?.chapter ?? null, onDone: back }));
@@ -113,7 +114,7 @@ export class Game implements Nav {
     const news = finishChapter(this.app.progress, chapter, Date.now());
     this.app.save();
     const reward = () => void this.app.go(new CompleteScene(this.app, { land, chapter, news, onNext: () => this.map() }));
-    const last = chapter.id === ALL_CHAPTERS[ALL_CHAPTERS.length - 1].id;
+    const last = chapter.id === ENDING_AFTER;
     this.story(chapter.id, last ? () => this.story('ending', reward) : reward);
   }
 }

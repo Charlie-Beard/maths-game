@@ -21,6 +21,10 @@ import { circle, curve, ellipse, hashString, ink, piece, poly, raw, rect, rng, s
 import type { PropId, ShapeId, Visual } from '../core/problem';
 import { h } from '../ui/dom';
 import { timeWords } from '../core/generators/more';
+import { measureNodes } from './visuals/measure';
+import { solidNodes } from './visuals/solid';
+import { tallyNodes } from './visuals/tally';
+import { turnNodes } from './visuals/turn';
 
 // ---------------------------------------------------------------------------
 // Small shared helpers
@@ -932,6 +936,19 @@ export function renderVisual(v: Visual, w: number, hgt: number): HTMLElement {
     }
     case 'length':
       nodes.push(...drawLengths(v.lengths, v.unit, w, hgt));
+      break;
+    // The second adventure (lands 11–14): one file each in visuals/.
+    case 'tally':
+      nodes.push(...tallyNodes(v, w, hgt));
+      break;
+    case 'turn':
+      nodes.push(...turnNodes(v, w, hgt));
+      break;
+    case 'solid':
+      nodes.push(...solidNodes(v, w, hgt));
+      break;
+    case 'measure':
+      nodes.push(...measureNodes(v, w, hgt));
       break;
   }
   el.innerHTML = paper(w, hgt, name, nodes, describe(v));
