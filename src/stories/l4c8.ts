@@ -300,7 +300,7 @@ export default defineStory({
     await together(k, all4, 0.3, { y: '+=10' });
     await together(k, all4, 0.3, { y: '-=10' });
     await k.say('phew', m4);
-    const keep = k.keepsake(k.chapter?.keepsake ?? 'snappedRuler', { x: 515, y: 640, w: 150, z: 24 });
+    const keep = k.keepsake(k.chapter?.keepsake ?? 'snappedRuler', { x: 515, y: 540, w: 150, z: 24 });
     const seal = k.add(landSeal(4), { x: 480, y: 70, w: 220, z: 30 });
     k.set([keep, seal], { opacity: 0 });
     k.fx.pop();

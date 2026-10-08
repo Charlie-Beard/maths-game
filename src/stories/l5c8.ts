@@ -303,7 +303,7 @@ export default defineStory({
     birthdayTune();
     void k.hop(m5, 24, 2);
     await k.say('happy', m5);
-    const keep = k.keepsake(k.chapter?.keepsake ?? 'birthdayBadge', { x: 515, y: 600, w: 150, z: 24 });
+    const keep = k.keepsake(k.chapter?.keepsake ?? 'birthdayBadge', { x: 515, y: 540, w: 150, z: 24 });
     const seal = k.add(landSeal(5), { x: 480, y: 70, w: 220, z: 30 });
     k.set([keep, seal], { opacity: 0 });
     k.fx.pop();

@@ -241,7 +241,7 @@ export default defineStory({
       k.backdrop(escapeBackdrop('l6c8-sky', [C.giantSky, '#d6dfe3', C.duskSky]));
       k.add(ladderArt('l6c8-ladder', 10), { x: LADDER.x - 60, y: LADDER.top, w: 120, z: 4, still: true });
       // Peering over the far side of his land (its cloud hides where his portrait ends).
-      giant3 = k.character('giant', { x: 640, y: -60, w: 200, z: 5 });
+      giant3 = k.character('giant', { x: 620, y: -95, w: 240, z: 5 });
       land = k.landFar(6, { x: 290, y: 18, w: 600, z: 6 });
       climbers = (['hero', 'moonface', 'saucepan'] as const).map((id, i) => k.character(id, { x: LADDER.x - 75, y: 200 + i * 140, w: 150, z: 20 - i }));
       // The Saucepan Man carries the biscuit, like a great big wheel.
@@ -289,13 +289,13 @@ export default defineStory({
     });
     k.music('cosy');
     flump();
-    const bis4 = k.add(biscuit(), { x: 450, y: 330, w: 300, z: 21 });
+    const bis4 = k.add(biscuit(), { x: 580, y: 470, w: 200, z: 22 });
     k.set(bis4, { opacity: 0 });
     k.fx.thud();
     await k.appear(bis4, 0.4);
     munch(5);
     await k.all(k.say('munch', m4), k.hop(m4, 20, 1));
-    const keep = k.keepsake(k.chapter?.keepsake ?? 'giantTeacup', { x: 515, y: 630, w: 150, z: 24 });
+    const keep = k.keepsake(k.chapter?.keepsake ?? 'giantTeacup', { x: 400, y: 500, w: 150, z: 24 });
     const seal = k.add(landSeal(6), { x: 480, y: 70, w: 220, z: 30 });
     k.set([keep, seal], { opacity: 0 });
     k.fx.pop();
