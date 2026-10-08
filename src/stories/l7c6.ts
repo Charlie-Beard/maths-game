@@ -86,7 +86,7 @@ export default defineStory({
     await k.wait(400);
 
     // Tap, tap, tap: the tip of a ruler at the door.
-    const tip = k.add(rulerTip('l7c6-ruler'), { x: 1180, y: 250, w: 460, z: 30 });
+    const tip = k.add(rulerTip('l7c6-ruler'), { x: 1180, y: 250, w: 460, z: 19 });
     snapSound.heels(3, 0.4, 0.7);
     const tapping = k.say('tap');
     await k.to(tip, 0.9, { x: -330, ease: 'power2.out' });

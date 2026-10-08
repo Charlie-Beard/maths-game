@@ -73,7 +73,7 @@ export default defineStory({
     await told;
 
     // Ten, and three more.
-    const sum = k.add(sumStrip('8 + 5 = 13', 'l7c3-sum'), { x: 770, y: 585, w: 290, z: 22 });
+    const sum = k.add(sumStrip('8 + 5 = 13', 'l7c3-sum'), { x: 830, y: 585, w: 290, z: 22 });
     k.set(sum, { opacity: 0 });
     void k.appear(sum, 0.4);
     await k.all(k.say('thirteen', mf), k.hop(mf, 30, 2));
