@@ -122,6 +122,13 @@ button:focus-visible {
     radial-gradient(ellipse at 50% 40%, var(--night-700), var(--night-900) 70%);
 }
 
+/*
+ * The stage is scaled to fit the screen by a plain transform. It has no
+ * will-change on purpose: with one, Safari keeps the picture drawn at the
+ * first size and stretches it, which blurs the SVGs and text. Without, it
+ * draws at the final screen size and stays crisp. Things that move inside
+ * it get their own layers from their own (3D) transforms.
+ */
 #stage {
   position: absolute;
   left: 50%;

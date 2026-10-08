@@ -68,7 +68,10 @@
   position: absolute;
   z-index: 48;
   pointer-events: none;
+  /* A brief full-stage glow: screen-blended, so it gets its own layer to do that on. */
   mix-blend-mode: screen;
+  will-change: opacity;
+  transform: translateZ(0);
 }
 
 .story-beam {
@@ -98,6 +101,8 @@
   position: absolute;
   inset: 0;
   transform-origin: 0 0;
+  /* Its GPU layer hint is set by Kit.camera while it moves, not here: a permanent
+     one would keep the picture drawn at wide-shot size and blur close-ups. */
 }
 
 /* Who is speaking: a name tag with their face, on the caption. */
@@ -144,12 +149,14 @@
   position: absolute;
   pointer-events: none;
 }
+/*
+ * Lights and dims stay on screen for a whole scene (and lights breathe), so
+ * they are plain see-through colour, not screen/multiply blends: a blend
+ * makes Safari re-mix everything underneath each frame. Pale colour on top
+ * lights things up; dark colour on top darkens them. Near enough the same.
+ */
 .story-light {
-  mix-blend-mode: screen;
   border-radius: 50%;
-}
-.story-dim {
-  mix-blend-mode: multiply;
 }
 
 .story-wipe {
@@ -160,6 +167,7 @@
   height: 1000px;
   z-index: 75;
   pointer-events: none;
+  backface-visibility: hidden;
 }
 .story-wipe svg {
   width: 100%;
