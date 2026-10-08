@@ -44,7 +44,7 @@ export default defineStory({
     const hostEl = k.character(host, { x: 10, y: 330, w: 230, z: 20 });
     const laceEl = k.add(lace(), { x: X0, y: 470, w: STEP * 6, z: 12 });
     k.set(laceEl, { opacity: 0 });
-    const hero = k.character('hero', { x: X0 - 20, y: 300, w: 170, z: 20 });
+    const hero = k.character('hero', { x: X0 - 20, y: 270, w: 200, z: 20 });
     await k.all(k.enter(hostEl, 'left'), k.enter(hero, 'left', 0.8), k.fade(laceEl, 1, 0.5));
     await k.say(`hello_${host}`, hostEl);
 
@@ -54,9 +54,9 @@ export default defineStory({
       // Little marks along the lace where each footstep ends.
       for (let i = 0; i < 6; i++) {
         const x = X0 + (i + 1) * STEP;
-        await jump(k, hero, x - 90, 300, 60, 0.45);
+        await jump(k, hero, x - 100, 270, 60, 0.45);
         tick(i);
-        const t = k.add(countTag(i + 1, C.goldLight, `l6c5-tag-${i}`), { x: x - 65, y: 395, w: 64, z: 16 });
+        const t = k.add(countTag(i + 1, C.goldLight, `l6c5-tag-${i}`), { x: x - 65, y: 395, w: 64, z: 22 });
         void k.appear(t, 0.2);
         const m = k.add(svg({ w: 8, h: 70, name: `l6c5-mark-${i}`, boil: false }, [piece(rect(0, 0, 8, 70), C.brownDark, { edge: 'cut', fibre: false, shadow: false })]), { x: x - 4, y: 440, w: 8, z: 14 });
         void k.appear(m, 0.2);
