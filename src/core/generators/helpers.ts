@@ -34,6 +34,12 @@ export const PROP_WORDS: Record<PropId, [string, string]> = {
 
 export const propWord = (p: PropId, n: number): string => PROP_WORDS[p][n === 1 ? 0 : 1];
 
+/** Capitalises the first letter, for a name that starts a sentence ("the Saucepan Man" → "The Saucepan Man"). */
+export const capital = (s: string): string => s.charAt(0).toUpperCase() + s.slice(1);
+
+/** `one` for a count of 1, otherwise `many`: "1 dot", "2 dots". */
+export const plural = (n: number, one: string, many: string): string => (n === 1 ? one : many);
+
 /** Who appears in story-style questions. */
 export const FOLK = ['Moon-Face', 'Silky', 'the Saucepan Man', 'Dame Washalot', 'Mr Watzisname', 'the Angry Pixie'] as const;
 

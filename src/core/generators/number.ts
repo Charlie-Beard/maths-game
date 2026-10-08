@@ -20,7 +20,7 @@
 import type { Answer, Problem, PropId, Speech } from '../problem';
 import type { Rand } from '../random';
 import type { SkillId } from '../skills';
-import { choicesFor, COUNTING_PROPS, FOLK, propWord, type Generator } from './helpers';
+import { capital, choicesFor, COUNTING_PROPS, FOLK, plural, propWord, type Generator } from './helpers';
 
 /** "{c0}, {c1}, {c2}" with the values in slots: counting aloud in a read-back. */
 function countAloud(values: number[], end = '!'): Speech {
@@ -42,7 +42,6 @@ function joinSpeech(...parts: Speech[]): Speech {
 }
 
 /** "the Saucepan Man" → "The Saucepan Man", to start a sentence. */
-const capital = (s: string): string => s[0].toUpperCase() + s.slice(1);
 
 /** "1 ten", "3 tens". */
 const tensWord = (t: number): string => (t === 1 ? 'ten' : 'tens');
@@ -72,7 +71,7 @@ export function subitise(tier: number, r: Rand): Problem {
   const frame = tier >= 3;
   const n = frame ? r.int(1, 10) : r.int(1, tier === 1 ? 4 : 6);
   const likely = frame ? [n + 1, n - 1, 10 - n, n === 5 ? 6 : 5] : [n + 1, n - 1];
-  let explain: Speech = { text: '{n} dots!', vals: { n } };
+  let explain: Speech = { text: `{n} ${plural(n, 'dot', 'dots')}!`, vals: { n } };
   if (frame && n === 10) explain = { text: '10 dots. The frame is full!' };
   else if (frame && n > 5) explain = { text: '{n} dots. 5 and {m} more!', vals: { n, m: n - 5 } };
   return {
@@ -648,8 +647,8 @@ export function oddEven(tier: number, r: Rand): Problem {
       choices,
       visual: { type: 'objects', groups: [{ prop, count: n }], layout: 'row' },
       explain: odd
-        ? { text: '{p} pairs and one left over. {n} is odd!', vals: { p: pairs, n } }
-        : { text: '{p} pairs and none left over. {n} is even!', vals: { p: pairs, n } },
+        ? { text: `{p} ${plural(pairs, 'pair', 'pairs')} and one left over. {n} is odd!`, vals: { p: pairs, n } }
+        : { text: `{p} ${plural(pairs, 'pair', 'pairs')} and none left over. {n} is even!`, vals: { p: pairs, n } },
       key: `odd-even:1:${n}`,
     };
   }

@@ -127,6 +127,9 @@
   position: absolute;
   z-index: 2;
   isolation: isolate;
+  /* The hit box is the whole cell (72 px at least); the art sits 5 px in. */
+  box-sizing: border-box;
+  padding: 5px;
 }
 .tf-counter svg {
   width: 100%;
@@ -137,7 +140,7 @@
 .tf-counter.more::before {
   content: '';
   position: absolute;
-  inset: -3px;
+  inset: 2px;
   border-radius: 50%;
   box-shadow: 0 0 0 4px var(--sky-400);
   z-index: -1;
@@ -145,7 +148,7 @@
 .tf-counter.to-go::after {
   content: '';
   position: absolute;
-  inset: -6px;
+  inset: -1px;
   border-radius: 50%;
   border: 4px dashed var(--scarlet-500);
 }
@@ -155,8 +158,8 @@
 .tf-counter.taken::after {
   content: '';
   position: absolute;
-  left: 4px;
-  right: 4px;
+  left: 9px;
+  right: 9px;
   top: 50%;
   height: 7px;
   background: var(--scarlet-500);

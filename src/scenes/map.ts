@@ -144,15 +144,16 @@ export class MapScene extends Scene {
     r.append(this.bannerEl);
     if (animate) this.closeCloud();
 
-    // Practice with Silky and Moon-Face's Treasure Room, in the bottom corners.
-    this.practiceBtn = portraitButton(characterArt('silky'), { x: 22, y: 676, size: 108, aria: 'Practice with Silky', label: 'Practice', ring: C.teal });
+    // Practice with Silky and Moon-Face's Treasure Room, in the bottom corners, with their
+    // labels kept above the iPad's home-indicator strip (the bottom ~20 px).
+    this.practiceBtn = portraitButton(characterArt('silky'), { x: 22, y: 656, size: 108, aria: 'Practice with Silky', label: 'Practice', ring: C.teal });
     this.practiceBtn.dataset.name = 'map-practice';
     this.tap(this.practiceBtn, () => {
       sfx.tap();
       voice.stop();
       this.app.nav.practice();
     });
-    const treasure = portraitButton(characterArt('moonface'), { x: 1050, y: 676, size: 108, aria: 'Treasure Room', label: 'Treasures', ring: C.gold, vb: '40 26 220 220' });
+    const treasure = portraitButton(characterArt('moonface'), { x: 1050, y: 656, size: 108, aria: 'Treasure Room', label: 'Treasures', ring: C.gold, vb: '40 26 220 220' });
     treasure.dataset.name = 'map-album';
     this.tap(treasure, () => {
       sfx.tap();

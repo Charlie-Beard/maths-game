@@ -16,9 +16,10 @@ import { sfx } from '../audio/sfx';
 import { voice } from '../audio/voice';
 import { characterArt } from '../art/characters';
 import { C } from '../art/palette';
+import { parchment } from '../art/ui';
 import type { Chapter, Land } from '../core/curriculum';
 import { generate } from '../core/generators';
-import { PHRASES, PRAISE } from '../core/phrases';
+import { personalise, PHRASES, PRAISE } from '../core/phrases';
 import type { Answer, Problem } from '../core/problem';
 import { recordOutcome } from '../core/progress';
 import { makeRand, randomSeed, type Rand } from '../core/random';
@@ -36,7 +37,14 @@ export interface PlayOptions {
   rand?: Rand;
   /** Called when every problem is answered. */
   onDone: (round: Round) => void;
+  /**
+   * Practice only: before `onDone`, Silky says a short well done on a card,
+   * with the toffees earned, and one big button carries on.
+   */
+  signOff?: boolean;
 }
+
+const portrait = (): boolean => document.body.classList.contains('is-portrait');
 
 export class PlayScene extends Scene {
   protected o: PlayOptions;
@@ -52,6 +60,13 @@ export class PlayScene extends Scene {
   private hero!: HTMLElement;
   private busy = false;
   private idle: ReturnType<typeof setTimeout> | null = null;
+  /** Silky is out helping: more taps on her wait until she's done. */
+  private helping = false;
+  /** The "back to the tree?" card is open. */
+  private confirming = false;
+  private backBtn!: HTMLElement;
+  /** His toffees when the screen opened, so Practice can say how many it earned. */
+  private toffeesAtStart: number;
 
   constructor(app: App, o: PlayOptions) {
     super(app, 'play');
@@ -59,6 +74,7 @@ export class PlayScene extends Scene {
     this.rand = o.rand ?? makeRand(randomSeed());
     this.round = new Round(o.problems, (p) => generate(p.skill, Math.max(1, p.tier - 1), this.rand));
     this.desk = h('div', { class: 'play-desk' });
+    this.toffeesAtStart = app.progress.toffees;
   }
 
   build(): void {
@@ -84,6 +100,12 @@ export class PlayScene extends Scene {
     this.silky = place(h('button', { class: 'silky-btn', 'aria-label': 'Ask Silky for help', html: characterArt('silky') }), 1040, 300, 130, 147);
     this.tap(this.silky, () => this.askSilky());
     r.append(this.silky);
+
+    // A quiet way out for a child who has had enough, beside the grown-ups'
+    // gear. It never moves or animates while he's answering.
+    this.backBtn = sealButton('map', { x: 84, y: 10, size: 72, color: C.slate, aria: 'Back to the tree', name: 'play-back' });
+    this.tap(this.backBtn, () => this.askLeave());
+    r.append(this.backBtn);
 
     this.hero = place(h('div', { class: 'play-hero', html: characterArt(this.app.progress.avatar ?? 'joe') }), 10, 560, 150, 170);
     r.append(this.hero);
@@ -143,13 +165,15 @@ export class PlayScene extends Scene {
     await this.beforeProblem();
     if (!this.alive || activity !== this.activity) return;
     this.busy = false;
-    activity.lock(false);
+    if (!this.confirming) activity.lock(false);
     activity.show();
     this.sayQuestion();
   }
 
   private sayQuestion(): void {
     this.restartIdle();
+    // Nothing is said behind the "turn the iPad" screen.
+    if (portrait()) return;
     void voice.speech(this.round.current.say);
   }
 
@@ -158,7 +182,9 @@ export class PlayScene extends Scene {
     const secs = this.app.progress.settings.idleHintSeconds;
     if (!secs) return;
     this.idle = setTimeout(() => {
-      if (!this.alive || this.busy) return;
+      if (!this.alive || this.busy || this.confirming) return;
+      // Portrait pauses the game: hold the hint and try again later.
+      if (portrait()) return this.restartIdle();
       sfx.rustle();
       this.sayQuestion();
     }, secs * 1000);
@@ -170,7 +196,7 @@ export class PlayScene extends Scene {
   }
 
   private async onAnswer(value: Answer): Promise<void> {
-    if (this.busy || this.round.done) return;
+    if (this.busy || this.confirming || this.round.done) return;
     this.restartIdle();
     const p = this.round.current;
     const verdict = this.round.answer(value);
@@ -196,14 +222,18 @@ export class PlayScene extends Scene {
     await this.activity?.right();
     if (!this.alive) return;
     await voice.speech(p.explain);
+    // Leaving stops the voice, which ends these lines early: don't go on to the next one.
+    if (!this.alive) return;
     if (outcome.wrong === 0 && this.rand.chance(0.35)) await voice.say(this.rand.pick(PRAISE));
+    if (!this.alive) return;
     await this.sleep(300);
     await this.afterRight(this.round.index, this.round.index + 1 >= this.round.total);
     if (!this.alive) return;
     this.dots[this.round.index]?.classList.add('done');
 
     if (!this.round.advance()) {
-      this.o.onDone(this.round);
+      if (this.o.signOff) this.practiceSignOff();
+      else this.o.onDone(this.round);
       return;
     }
     void this.showProblem();
@@ -214,7 +244,9 @@ export class PlayScene extends Scene {
     if (level === 0 || !this.activity) return;
     this.activity.help(level);
     if (level === 1) {
-      void voice.say(PHRASES.tryAgain).then(() => this.alive && this.sayQuestion());
+      // Only re-read the question if the line finished: a quick second wrong
+      // tap cuts it off and starts the next help line instead.
+      void voice.say(PHRASES.tryAgain).then((finished) => finished && this.alive && !this.busy && this.sayQuestion());
     } else if (level === 2) {
       void voice.say(PHRASES.showMe);
     } else {
@@ -223,7 +255,7 @@ export class PlayScene extends Scene {
   }
 
   private askSilky(): void {
-    if (this.busy) return;
+    if (this.busy || this.helping || this.confirming) return;
     sfx.tap();
     this.round.askHelp();
     this.stepHelp();
@@ -231,14 +263,85 @@ export class PlayScene extends Scene {
 
   /** Silky flies to the middle, says the working, and settles back. */
   private async silkyHelps(): Promise<void> {
-    sfx.sparkle();
-    if (!isCalm()) {
-      await sm(this.silky, 0.6, { x: -440, y: -160, scale: 1.3, ease: 'power2.inOut' });
+    // One visit at a time: more taps or wrong answers meanwhile would cut her
+    // lines off and tween her twice.
+    if (this.helping) return;
+    this.helping = true;
+    try {
+      sfx.sparkle();
+      if (!isCalm()) {
+        await sm(this.silky, 0.6, { x: -440, y: -160, scale: 1.3, ease: 'power2.inOut' });
+      }
+      if (!this.alive) return;
+      // Skip the working if something interrupted her opening line.
+      if (await voice.say(PHRASES.silkyHere)) {
+        if (!this.alive) return;
+        await voice.speech(this.round.current.explain);
+      }
+    } finally {
+      this.helping = false;
+      if (this.alive && !isCalm()) gsap.to(this.silky, { x: 0, y: 0, scale: 1, duration: 0.6, ease: 'power2.out' });
     }
-    await voice.say(PHRASES.silkyHere);
-    if (!this.alive) return;
-    await voice.speech(this.round.current.explain);
-    if (!isCalm()) gsap.to(this.silky, { x: 0, y: 0, scale: 1, duration: 0.6, ease: 'power2.out' });
+  }
+
+  /** A calm question on a parchment card: nothing is lost either way. */
+  private askLeave(): void {
+    if (this.confirming) return;
+    sfx.tap();
+    this.confirming = true;
+    this.stopIdle();
+    this.activity?.lock(true);
+    const veil = h('div', { class: 'play-veil' });
+    const card = place(h('div', { class: 'play-card', html: parchment(600, 400, 'play-leave') }), 290, 190, 600, 400);
+    card.append(place(h('div', { class: 'play-card-title' }, PHRASES.leaveAsk), 40, 50, 520, 80));
+    const yes = sealButton('tick', { x: 90, y: 170, size: 140, color: C.green, label: 'Yes', aria: 'Yes, back to the tree', name: 'leave-yes' });
+    const keep = sealButton('play', { x: 370, y: 170, size: 140, color: C.red, label: 'Keep playing', aria: 'Keep playing', name: 'leave-keep' });
+    card.append(yes, keep);
+    veil.append(card);
+    this.root.append(veil);
+    if (!isCalm()) void sm(card, 0.25, { startAt: { scale: 0.92, opacity: 0 }, scale: 1, opacity: 1, ease: 'power2.out' });
+    const close = () => {
+      veil.remove();
+      this.confirming = false;
+      voice.stop();
+      if (!this.busy) this.activity?.lock(false);
+      if (!this.busy) this.restartIdle();
+    };
+    this.tap(yes, () => {
+      sfx.tap();
+      voice.stop();
+      this.app.nav.map();
+    });
+    this.tap(keep, () => {
+      sfx.tap();
+      close();
+    });
+    void voice.say(PHRASES.leaveAsk);
+  }
+
+  /** Practice ends with Silky's well done and the toffees earned, then one big button. */
+  private practiceSignOff(): void {
+    const earned = Math.max(0, this.app.progress.toffees - this.toffeesAtStart);
+    if (this.activity) this.activity.el.style.visibility = 'hidden';
+    this.silky.style.visibility = 'hidden';
+    this.backBtn.style.visibility = 'hidden';
+    const veil = h('div', { class: 'play-veil' });
+    const card = place(h('div', { class: 'play-card', html: parchment(760, 440, 'practice-done') }), 210, 190, 760, 440);
+    card.append(place(h('div', { class: 'play-card-art', html: characterArt('silky') }), 50, 70, 200, 226));
+    card.append(place(h('div', { class: 'play-card-title small' }, personalise(PHRASES.practiceDone, this.app.progress.name)), 270, 50, 440, 150));
+    if (earned > 0) card.append(place(h('div', { class: 'play-card-toffees' }, `${earned} ${earned === 1 ? 'toffee' : 'toffees'}`), 270, 225, 440, 70));
+    const on = sealButton('next', { x: 560, y: 290, size: 130, color: C.red, aria: 'Back to the tree', name: 'practice-done' });
+    card.append(on);
+    veil.append(card);
+    this.root.append(veil);
+    if (!isCalm()) void pop(card, 1.05);
+    this.tap(on, () => {
+      sfx.tap();
+      voice.stop();
+      this.o.onDone(this.round);
+    });
+    sfx.success();
+    void voice.say(PHRASES.practiceDone);
   }
 
   private async cheer(): Promise<void> {

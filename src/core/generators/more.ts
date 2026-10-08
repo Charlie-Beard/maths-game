@@ -39,7 +39,7 @@
 import type { Answer, Problem, PropId, ShapeId, Speech } from '../problem';
 import type { Rand } from '../random';
 import type { SkillId } from '../skills';
-import { choicesFor, choicesFrom, FOLK, propWord, type Generator } from './helpers';
+import { choicesFor, choicesFrom, FOLK, plural, propWord, type Generator } from './helpers';
 
 // ---------------------------------------------------------------------------
 // Shared pieces
@@ -280,7 +280,7 @@ export function groups(tier: number, r: Rand): Problem {
   const total = g * each;
   const likely = [g + each, total + each, total - each, total + 1, total - 1];
   const choices = choicesFor(total, r, { min: 1, max: 30, likely });
-  const explain = { text: '{g} groups of {e} make {c}!', vals: { g, e: each, c: total } };
+  const explain = { text: `{g} ${plural(g, 'group', 'groups')} of {e} ${plural(g, 'makes', 'make')} {c}!`, vals: { g, e: each, c: total } };
   if (tier === 2) {
     return {
       ...base,
@@ -428,7 +428,7 @@ function timesTable(skill: SkillId, m: 2 | 5 | 10, tier: number, r: Rand): Probl
     };
   }
   const activity = tier >= 3 ? 'numberPad' : 'choose';
-  const explain = { text: '{n} groups of {m} make {c}. {n} times {m} is {c}!', vals: { n, m, c } };
+  const explain = { text: `{n} ${plural(n, 'group', 'groups')} of {m} ${plural(n, 'makes', 'make')} {c}. {n} times {m} is {c}!`, vals: { n, m, c } };
   if (tier === 2 && r.chance(0.25)) {
     return {
       skill,

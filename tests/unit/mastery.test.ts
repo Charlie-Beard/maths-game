@@ -58,4 +58,36 @@ describe('mastery', () => {
     const d = { ...newSkillState(), mastered: false, due: 0 };
     expect(dueForReview({ 'add-10': b, 'count-10': a, 'sub-10': c, 'bonds-10': d }, at)).toEqual(['count-10', 'add-10']);
   });
+
+  describe('Leitner review', () => {
+    const mastered = () => play(newSkillState(1), Array(20).fill(0), 3);
+
+    it('does not advance the box for first-try rights that were not due', () => {
+      let st = mastered();
+      expect(st.mastered).toBe(true);
+      const { box, due } = st;
+      const t0 = st.last;
+      for (let i = 0; i < 16; i++) st = record(st, { skill: 'add-10', tier: st.tier, wrong: 0, at: t0 + (i + 1) * 1000 }, 3);
+      expect(st.box).toBe(box);
+      expect(st.due).toBe(due);
+      expect(st.box).toBeLessThanOrEqual(2);
+    });
+
+    it('advances the box when a due review is right first time', () => {
+      let st = mastered();
+      for (let want = st.box + 1; want <= 5; want++) {
+        st = record(st, { skill: 'add-10', tier: st.tier, wrong: 0, at: st.due + 1 }, 3);
+        expect(st.box).toBe(want);
+      }
+      expect(st.due - st.last).toBe(BOX_DAYS[4] * DAY);
+    });
+
+    it('sends a wrong answer back to box 1 even when not due', () => {
+      let st = mastered();
+      st = record(st, { skill: 'add-10', tier: st.tier, wrong: 0, at: st.due + 1 }, 3);
+      expect(st.box).toBe(2);
+      st = record(st, { skill: 'add-10', tier: st.tier, wrong: 1, at: st.last + 1000 }, 3);
+      expect(st.box).toBe(1);
+    });
+  });
 });

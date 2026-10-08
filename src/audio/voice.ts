@@ -57,7 +57,8 @@ function fetchBuffer(url: string): Promise<AudioBuffer | null> {
   return p;
 }
 
-function playBuffer(buf: AudioBuffer, rate = 1): Promise<void> {
+/** Resolves true when the clip played to its end, false when something stopped it. */
+function playBuffer(buf: AudioBuffer, rate = 1): Promise<boolean> {
   stopClip();
   return new Promise((resolve) => {
     const src = audio().createBufferSource();
@@ -65,11 +66,11 @@ function playBuffer(buf: AudioBuffer, rate = 1): Promise<void> {
     src.playbackRate.value = rate;
     src.connect(buses.voice);
     let done = false;
-    const finish = () => {
+    const finish = (completed: boolean) => {
       if (done) return;
       done = true;
       if (current?.stop === stopThis) current = null;
-      resolve();
+      resolve(completed);
     };
     const stopThis = () => {
       try {
@@ -77,9 +78,10 @@ function playBuffer(buf: AudioBuffer, rate = 1): Promise<void> {
       } catch {
         /* already stopped */
       }
-      finish();
+      finish(false);
     };
-    src.onended = finish;
+    // Stopping a source also fires onended, so `stopThis` must get in first.
+    src.onended = () => finish(true);
     current = { stop: stopThis };
     src.start();
   });
@@ -96,10 +98,11 @@ function pickVoice(): SpeechSynthesisVoice | null {
   return britishVoice;
 }
 
-function speak(text: string, rate = 0.85): Promise<void> {
-  stop();
+/** Resolves true when the iPad finished saying it, false when it was cut off. */
+function speak(text: string, rate = 0.85): Promise<boolean> {
+  stopClip();
   const synth = window.speechSynthesis;
-  if (!synth) return Promise.resolve();
+  if (!synth) return Promise.resolve(false);
   return new Promise((resolve) => {
     const u = new SpeechSynthesisUtterance(text);
     u.lang = 'en-GB';
@@ -108,19 +111,20 @@ function speak(text: string, rate = 0.85): Promise<void> {
     const v = pickVoice();
     if (v) u.voice = v;
     let done = false;
-    const finish = () => {
+    const finish = (completed: boolean) => {
       if (done) return;
       done = true;
-      resolve();
+      resolve(completed);
     };
-    u.onend = finish;
-    u.onerror = finish;
+    u.onend = () => finish(true);
+    // Cancelling fires an error event too; the stop below has already said false.
+    u.onerror = () => finish(false);
     // Safety net: Safari occasionally never fires onend.
-    setTimeout(finish, 1200 + text.length * 120);
+    setTimeout(() => finish(true), 1200 + text.length * 120);
     current = {
       stop: () => {
         synth.cancel();
-        finish();
+        finish(false);
       },
     };
     synth.speak(u);
@@ -136,7 +140,11 @@ function unrecorded(what: string): void {
   if (import.meta.env.DEV && manifest.lines.length) console.warn(`[voice] not recorded, the iPad says it: ${what}`);
 }
 
-/** The `speech` sequence playing now (a new one, or stop(), ends it). */
+/**
+ * The line or `speech` sequence that owns the voice now. A new one, or
+ * stop(), takes it away, so a line still loading when it is cancelled
+ * stays silent instead of playing late.
+ */
 let speaking: object | null = null;
 
 /** Stops the clip playing now (but not a `speech` sequence it belongs to). */
@@ -167,18 +175,25 @@ export const voice = {
    * Says a line in a speaker's voice (a character id, default the
    * narrator). "{name}" is filled in with the child's name: the recording
    * with his name is used if there is one, else the version without a name.
+   *
+   * Resolves true only if the line played to its end. False means it was
+   * interrupted or stopped, so callers must not carry on as if it finished.
    */
-  async say(template: string, who = 'narrator'): Promise<void> {
+  async say(template: string, who = 'narrator'): Promise<boolean> {
     stop();
+    const token = {};
+    speaking = token;
     await loadManifest();
     const personal = personalise(template, playerName);
     for (const text of [personal, generic(template)]) {
       const id = voiceId(text, who);
       if (manifest.lines.includes(id)) {
         const buf = await fetchBuffer(lineUrl(id));
+        if (speaking !== token) return false;
         if (buf) return playBuffer(buf);
       }
     }
+    if (speaking !== token) return false;
     unrecorded(`${who}: “${generic(template)}”`);
     return speak(personal, 0.9);
   },
@@ -186,27 +201,32 @@ export const voice = {
   /**
    * Says a question or explanation with numbers in it. Uses recorded
    * pieces and number clips when every one exists, else the iPad's voice.
+   * Resolves true only if it played to the end (see `say`).
    */
-  async speech(s: Speech): Promise<void> {
+  async speech(s: Speech): Promise<boolean> {
+    const early = {};
+    speaking = early;
     await loadManifest();
+    // A newer line or stop() arrived while the manifest loaded.
+    if (speaking !== early) return false;
     const parts = speechParts(s);
     const recorded = parts.every((p) =>
       'piece' in p ? manifest.pieces.includes(pieceId(p.piece)) : typeof p.value === 'number' && manifest.numbers.includes(p.value),
     );
-    stop();
+    stopClip();
     if (!recorded) {
       unrecorded(`question: “${s.text}” with ${JSON.stringify(s.vals ?? {})}`);
       return speak(personalise(speechText(s), playerName), 0.85);
     }
-    const token = {};
-    speaking = token;
+    const token = early;
     for (const p of parts) {
-      if (speaking !== token) return;
+      if (speaking !== token) return false;
       const url = 'piece' in p ? pieceUrl(pieceId(p.piece)) : numberUrl(p.value as number, p.end);
       const buf = await fetchBuffer(url);
-      if (speaking !== token) return;
-      if (buf) await playBuffer(buf);
+      if (speaking !== token) return false;
+      if (buf && !(await playBuffer(buf))) return false;
     }
+    return speaking === token;
   },
 
   /** Warms the cache so the first tap answers instantly. Lines are the narrator's unless they say who. */

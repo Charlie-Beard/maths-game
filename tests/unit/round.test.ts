@@ -103,4 +103,42 @@ describe('Round', () => {
     }
     expect(round.total).toBe(10);
   });
+
+  it('asking Silky steps help up but is not a wrong answer', () => {
+    const round = new Round(problems(), regen(1));
+    round.askHelp();
+    expect(round.help).toBe(1);
+    round.askHelp();
+    round.askHelp();
+    expect(round.help).toBe(3);
+    expect(round.answer(round.current.answer, now)).toBe('right');
+    expect(round.outcomes[0].wrong).toBe(0);
+    expect(round.perfect).toBe(1);
+    // Not a "Silky helped" problem, so nothing is re-queued.
+    expect(round.total).toBe(8);
+    round.advance();
+    expect(round.help).toBe(0);
+  });
+
+  it('counts only real wrong answers when he also asked for help', () => {
+    const round = new Round(problems(), regen(1));
+    round.askHelp();
+    round.answer(-1);
+    expect(round.help).toBe(2);
+    round.answer(round.current.answer, now);
+    expect(round.outcomes[0].wrong).toBe(1);
+  });
+
+  it('re-queues a different problem from the one just solved', () => {
+    const first = problems();
+    let n = 0;
+    // Gives the same problem twice before a different one.
+    const stubborn = (p: (typeof first)[number]) => (n++ < 2 ? p : generate(p.skill, p.tier, makeRand(100 + n)));
+    const round = new Round(first, stubborn);
+    const solved = round.current;
+    for (let w = 0; w < 3; w++) round.answer(-1);
+    round.answer(solved.answer);
+    expect(round.total).toBe(9);
+    expect(round.problems[8].key).not.toBe(solved.key);
+  });
 });
