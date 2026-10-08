@@ -10,9 +10,9 @@
  *     like the white core of real torn card
  *   - a soft offset shadow sits under each piece so layers read as stacked
  *
- * Each piece is rendered in a few slightly different "boil" frames which
- * are cycled at a low frame rate in CSS, giving the gentle jitter of
- * stop-motion animation. Boiling pauses whenever the child is concentrating.
+ * Each piece is drawn once. (It used to be drawn in three "boil" frames
+ * cycled in CSS for a stop-motion jitter, but swapping thousands of
+ * layers made characters flicker on the iPad, and tripled the drawing.)
  */
 
 export type Pt = readonly [number, number];
@@ -240,7 +240,8 @@ export function toPath(pts: Pt[]): string {
 // Composition
 // ---------------------------------------------------------------------------
 
-export const BOIL_FRAMES = 3;
+/** Pieces are drawn once: the boil frames are gone (see the top of this file). */
+export const BOIL_FRAMES = 1;
 
 export interface Ctx {
   /** Base seed for this illustration. */
@@ -391,7 +392,7 @@ export interface SvgOpts {
   h: number;
   /** Name, used to seed the randomness (stable across builds). */
   name: string;
-  /** Render boil frames (default true). */
+  /** No longer used: art is always drawn once (kept so callers still compile). */
   boil?: boolean;
   className?: string;
   /** Accessible label; omitted = decorative. */
@@ -405,7 +406,7 @@ export function svg(o: SvgOpts, children: Node[]): string {
   const ctx: Ctx = {
     seed,
     next: () => (seed + ++counter * 104729) >>> 0,
-    frames: o.boil === false ? 1 : BOIL_FRAMES,
+    frames: BOIL_FRAMES,
   };
   const a11y = o.label ? `role="img" aria-label="${o.label}"` : 'aria-hidden="true"';
   return `<svg class="paper ${o.className ?? ''}" viewBox="0 0 ${o.w} ${o.h}" ${a11y} xmlns="http://www.w3.org/2000/svg">${children

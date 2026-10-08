@@ -1,11 +1,10 @@
 /**
- * Animation helpers. Movement is quantised to 12 frames per second — the
- * "on twos" timing of stop-motion — while press feedback stays instant.
- * In calm mode, movement is shortened and simplified.
+ * Animation helpers. Movement runs smoothly at the display's own frame
+ * rate (it used to be quantised to 12 fps like stop-motion, but on the
+ * iPad's fast screen that read as judder). In calm mode, movement is
+ * shortened and simplified.
  */
 import { gsap } from 'gsap';
-
-export const STOP_MOTION_FPS = 12;
 
 let calm = false;
 export function setCalm(v: boolean): void {
@@ -15,18 +14,17 @@ export function setCalm(v: boolean): void {
 export const isCalm = (): boolean => calm;
 
 /**
- * Wraps an ease so time advances in held frames, like stop-motion.
- * `duration` is needed to know how many frames there are.
+ * Resolves an ease. It once held time in 12 fps frames, like stop-motion;
+ * motion is smooth now, so this is the plain ease. Kept so callers can
+ * pass a name or a function alike. `_duration` is no longer used.
  */
-export function stepped(duration: number, ease: string | ((t: number) => number) = 'power2.inOut'): (t: number) => number {
-  const base = typeof ease === 'function' ? ease : gsap.parseEase(ease);
-  const frames = Math.max(2, Math.round(duration * STOP_MOTION_FPS));
-  return (t: number) => (t >= 1 ? 1 : base(Math.floor(t * frames) / frames));
+export function stepped(_duration: number, ease: string | ((t: number) => number) = 'power2.inOut'): (t: number) => number {
+  return typeof ease === 'function' ? ease : gsap.parseEase(ease);
 }
 
 type Vars = gsap.TweenVars;
 
-/** A stop-motion tween. */
+/** A tween that follows calm mode. */
 export function sm(target: gsap.TweenTarget, duration: number, vars: Vars & { ease?: string }): gsap.core.Tween {
   const d = calm ? Math.min(duration, 0.25) : duration;
   return gsap.to(target, { ...vars, duration: d, ease: stepped(d, vars.ease ?? 'power2.inOut') });
@@ -61,7 +59,7 @@ export function pop(el: Element, amount = 1.12): gsap.core.Timeline {
     .to(el, { scale: 1, duration: 0.25, ease: stepped(0.25, 'back.out(3)') });
 }
 
-/** A paper "breathing" idle loop (stepped), returns a stopper. */
+/** A paper "breathing" idle loop, returns a stopper. */
 export function breathe(el: Element, amount = 0.03, period = 2.4): () => void {
   if (calm) return () => {};
   const tw = gsap.to(el, {

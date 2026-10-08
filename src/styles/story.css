@@ -29,12 +29,6 @@
 .story-flip svg {
   overflow: visible;
 }
-.story-actor.still .paper .f {
-  animation: none;
-}
-.story-actor.still .paper .f0 {
-  visibility: visible;
-}
 
 .story-caption {
   position: absolute;
