@@ -224,6 +224,8 @@ export const FINALES: Record<number, FinaleLand> = {
   // The second adventure. Each land's story workstream owns its own entry
   // below (and may change anything in it); the lines here are first drafts.
 
+  // The Old Woman follows them down the ladder, kindly, calling them back
+  // for supper (she never catches them). The story l11c8 picks up from there.
   11: {
     n: 11,
     mode: 'escape',
@@ -234,9 +236,9 @@ export const FINALES: Record<number, FinaleLand> = {
     hazard: 'chase',
     chaser: 'oldWoman',
     lines: {
-      start: 'The shoe is walking away! Down the ladder, {name}!',
-      beats: ['Come back for supper, dears!', 'Hold on tight!', 'One more rung!', 'Mind the laces!', 'Nearly down!'],
-      end: 'Jump! Safe on the tree. Goodbye, Old Woman! Goodbye, children!',
+      start: 'The shoe is waking up, and the land is moving on! Down the ladder, {name}!',
+      beats: ['Come back for supper, my dears!', 'Hold on tight!', 'Wait for me, dears!', 'One more rung!', 'Nearly down!'],
+      end: 'Jump! Safe on the tree. But what is she calling?',
     },
   },
 
