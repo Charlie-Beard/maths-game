@@ -87,9 +87,13 @@ export function record(prev: SkillState, o: Outcome, ceiling = tierCount(o.skill
       st.due = o.at + BOX_DAYS[0] * DAY;
     }
   } else if (o.wrong === 0) {
-    // Reviewed and still sure: wait longer next time.
-    st.box = Math.min(BOX_DAYS.length, st.box + 1);
-    st.due = o.at + BOX_DAYS[st.box - 1] * DAY;
+    // Only a review that was actually due moves the box on. Getting it right
+    // while it isn't due (more of the same in one sitting) proves nothing
+    // about the long gap, so box and due stay put.
+    if (o.at >= prev.due) {
+      st.box = Math.min(BOX_DAYS.length, st.box + 1);
+      st.due = o.at + BOX_DAYS[st.box - 1] * DAY;
+    }
   } else {
     // Slipped: review again soon, a tier gentler.
     st.box = 1;

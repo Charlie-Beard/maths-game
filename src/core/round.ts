@@ -4,8 +4,8 @@
  * buildRound: 8 problems = 5 focus + 2 recent + 1 spaced review, with the
  * focus tiers chosen per skill inside the chapter's range.
  *
- * Round: the state of play. Wrong answers raise the help level
- * (1 say it again, 2 show me, 3 Silky); a problem Silky had to help with
+ * Round: the state of play. Wrong answers (and asking Silky) raise the help
+ * level (1 say it again, 2 show me, 3 Silky); a problem Silky had to help with
  * comes back once at the end, a tier gentler, with new numbers.
  */
 import { ALL_CHAPTERS, LANDS, type Chapter } from './curriculum';
@@ -117,6 +117,8 @@ export class Round {
   readonly outcomes: Outcome[] = [];
   private i = 0;
   private wrong = 0;
+  /** Times he asked Silky for help on this problem (not wrong answers). */
+  private asked = 0;
   private requeued = 0;
   private regen: (p: Problem) => Problem;
 
@@ -138,9 +140,12 @@ export class Round {
     return this.problems.length;
   }
 
-  /** Help level for the current problem: wrong answers so far, up to 3. */
+  /**
+   * Help level for the current problem, up to 3: wrong answers plus times he
+   * asked Silky. Both step the help up; only wrong answers cost credit.
+   */
   get help(): HelpLevel {
-    return Math.min(3, this.wrong) as HelpLevel;
+    return Math.min(3, this.wrong + this.asked) as HelpLevel;
   }
 
   get done(): boolean {
@@ -163,20 +168,33 @@ export class Round {
     this.outcomes.push({ skill: p.skill, tier: p.tier, wrong: this.wrong, at: now });
     if (this.wrong >= 3 && this.requeued < MAX_REQUEUE) {
       this.requeued += 1;
-      this.problems.push(this.regen(p));
+      this.problems.push(this.fresh(p));
     }
     return 'right';
   }
 
-  /** He asked Silky for help: counts like a wrong answer, so help steps up. */
+  /**
+   * He asked Silky for help. Help steps up just as after a wrong answer, but
+   * it isn't one: asking is a good thing to do, so the toffee and the score
+   * (which follow `wrong` only) are untouched, and Silky showing the answer
+   * because he asked doesn't cost him anything.
+   */
   askHelp(): void {
-    if (!this.done) this.wrong += 1;
+    if (!this.done) this.asked += 1;
+  }
+
+  /** A fresh problem like `p`, but not the same maths as the one just solved. */
+  private fresh(p: Problem): Problem {
+    let q = this.regen(p);
+    for (let tries = 0; q.key === p.key && tries < 8; tries++) q = this.regen(p);
+    return q;
   }
 
   /** Moves to the next problem. Returns false when the round is over. */
   advance(): boolean {
     this.i += 1;
     this.wrong = 0;
+    this.asked = 0;
     return !this.done;
   }
 }

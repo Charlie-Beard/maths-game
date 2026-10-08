@@ -5,7 +5,7 @@
  */
 import type { Problem } from '../problem';
 import type { Rand } from '../random';
-import { choicesFor, COUNTING_PROPS, FOLK, propWord } from './helpers';
+import { capital, choicesFor, COUNTING_PROPS, FOLK, plural, propWord } from './helpers';
 
 export function count10(tier: number, r: Rand): Problem {
   const n = tier === 1 ? r.int(1, 5) : r.int(3, 10);
@@ -46,7 +46,7 @@ function addWithin(skill: 'add-5' | 'add-10', max: number, tier: number, r: Rand
   const prop = r.pick(COUNTING_PROPS);
   const who = r.pick(FOLK);
   const say = {
-    text: `${who} has {a} ${propWord(prop, a)}. Then {b} more come. How many now?`,
+    text: `${capital(who)} has {a} ${propWord(prop, a)}. Then {b} more ${plural(b, 'comes', 'come')}. How many now?`,
     vals: { a, b },
   };
   const explain = { text: '{a} add {b} makes {c}!', vals: { a, b, c: total } };
@@ -88,7 +88,7 @@ export function sub10(tier: number, r: Rand): Problem {
   const c = a - b;
   const prop = r.pick(COUNTING_PROPS);
   const who = r.pick(FOLK);
-  const say = { text: `${who} has {a} ${propWord(prop, a)}. {b} roll away. How many are left?`, vals: { a, b } };
+  const say = { text: `${capital(who)} has {a} ${propWord(prop, a)}. {b} ${plural(b, 'rolls', 'roll')} away. How many are left?`, vals: { a, b } };
   const explain = { text: '{a} take away {b} leaves {c}!', vals: { a, b, c } };
   const choices = choicesFor(c, r, { min: 0, max: 10, likely: [c + 1, c - 1, Math.min(a + b, 10)] });
   const base = { skill: 'sub-10', tier, say, answer: c, choices, explain, key: `sub-10:${a}-${b}` } as const;
