@@ -151,13 +151,13 @@ export default defineStory({
     for (let i = 0; i < 14; i++) {
       const row = i < 10 ? 0 : 1;
       const x = 250 + (row ? i - 10 : i) * 62;
-      const el = k.add(balloonArt(`l5c8-b${i}`, BALLOONS[i % BALLOONS.length]), { x, y: 60 + row * 150, w: 60, z: 25 });
+      const el = k.add(balloonArt(`l5c8-b${i}`, BALLOONS[i % BALLOONS.length]), { x, y: 100 + row * 150, w: 60, z: 25 });
       k.set(el, { opacity: 0, y: 500 });
       balloons.push(el);
     }
-    const ten = k.add(numberTag('10', C.goldLight, 'l5c8-ten'), { x: 860, y: 90, w: 110, z: 26 });
-    const four = k.add(numberTag('4', C.sky, 'l5c8-four'), { x: 520, y: 240, w: 110, z: 26 });
-    const fourteen = k.add(numberTag('14', C.pink, 'l5c8-fourteen'), { x: 860, y: 90, w: 120, z: 27 });
+    const ten = k.add(numberTag('10', C.goldLight, 'l5c8-ten'), { x: 880, y: 130, w: 110, z: 26 });
+    const four = k.add(numberTag('4', C.sky, 'l5c8-four'), { x: 520, y: 280, w: 110, z: 26 });
+    const fourteen = k.add(numberTag('14', C.pink, 'l5c8-fourteen'), { x: 870, y: 130, w: 120, z: 27 });
     k.set([ten, four, fourteen], { opacity: 0 });
     const rise = async () => {
       for (const [i, b] of balloons.entries()) {
@@ -178,7 +178,7 @@ export default defineStory({
     // Into a bunch in the hero's hand.
     void k.fade(fourteen, 0, 0.4);
     k.fx.whizz();
-    await k.all(...balloons.map((b, i) => k.to(b, 0.8, { x: `+=${960 + (i % 5) * 24 - (250 + (i < 10 ? i : i - 10) * 62)}`, y: `+=${170 + Math.floor(i / 5) * 30 - (60 + (i < 10 ? 0 : 150))}`, ease: 'power2.inOut' })));
+    await k.all(...balloons.map((b, i) => k.to(b, 0.8, { x: `+=${960 + (i % 5) * 24 - (250 + (i < 10 ? i : i - 10) * 62)}`, y: `+=${170 + Math.floor(i / 5) * 30 - (100 + (i < 10 ? 0 : 150))}`, ease: 'power2.inOut' })));
     drum(3);
     void k.hop(oom, 24, 2);
     await k.say('drum', oom);
