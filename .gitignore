@@ -11,3 +11,6 @@ __pycache__
 
 # Screenshots a script once wrote to a folder literally called "undefined".
 undefined/
+
+# Agent worktrees (local only).
+.claude/worktrees/

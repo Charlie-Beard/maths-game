@@ -42,6 +42,15 @@ export type ShapeId = 'circle' | 'square' | 'triangle' | 'rectangle' | 'pentagon
 /** 3D shapes (land 13). */
 export type SolidId = 'cube' | 'cuboid' | 'sphere' | 'cylinder' | 'cone' | 'pyramid';
 
+/** A little grid to walk on (land 13, `turn`): the start square and the flags to land on. Rows count down from the top. */
+export interface TurnGrid {
+  cols: number;
+  rows: number;
+  col: number;
+  row: number;
+  flags: { id: string; col: number; row: number }[];
+}
+
 /** How he answers. Each has a module in src/activities. */
 export type ActivityKind =
   | 'choose'
@@ -95,9 +104,28 @@ export type Visual =
   /** A tally chart or pictogram: one row per thing counted (`per` = how many one picture stands for). */
   | { type: 'tally'; style: 'tally' | 'pictogram'; rows: { label: string; count: number; prop?: PropId }[]; per?: number }
   /** Something facing a way (0 = up, 90 = right …), and the turn it makes; or a path of moves. */
-  | { type: 'turn'; facing: number; turn?: number; dir?: 'cw' | 'acw'; moves?: ('forward' | 'left' | 'right')[] }
+  | {
+      type: 'turn';
+      facing: number;
+      turn?: number;
+      dir?: 'cw' | 'acw';
+      moves?: ('forward' | 'left' | 'right')[];
+      /** 'turn' (default): the arrow and a curved arrow for the turn; 'before-after': a faded start and the bold end, no curve (which way did it turn?); 'arrow': just the arrow. */
+      show?: 'turn' | 'before-after' | 'arrow';
+      /** A grid to walk on (with `moves`): where he starts, and the flags he might land on. */
+      grid?: TurnGrid;
+    }
   /** One or more 3D shapes. */
-  | { type: 'solid'; solids: SolidId[] }
+  | {
+      type: 'solid';
+      solids: SolidId[];
+      /** Draw the front face in gold, so he can say what shape it is. */
+      face?: boolean;
+      /** Lie a cylinder or cone on its side, so its round end faces him. */
+      lying?: boolean;
+      /** What is being counted (so help can number it). */
+      ask?: 'faces' | 'edges' | 'corners';
+    }
   /** A balance, kitchen scale, jug or thermometer, with its reading(s). */
   | { type: 'measure'; gauge: 'balance' | 'dial' | 'jug' | 'thermometer'; values: number[]; max: number; step: number; unit: 'kg' | 'l' | '°C'; labelEvery?: number };
 
