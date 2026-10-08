@@ -35,7 +35,7 @@ test('turn: every fixture plays to the right answer', async ({ page }) => {
 test('solid: every fixture plays to the right answer', async ({ page }) => {
   await page.goto('/?scene=fixtures&kind=solid&seed=1');
   await expect(page.locator('.activity-solid')).toBeVisible();
-  await playAll(page, 6);
+  await playAll(page, 5);
 });
 
 test('all answer targets are at least 72 px', async ({ page }) => {

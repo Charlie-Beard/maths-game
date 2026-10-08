@@ -707,6 +707,21 @@ function describe(v: Visual): string {
       return `Coins: ${v.coins.map(moneyText).join(', ')}`;
     case 'shape':
       return 'A shape';
+    case 'turn': {
+      const way = v.dir === 'acw' ? 'anticlockwise' : 'clockwise';
+      const names = ['up', 'to the right', 'down', 'to the left'];
+      const at = names[((Math.round(v.facing / 90) % 4) + 4) % 4];
+      if (v.grid) return `A paving path with flags. An arrow starts facing ${at}, with ${v.moves?.length ?? 0} moves to follow`;
+      if (v.show === 'before-after') return `An arrow after a quarter turn, with a faded arrow where it started, pointing ${at}`;
+      const amount = v.turn === 180 ? 'a half turn' : v.turn === 270 ? 'three quarters of a turn' : 'a quarter turn';
+      return v.turn ? `An arrow pointing ${at}, with a curved arrow for ${amount} ${way}` : `An arrow pointing ${at}`;
+    }
+    case 'solid': {
+      const names = v.solids.join(' and ');
+      if (v.face) return `A ${names} with one gold face`;
+      if (v.ask) return `A ${names}: count its ${v.ask === 'faces' ? 'flat faces' : v.ask}`;
+      return `A 3D shape: ${names}`;
+    }
     default:
       return `A picture (${v.type})`;
   }
