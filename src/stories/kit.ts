@@ -658,7 +658,13 @@ export class Kit<K extends string = string> {
       this.set(this.root, to);
       return Promise.resolve();
     }
-    return this.to(this.root, seconds, { ...to, ease: 'sine.inOut' });
+    // Hint the browser to keep the world as one GPU layer while it moves, so a
+    // push-in slides a picture instead of redrawing every piece each frame.
+    // Dropped afterwards so the still shot is redrawn sharp at its new size.
+    this.root.style.willChange = 'transform';
+    return this.to(this.root, seconds, { ...to, ease: 'sine.inOut' }).then(() => {
+      this.root.style.willChange = '';
+    });
   }
 
   // ------------------------------------------------------------------- cuts
@@ -680,6 +686,7 @@ export class Kit<K extends string = string> {
     const sheet = h('div', { class: 'story-wipe', html: parchment(1500, 1000, 'story-wipe', C.sand, 3) });
     this.stage.insertBefore(sheet, this.captionEl);
     sfx.page();
+    sheet.style.willChange = 'transform';
     this.set(sheet, { x: 1240, rotation: 3 });
     await this.to(sheet, 0.42, { x: -160, rotation: -1, ease: 'power2.in' });
     this.clear();
