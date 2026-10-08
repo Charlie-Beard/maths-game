@@ -115,16 +115,16 @@ export default defineStory({
 
     // ---- Red caps, peeping over the boxes by the carousel.
     const caps = [
-      peeper(k, { x: 880, y: 440, w: 90, z: 15 }),
-      peeper(k, { x: 960, y: 420, w: 90, z: 15, flip: true }),
+      peeper(k, { x: 880, y: 412, w: 90, z: 15 }),
+      peeper(k, { x: 960, y: 400, w: 90, z: 15, flip: true }),
     ];
-    k.set(caps, { y: 80 });
+    k.set(caps, { y: 80, opacity: 0 });
     await k.camera({ zoom: 1.6, x: 940, y: 480 }, 1.4);
     k.fx.sneak();
-    await k.all(...caps.map((c, i) => k.wait(i * 300).then(() => k.to(c, 0.6, { y: 0, ease: 'power2.out' }))));
+    await k.all(...caps.map((c, i) => k.wait(i * 300).then(() => k.to(c, 0.6, { y: 0, opacity: 1, ease: 'power2.out' }))));
     await k.say('caps', hero);
     // They see they've been seen, and duck down.
-    await k.all(...caps.map((c) => k.to(c, 0.3, { y: 80, ease: 'power2.in' })));
+    await k.all(...caps.map((c) => k.to(c, 0.3, { y: 80, opacity: 0, ease: 'power2.in' })));
     await k.camera({}, 1.0);
     await k.wait(400);
   },

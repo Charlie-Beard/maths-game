@@ -92,7 +92,8 @@ export default defineStory({
       await k.to(cylB, 0.5, { rotation: 90, x: 70, y: 90 * (W / 160) - 8, ease: 'power2.in' });
       tock(0);
       roll(1.4);
-      await k.to(cylB, 1.4, { x: 400, rotation: 90 + 360, ease: 'power1.out' });
+      // Rolling on its curved side, away from us: it just trundles along (no tumbling).
+      await k.to(cylB, 1.4, { x: 230, ease: 'power1.out' });
     };
     await k.all(k.say('cylinder'), both());
     await k.all(k.say('clever', hero), k.hop(hero, 30, 1));

@@ -109,8 +109,8 @@ export default defineStory({
       k.landScene();
       k.dim(0.18, '#3a1f40');
       k.add(boxes('l13c8-boxes'), { x: 60, y: 440, w: 200, z: 16 });
-      caps = [peeper(k, { x: 80, y: 450, w: 84, z: 15 }), peeper(k, { x: 160, y: 442, w: 84, z: 15, flip: true })];
-      k.set(caps, { y: 110 });
+      caps = [peeper(k, { x: 80, y: 420, w: 84, z: 15 }), peeper(k, { x: 160, y: 412, w: 84, z: 15, flip: true })];
+      k.set(caps, { y: 110, opacity: 0 });
       sauce = k.character('saucepan', { x: 820, y: 370, w: 240, z: 20, flip: true });
       wg = k.character('whirligig', { x: 420, y: 370, w: 240, z: 19 });
       k.set(wg, { opacity: 0 });
@@ -137,7 +137,7 @@ export default defineStory({
     })();
     await tiptoe;
     snigger();
-    await k.all(...caps.map((c, i) => k.wait(i * 200).then(() => k.to(c, 0.5, { y: 0, ease: 'power2.out' }))));
+    await k.all(...caps.map((c, i) => k.wait(i * 200).then(() => k.to(c, 0.5, { y: 0, opacity: 1, ease: 'power2.out' }))));
     // Out they come: three red goblins, sneaking up.
     const gobs = [
       goblin(k, 'g1', { x: 120, y: 360, w: 170, z: 22 }),
@@ -145,7 +145,7 @@ export default defineStory({
       goblin(k, 'g3', { x: 1000, y: 370, w: 160, z: 21, flip: true }),
     ];
     k.set(gobs, { opacity: 0 });
-    void k.all(...caps.map((c) => k.to(c, 0.3, { y: 110 })));
+    void k.all(...caps.map((c) => k.to(c, 0.3, { y: 110, opacity: 0, ease: 'power2.in' })));
     await k.all(k.enter(gobs[0], 'left', 0.6), k.enter(gobs[1], 'left', 0.7), k.enter(gobs[2], 'right', 0.7));
     await k.all(k.say('hear', gobs[0]), k.hop(gobs[1], 20, 2));
 
@@ -187,10 +187,15 @@ export default defineStory({
     await k.all(k.say('fine'), k.wait(1800).then(() => clank(3, 0.3)));
     await away;
     // A roundabout ticket floats down, and Silky catches it.
-    const ticket = k.keepsake(k.chapter?.keepsake ?? 'roundaboutTicket', { x: 540, y: -160, w: 110, z: 45 });
+    // It flutters down (side to side) into Silky's hands, by her wand.
+    const ticket = k.keepsake(k.chapter?.keepsake ?? 'roundaboutTicket', { x: 600, y: 560, w: 110, z: 45 });
+    k.set(ticket, { x: -60, y: -720 });
     k.fx.twinkle();
-    await k.all(k.to(ticket, 2.2, { y: 470, rotation: 30, ease: 'sine.out' }), k.wait(400).then(() => k.to(ticket, 1, { x: 30, ease: 'sine.inOut' })));
-    k.sparkle(600, 400, 10, 90);
+    const flutter = async () => {
+      for (const x of [60, -40, 0]) await k.to(ticket, 0.8, { x, rotation: x / 3, ease: 'sine.inOut' });
+    };
+    await k.all(k.to(ticket, 2.4, { y: 0, ease: 'sine.out' }), flutter());
+    k.sparkle(655, 610, 10, 90);
     await k.all(k.say('promise', h3), k.hop(h3, 26, 1));
     await k.all(k.say('after', m3), wave(k, m3, 'armL', 2));
 

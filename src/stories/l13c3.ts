@@ -82,14 +82,14 @@ export default defineStory({
 
     // ---- A stripy ball rolls past, all by itself.
     await k.all(...tags.map((t) => k.fade(t, 0, 0.3)), k.fade(wholeTag, 0, 0.3));
-    const ball = k.keepsake('rollingBall', { x: 1200, y: 500, w: 110, z: 24 });
+    const ball = k.keepsake('rollingBall', { x: 1200, y: 580, w: 100, z: 24 });
     const kid = k.character(sib, { x: 300, y: 400, w: 220, z: 22 });
     k.set(kid, { opacity: 0 });
-    k.fx.boing();
-    void k.all(k.to(ball, 3, { x: -1500, ease: 'none' }), k.to(ball, 3, { rotation: -900, ease: 'none' }));
-    await k.wait(500);
     await k.enter(kid, 'bottom', 0.6);
-    await k.all(k.say(`next_${sib}`, kid), k.hop(kid, 26, 1));
+    k.fx.boing();
+    // Along the ground, in front of everyone's feet, while they watch it go.
+    const rolling = k.all(k.to(ball, 4, { x: -1400, ease: 'none' }), k.to(ball, 4, { rotation: -1080, ease: 'none' }));
+    await k.all(k.say(`next_${sib}`, kid), k.hop(kid, 26, 1), rolling);
     await k.wait(400);
   },
 });

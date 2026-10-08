@@ -40,7 +40,7 @@ export default defineStory({
       peeper(k, { x: 560, y: 420, w: 84, z: 15, flip: true }),
       peeper(k, { x: 640, y: 412, w: 84, z: 15 }),
     ];
-    k.set(caps, { y: 110 });
+    k.set(caps, { y: 110, opacity: 0 });
 
     const mf = k.character('moonface', { x: 20, y: 370, w: 240, z: 20 });
     const hero = k.character('hero', { x: 930, y: 390, w: 220, z: 20, flip: true });
@@ -62,7 +62,7 @@ export default defineStory({
 
     // ---- Red caps, peeping.
     k.fx.sneak();
-    await k.all(...caps.map((c, i) => k.wait(i * 350).then(() => k.to(c, 0.7, { y: 0, ease: 'power2.out' }))));
+    await k.all(...caps.map((c, i) => k.wait(i * 350).then(() => k.to(c, 0.7, { y: 0, opacity: 1, ease: 'power2.out' }))));
     snigger();
     await k.all(k.say('shh', mf), k.camera({ zoom: 1.3, x: 520, y: 470 }, 1.4));
     await k.say('caps');
@@ -73,7 +73,7 @@ export default defineStory({
     k.set(sauce, { opacity: 0 });
     clank(6, 1.4);
     await k.enter(sauce, 'right', 0.8);
-    void k.all(...caps.map((c) => k.to(c, 0.3, { y: 110, ease: 'power2.in' })));
+    void k.all(...caps.map((c) => k.to(c, 0.3, { y: 110, opacity: 0, ease: 'power2.in' })));
     await k.all(k.say('eh', sauce), k.hop(sauce, 24, 2), k.wait(400).then(() => clank(5, 1.4)));
     await k.say('loud', mf);
 

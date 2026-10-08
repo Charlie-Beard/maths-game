@@ -61,6 +61,9 @@ export default defineStory({
       k.sfx.success();
     };
     await k.all(k.say('six'), counting());
+    // Let the row of six squares sit for a moment before it goes.
+    await k.all(...faces.map((f, i) => k.wait(i * 90).then(() => k.pop(f, 1.1))));
+    await k.wait(900);
     await k.all(...faces.map((f) => k.fade(f, 0, 0.3)));
 
     // ---- Up the helter-skelter, and down on a mat.
