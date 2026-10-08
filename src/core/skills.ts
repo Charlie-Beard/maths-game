@@ -1,6 +1,7 @@
 /**
  * The skill catalogue: every small step of maths in the game, in teaching
- * order (UK Year 1 → Year 2, White Rose / NCETM small steps).
+ * order (UK Year 1 → Year 2, White Rose / NCETM small steps). Lands 11–14,
+ * the second adventure after Dame Snap, finish off Year 2.
  *
  * Each skill has tiers that follow concrete → pictorial → abstract and grow
  * the numbers. Tier 1 is always the gentlest. What each tier means is
@@ -82,6 +83,18 @@ export const SKILL_IDS = [
   'add-2d2d',
   'sub-2d2d',
   'missing-100',
+  // Land 11: the Old Woman's Shoe
+  'tally',
+  'change',
+  // Land 12: Mr Oom Boom Boom's Land of Music
+  'count-3s',
+  'time-5',
+  // Land 13: Roundabouts
+  'turns',
+  'shapes-3d',
+  // Land 14: the Red Goblins
+  'compare-measures',
+  'read-scales',
 ] as const;
 
 export type SkillId = (typeof SKILL_IDS)[number];
@@ -138,6 +151,15 @@ export const SKILLS: Record<SkillId, Skill> = Object.fromEntries(
     s('add-2d2d', 'Add two 2-digit numbers', 'addsub', ['34 + 25 with bundles (no crossing)', 'as numbers', '38 + 25 crossing a ten', 'typed'], ['add-tens']),
     s('sub-2d2d', 'Take away two 2-digit numbers', 'addsub', ['57 − 23 with bundles (no crossing)', 'as numbers', '52 − 27 crossing a ten', 'typed'], ['add-2d2d', 'sub-2d1d']),
     s('missing-100', 'Missing numbers to 100', 'addsub', ['30 + ? = 100 (tens)', '45 + ? = 50', '? − 20 = 35', 'typed'], ['add-2d2d']),
+    // The second adventure (lands 11–14): the rest of Year 2.
+    s('tally', 'Tally charts and pictograms', 'measure', ['count a tally (to 10)', 'tallies in fives (to 20)', 'read a pictogram (one picture is one)', 'a pictogram where one picture is 2, 5 or 10', 'how many more? compare two rows'], ['count-2s-5s']),
+    s('change', 'Totals and change', 'measure', ['two prices to 20p: how much altogether?', 'change from 10p', 'change from 20p', 'change from 50p and £1'], ['coins', 'sub-20']),
+    s('count-3s', 'Count in 3s', 'multdiv', ['count groups of 3 objects', 'count on in 3s: the missing number', '3s as numbers (4 threes are 12)', 'typed'], ['groups', 'count-2s-5s']),
+    s('time-5', 'Time to 5 minutes', 'measure', ['5, 10, 20 and 25 past', '5, 10, 20 and 25 to', 'any 5-minute time', 'set the hands', 'how long? (later and earlier)'], ['time']),
+    s('turns', 'Turns and directions', 'geometry', ['quarter or half turn: which way now?', 'clockwise or anticlockwise', 'three-quarter turns', 'follow the directions: forwards, left, right'], ['fractions', 'shapes-2d']),
+    s('shapes-3d', '3D shapes', 'geometry', ['cube, sphere, cylinder, cone', 'cuboid and pyramid too', 'count the faces', 'count the edges and corners (vertices)', 'which 2D shape is on a face?'], ['shapes-2d']),
+    s('compare-measures', 'Heavier, fuller, hotter', 'measure', ['heavier or lighter? (a balance)', 'more full or less full?', 'hotter or colder?', 'order three'], ['compare-100']),
+    s('read-scales', 'Read scales: kg, litres and °C', 'measure', ['kitchen scale in 1s (kg)', 'jug in litres, in steps of 2 or 5', 'thermometer in 10s (°C)', 'unnumbered marks between the numbers'], ['compare-measures', 'count-2s-5s', 'count-10s']),
   ].map((k) => [k.id, k]),
 ) as Record<SkillId, Skill>;
 

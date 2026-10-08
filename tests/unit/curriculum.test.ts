@@ -4,8 +4,8 @@ import { CHARACTER_NAMES } from '../../src/core/names';
 import { SKILL_IDS, SKILLS, tierCount, type SkillId } from '../../src/core/skills';
 
 describe('curriculum', () => {
-  it('has 10 lands of 8 chapters, the 8th a finale', () => {
-    expect(LANDS).toHaveLength(10);
+  it('has 14 lands of 8 chapters, the 8th a finale', () => {
+    expect(LANDS).toHaveLength(14);
     for (const l of LANDS) {
       expect(l.chapters).toHaveLength(8);
       l.chapters.forEach((c, i) => {
@@ -13,7 +13,7 @@ describe('curriculum', () => {
         expect(c.id).toBe(`l${l.n}c${i + 1}`);
       });
     }
-    expect(ALL_CHAPTERS).toHaveLength(80);
+    expect(ALL_CHAPTERS).toHaveLength(112);
   });
 
   it('only uses known skills, hosts and sensible tiers', () => {

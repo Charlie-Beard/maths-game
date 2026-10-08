@@ -301,6 +301,75 @@ that plays 80 chapters with a simulated child, checking tiers rise and
 review comes back), performance on an iPad, and a final pass on every
 screen.
 
+## Session 6: the second adventure (lands 11–14)
+
+Jasper asked for more lands. Four new ones come **after** Dame Snap is
+beaten and the ending film plays (`ENDING_AFTER = 'l10c8'` in
+`curriculum.ts`), so no existing chapter id or save moves. They finish off
+Year 2. Each land teaches two new skills (tiers in `core/skills.ts`) and
+mixes in review.
+
+| # | Land | Host | New skills | New picture (`Visual`) |
+|---|---|---|---|---|
+| 11 | The Old Woman's Shoe | `oldWoman` (new) | `tally` (tally charts, pictograms), `change` | `tally` |
+| 12 | The Land of Music (Mr Oom Boom Boom's) | `oomboom` | `count-3s` (oom-pah-pah), `time-5` | none: `groups`, `clock` |
+| 13 | The Land of Roundabouts | `whirligig` (new, Mr Whirligig) | `turns`, `shapes-3d` | `turn`, `solid` |
+| 14 | The Land of the Red Goblins | `redGoblin` (new) | `compare-measures`, `read-scales` | `measure` |
+
+**The arc.** After the party, lands keep coming to the top of the tree.
+In land 11 a little red cap is seen hiding in the Shoe's laces (c7). In
+land 12 the Red Goblins steal Mr Oom Boom Boom's big drum (c6). The band
+follows their little red footprints (c7), and in the finale the goblins
+march off with it. At the fair in land 13 the goblins are about (c7), and
+as the land spins away they carry off the Saucepan Man, who clanks too
+loudly to hide. That is the cliffhanger. In land 14 everyone goes down the
+goblin hole, follows the clanking, frees the Saucepan Man (c7), gets the
+big drum back, and escapes with the goblins chasing (finale). It ends
+home at the tree with a feast, and the drum booming. **Red goblins are
+cartoon-menacing** (they grab, sneak, shout and chase; PLAN.md §2), and
+nobody is hurt or lost for good.
+
+All four finales are `escape` (configs in `scenes/finale-lands.ts`,
+entries 11–14): 11 `chase` (the Old Woman calling them back for supper),
+12 `march` (goblins with the drum), 13 `spin`, and 14 `chase` (the Red
+Goblin).
+
+### Who owns what
+
+The foundation commit made a stub for everything and registered each one,
+so **no workstream needs to edit a registry**. Search for `SCAFFOLD`.
+
+| ID | Owns (land n) |
+|---|---|
+| **M-n** maths | `core/generators/l{n}.ts`; `activities/visuals/{its kinds}.ts`; `activities/set-l{n}.ts`, `fixtures-l{n}.ts` and any new activity module it adds (`activities/{kind}.ts`, styles in `styles/activities-l{n}.css` plus one import line in `main.ts`); `tests/unit/generators-l{n}.test.ts`; `tests/e2e/activities-l{n}.spec.ts`. It may change only its own kinds' lines in `core/problem.ts` (the `Visual` union) |
+| **A-n** art | `art/characters/l{n}.ts` (the new host, if any); `art/lands/l{n}.ts`; `art/keepsakes-l{n}.ts` (8 keepsakes, their names and the seal emblem) |
+| **S-n** stories | `stories/l{n}c1.ts` … `l{n}c8.ts`, `stories/registry/l{n}.ts`, any shared helpers for the land (`stories/{land}.ts`, as `snow.ts`), finale entry n in `scenes/finale-lands.ts`, and land n's block in `curriculum.ts` (titles and intros only: ids, skills, tiers and keepsake ids stay) |
+
+Phase 1 runs M-11…14 and A-11…14 in parallel. Phase 2 (S-11…14) starts
+after they are merged, because stories need the hosts, the backdrops and
+the keepsakes.
+
+### Notes for every agent
+
+- Read CLAUDE.md, PLAN.md (§2, §5, §7 and §13 above all), this section,
+  and the files you own (the stubs say what they're for).
+- Non-numeric answers are strings, as in `generators/more.ts`. **He is
+  6 and only just reading.** Choices he would have to read (`'cylinder'`,
+  `'clockwise'`) must also be pictures he can tap, or be said aloud as in
+  `shape`. Prefer a picture-card activity over word cards.
+- Run e2e with your own `PW_PORT` (M-n: 43n1, A-n: 43n2, S-n: 43n3, so
+  land 12's maths agent uses 4321) and `--workers=2 --fully-parallel`:
+  up to eight agents share one 16-thread PC. Run the specs your work
+  touches, plus `smoke`, `play` and `screens`. The orchestrator runs
+  the full suite after merging (`finale.spec.ts` alone is slow).
+- Commit in your worktree branch: one or more commits, each ending with
+  the `Co-Authored-By` line, made with `git -c user.name=Claude -c
+  user.email=noreply@anthropic.com commit …`. Don't push, merge or open a
+  PR. The orchestrator merges.
+- Before you finish, `npm run typecheck`, `npm test` and those e2e specs
+  must all pass, and you must have looked at screenshots of everything
+  you drew at 1180 × 820.
+
 ## Open questions for the parent
 
 These can be answered any time before the session that needs them:

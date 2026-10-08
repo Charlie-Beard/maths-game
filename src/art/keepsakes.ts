@@ -10,68 +10,19 @@
  * Each land finale gives a land seal (240 × 240): a big round wax-and-paper
  * seal in the land's colour with an emblem in the middle, hung on the tree
  * on the map.
+ *
+ * Lands 11–14 keep their keepsakes, names and seal emblem in their own
+ * files (keepsakes-l11.ts …), drawn with the shared keepsake-kit.ts.
  */
 import { LANDS } from '../core/curriculum';
-import type { PropId } from '../core/problem';
 import { C } from './palette';
-import { band, circle, curve, dot, ellipse, group, ink, piece, poly, raw, rect, svg, type Node, type Pt } from './paper';
+import { band, circle, curve, dot, ellipse, group, ink, piece, poly, rect, svg, type Node, type Pt } from './paper';
 import { flat, glint, ground, propNodes, scallop, shine, starPts } from './props';
-
-type Draw = () => Node[];
-
-// ---------------------------------------------------------------------------
-// Helpers
-// ---------------------------------------------------------------------------
-
-/** A prop's drawing (120 box) scaled up into the keepsake box. */
-const big = (id: PropId, s = 1.45, x = 100, y = 100): Node =>
-  group({ transform: `translate(${x - 60 * s} ${y - 60 * s}) scale(${s})` }, propNodes(id, true));
-
-/** Any nodes moved and scaled. */
-const at = (x: number, y: number, s: number, nodes: Node[], rot = 0): Node =>
-  group({ transform: `translate(${x} ${y}) scale(${s})${rot ? ` rotate(${rot})` : ''}` }, nodes);
-
-/** Andika lettering laid on the art (sums on a blackboard, £1 on a coin). */
-const text = (x: number, y: number, s: string, size: number, fill: string, rot = 0): Node =>
-  raw(
-    `<text x="${x}" y="${y}" font-family="Andika, sans-serif" font-weight="700" font-size="${size}" fill="${fill}" text-anchor="middle"${rot ? ` transform="rotate(${rot} ${x} ${y})"` : ''}>${s}</text>`,
-  );
-
-const cut = { edge: 'cut' as const };
-const cutFlat = { edge: 'cut' as const, fibre: false as const };
-
-/** Mixes two #rrggbb colours (t = 0 → a, 1 → b). */
-function mix(a: string, b: string, t: number): string {
-  const pa = [1, 3, 5].map((i) => parseInt(a.slice(i, i + 2), 16));
-  const pb = [1, 3, 5].map((i) => parseInt(b.slice(i, i + 2), 16));
-  return '#' + pa.map((v, i) => Math.round(v + (pb[i] - v) * t).toString(16).padStart(2, '0')).join('');
-}
-
-/** A key, big, in any metal: the bow on the left, teeth on the right. */
-const bigKey = (metal: string, dark: string, fancy = false): Node[] => [
-  ground(100, 150, 76, 8),
-  piece(rect(70, 90, 112, 20, 6), metal),
-  piece(poly([[140, 104], [184, 104], [184, 140], [172, 140], [172, 126], [160, 126], [160, 142], [140, 142]]), metal),
-  ...(fancy
-    ? [
-        piece(circle(46, 76, 16), metal),
-        piece(circle(46, 124, 16), metal),
-        piece(circle(22, 100, 16), metal),
-      ]
-    : []),
-  piece(circle(48, 100, 34), metal),
-  piece(circle(48, 100, 15), dark, cutFlat),
-  shine([[24, 90], [34, 74], [40, 78], [30, 94]], 0.45),
-  ink([[80, 96], [136, 96]], { width: 3, color: mix(metal, '#ffffff', 0.4) }),
-];
-
-/** A fluffy lip of snow along the top of something. */
-const snowLip = (x0: number, x1: number, y: number): Node =>
-  piece(curve([[x0, y + 4], [x0 + 8, y - 12], [(x0 + x1) / 2, y - 16], [x1 - 8, y - 12], [x1, y + 4], [(x0 + x1) / 2, y + 10]], 2), C.snow, { fibre: C.snowShade });
-
-/** Grass tufts along the ground. */
-const grass = (pts: [number, number][]): Node[] =>
-  pts.map(([x, y]) => ink([[x - 6, y - 12], [x, y], [x + 2, y - 16], [x + 4, y], [x + 10, y - 10]], { width: 3, color: C.leafDark }));
+import { at, big, bigKey, cut, cutFlat, grass, mix, snowLip, text, type Draw } from './keepsake-kit';
+import { EMBLEM_L11, KEEPSAKES_L11, NAMES_L11 } from './keepsakes-l11';
+import { EMBLEM_L12, KEEPSAKES_L12, NAMES_L12 } from './keepsakes-l12';
+import { EMBLEM_L13, KEEPSAKES_L13, NAMES_L13 } from './keepsakes-l13';
+import { EMBLEM_L14, KEEPSAKES_L14, NAMES_L14 } from './keepsakes-l14';
 
 // ---------------------------------------------------------------------------
 // Land 1: the Enchanted Wood
@@ -926,7 +877,7 @@ const L10: Record<string, Draw> = {
   ],
 };
 
-const DRAW: Record<string, Draw> = { ...L1, ...L2, ...L3, ...L4, ...L5, ...L6, ...L7, ...L8, ...L9, ...L10 };
+const DRAW: Record<string, Draw> = { ...L1, ...L2, ...L3, ...L4, ...L5, ...L6, ...L7, ...L8, ...L9, ...L10, ...KEEPSAKES_L11, ...KEEPSAKES_L12, ...KEEPSAKES_L13, ...KEEPSAKES_L14 };
 
 // ---------------------------------------------------------------------------
 // Names (read aloud and shown in the Treasure Room)
@@ -1023,6 +974,11 @@ export const KEEPSAKE_NAMES: Record<string, string> = {
   goldStar: 'A gold star',
   silkyWing: 'Silky’s wings',
   crown: 'A champion’s crown',
+  // The second adventure (lands 11–14): each land names its own.
+  ...NAMES_L11,
+  ...NAMES_L12,
+  ...NAMES_L13,
+  ...NAMES_L14,
 };
 
 /** Every keepsake id that has art. */
@@ -1053,9 +1009,9 @@ const tree = (): Node[] => [
 ];
 
 /** Each land's emblem: a 200-box drawing set in the middle of its seal. */
-const EMBLEMS: Draw[] = [tree, L2.upsideHat, L3.lolly, L4.snappedRuler, L5.cakeSlice, L6.footprint, L7.wand, () => [big('soldier', 1.6)], L9.snowflake, L10.padlock];
+const EMBLEMS: Draw[] = [tree, L2.upsideHat, L3.lolly, L4.snappedRuler, L5.cakeSlice, L6.footprint, L7.wand, () => [big('soldier', 1.6)], L9.snowflake, L10.padlock, EMBLEM_L11, EMBLEM_L12, EMBLEM_L13, EMBLEM_L14];
 
-/** The big round seal for land n (1–10), 240 × 240. */
+/** The big round seal for land n (1–14), 240 × 240. */
 export function landSeal(n: number): string {
   const land = LANDS[Math.min(Math.max(n, 1), LANDS.length) - 1];
   const col = land.color;

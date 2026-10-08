@@ -76,10 +76,10 @@ export function clock(p: Problem, ctx: ActivityContext): Activity {
   const cards = new Map<string, HTMLElement>();
   if (!setMode) {
     const choices = p.choices ?? [];
-    const w = choices.length > 3 ? 196 : 230;
-    const xs = rowX(choices.length, w, 24);
+    const w = choices.length > 3 ? 226 : 230;
+    const xs = choices.length > 3 ? rowX(choices.length, w, 6, 622) : rowX(choices.length, w, 24);
     choices.forEach((c, i) => {
-      const card = answerCard(String(c), c, xs[i], 600, w, 150);
+      const card = answerCard(String(c), c, xs[i], choices.length > 3 ? 585 : 600, w, choices.length > 3 ? 190 : 150);
       kit.tap(card, () => {
         ctx.sfx('tap');
         ctx.answer(c);

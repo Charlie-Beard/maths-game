@@ -39,6 +39,9 @@ export type PropId = (typeof PROP_IDS)[number];
 
 export type ShapeId = 'circle' | 'square' | 'triangle' | 'rectangle' | 'pentagon' | 'hexagon' | 'oval' | 'star';
 
+/** 3D shapes (land 13). */
+export type SolidId = 'cube' | 'cuboid' | 'sphere' | 'cylinder' | 'cone' | 'pyramid';
+
 /** How he answers. Each has a module in src/activities. */
 export type ActivityKind =
   | 'choose'
@@ -54,7 +57,14 @@ export type ActivityKind =
   | 'clock'
   | 'coins'
   | 'shape'
-  | 'numberPad';
+  | 'numberPad'
+  // The second adventure (lands 11–14). Until a module is registered for
+  // one of these, `choose` shows the problem.
+  | 'tally'
+  | 'change'
+  | 'turn'
+  | 'solid'
+  | 'measure';
 
 export interface ObjectGroup {
   prop: PropId;
@@ -79,7 +89,17 @@ export type Visual =
   | { type: 'clock'; hour: number; minute: number }
   | { type: 'coins'; coins: number[]; target?: number }
   | { type: 'shape'; shape: ShapeId; turned?: number }
-  | { type: 'length'; lengths: number[]; unit: 'footsteps' | 'cm' };
+  | { type: 'length'; lengths: number[]; unit: 'footsteps' | 'cm' }
+  // The second adventure (lands 11–14). Each is drawn by its own file in
+  // src/activities/visuals/, owned by that land's workstream.
+  /** A tally chart or pictogram: one row per thing counted (`per` = how many one picture stands for). */
+  | { type: 'tally'; style: 'tally' | 'pictogram'; rows: { label: string; count: number; prop?: PropId }[]; per?: number }
+  /** Something facing a way (0 = up, 90 = right …), and the turn it makes; or a path of moves. */
+  | { type: 'turn'; facing: number; turn?: number; dir?: 'cw' | 'acw'; moves?: ('forward' | 'left' | 'right')[] }
+  /** One or more 3D shapes. */
+  | { type: 'solid'; solids: SolidId[] }
+  /** A balance, kitchen scale, jug or thermometer, with its reading(s). */
+  | { type: 'measure'; gauge: 'balance' | 'dial' | 'jug' | 'thermometer'; values: number[]; max: number; step: number; unit: 'kg' | 'l' | '°C'; labelEvery?: number };
 
 export type Answer = number | string;
 

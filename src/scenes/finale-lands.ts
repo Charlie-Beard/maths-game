@@ -4,7 +4,7 @@
  * the mechanics in finale.ts.
  *
  *   climb   (land 1)          up the trunk to Moon-Face's door
- *   escape  (2, 3, 5, 6, 8, 9) down the ladder before the land moves on;
+ *   escape  (2, 3, 5, 6, 8, 9, 11–14) down the ladder before the land moves on;
  *                              `hazard` says how the land threatens
  *   snap    (4, 7, 10)        Dame Snap at her board; each wave is a set of
  *                              rules to crack, cages to unlock or rulers
@@ -218,6 +218,72 @@ export const FINALES: Record<number, FinaleLand> = {
       beats: ['SILENCE!', 'NOT ONE child has EVER done that!', 'My rules! MY RULES!', 'Stop that at ONCE!', 'SNAP!', 'GRRR!'],
       exit: 'No! My rulers! My rules! Let me out of this cupboard!',
       end: 'You did it, {name}! Dame Snap is beaten for good!',
+    },
+  },
+
+  // The second adventure. Each land's story workstream owns its own entry
+  // below (and may change anything in it); the lines here are first drafts.
+
+  11: {
+    n: 11,
+    mode: 'escape',
+    folk: ['silky', 'saucepan'],
+    mood: 'adventure',
+    sky: ['#efd9bf', '#d9b48c', C.duskSky],
+    clouds: C.cloud,
+    hazard: 'chase',
+    chaser: 'oldWoman',
+    lines: {
+      start: 'The shoe is walking away! Down the ladder, {name}!',
+      beats: ['Come back for supper, dears!', 'Hold on tight!', 'One more rung!', 'Mind the laces!', 'Nearly down!'],
+      end: 'Jump! Safe on the tree. Goodbye, Old Woman! Goodbye, children!',
+    },
+  },
+
+  12: {
+    n: 12,
+    mode: 'escape',
+    folk: ['oomboom', 'moonface'],
+    mood: 'sneaky',
+    sky: ['#cfe6e2', '#9fcfc8', C.duskSky],
+    clouds: C.cloud,
+    hazard: 'march',
+    chaser: 'redGoblin',
+    lines: {
+      start: 'The goblins are marching off with the big drum! The land is going! Down, {name}!',
+      beats: ['Boom! Boom! Boom!', 'Oom-pah-pah!', 'One more rung!', 'Hold on tight!', 'Nearly down!'],
+      end: 'Jump! We’re safe. But the goblins still have my drum…',
+    },
+  },
+
+  13: {
+    n: 13,
+    mode: 'escape',
+    folk: ['moonface', 'silky'],
+    mood: 'adventure',
+    sky: ['#f6dcc4', '#eeb48a', C.duskSky],
+    clouds: C.cloud,
+    hazard: 'spin',
+    lines: {
+      start: 'The land is spinning away! Down the ladder, {name}!',
+      beats: ['Round and round!', 'Hold on tight!', 'One more rung!', 'Don’t get dizzy!', 'Nearly down!'],
+      end: 'Jump! Safe. But where is the Saucepan Man?',
+    },
+  },
+
+  14: {
+    n: 14,
+    mode: 'escape',
+    folk: ['moonface', 'saucepan'],
+    mood: 'sneaky',
+    sky: ['#4a2a2a', '#7a3a32', C.duskSky],
+    clouds: '#d8c4bc',
+    hazard: 'chase',
+    chaser: 'redGoblin',
+    lines: {
+      start: 'The goblins are coming! Up and out, {name}! Down the ladder home!',
+      beats: ['Come BACK here!', 'Clank! Clank! Faster!', 'One more rung!', 'They’re too slow!', 'Nearly down!'],
+      end: 'Jump! Home at last! Goodbye, Red Goblins, for ever!',
     },
   },
 };

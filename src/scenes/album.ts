@@ -5,7 +5,7 @@
  *   Keepsakes  one shelf per land, 8 keepsakes each; ones still to find
  *              are dark silhouettes, so he can see what's coming
  *   Cards      the Folk cards, a "?" for ones not met yet
- *   Seals      the ten land seals
+ *   Seals      a seal for every land
  *   Stories    every story he has unlocked, to watch again
  *
  * Four big tabs down the left, always in the same order. Tapping a
@@ -20,7 +20,7 @@ import { C } from '../art/palette';
 import { circle, ellipse, ink, piece, rect, svg } from '../art/paper';
 import { picturesReady, rasterHtml } from '../art/raster';
 import { waxSeal } from '../art/ui';
-import { ALL_CHAPTERS, LANDS, type Chapter } from '../core/curriculum';
+import { ALL_CHAPTERS, ENDING_AFTER, findChapter, LANDS, type Chapter } from '../core/curriculum';
 import { CHARACTER_NAMES } from '../core/names';
 import { pop, sm } from '../ui/anim';
 import { banner, crop, folkCard, sealButton } from '../ui/components';
@@ -197,17 +197,17 @@ export class AlbumScene extends Scene {
       this.body.append(this.storyGroup('The beginning', [this.storyTile('opening', 'Up the Faraway Tree', 'moonface', LANDS[0].color)]));
       any = true;
     }
+    // The ending film sits after Dame Snap's Prison, before the second adventure.
+    const end = findChapter(ENDING_AFTER)!;
     for (const land of LANDS) {
       const tiles = land.chapters.filter((c) => p.chapters[c.id]?.done && hasStory(c.id)).map((c) => this.storyTile(c.id, c.title, c.host, land.color, c.kind === 'finale'));
       if (tiles.length) {
         this.body.append(this.storyGroup(land.title, tiles));
         any = true;
       }
-    }
-    const last = ALL_CHAPTERS[ALL_CHAPTERS.length - 1];
-    if (p.chapters[last.id]?.done && hasStory('ending')) {
-      this.body.append(this.storyGroup('The end', [this.storyTile('ending', 'The Biggest Birthday', 'moonface', LANDS[LANDS.length - 1].color)]));
-      any = true;
+      if (land === end.land && p.chapters[end.chapter.id]?.done && hasStory('ending')) {
+        this.body.append(this.storyGroup('The end', [this.storyTile('ending', 'The Biggest Birthday', 'moonface', land.color)]));
+      }
     }
     if (!any) this.body.append(h('p', { class: 'treasure-empty' }, 'Finish a chapter, and its story will be kept here to watch again.'));
   }

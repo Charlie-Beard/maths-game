@@ -7,7 +7,8 @@
 import { expect, test, type Page } from '@playwright/test';
 import { KEEPSAKE_NAMES } from '../../src/art/keepsakes';
 import { TREE_PLACES } from '../../src/art/scenery';
-import { ALL_CHAPTERS } from '../../src/core/curriculum';
+import { ALL_CHAPTERS, LANDS } from '../../src/core/curriculum';
+import { SKILL_IDS } from '../../src/core/skills';
 import { defaultProgress, finishChapter, recordOutcome, type Progress } from '../../src/core/progress';
 import { AUTH_KEY, fakeCloud } from './cloud';
 import { settled } from './wait';
@@ -183,7 +184,7 @@ test('the Treasure Room shows keepsakes (unfound ones dark), cards, seals and st
   await room.click({ force: true });
 
   await expect(page.locator('.treasure-tab.on')).toHaveAttribute('data-tab', 'keepsakes');
-  await expect(page.locator('.shelf-row')).toHaveCount(10);
+  await expect(page.locator('.shelf-row')).toHaveCount(LANDS.length);
   await expect(page.locator('.keepsake-item:not(.missing)')).toHaveCount(27);
   await expect(page.locator('.keepsake-item.missing')).toHaveCount(53);
 
@@ -231,7 +232,7 @@ test('the corner shows every skill, by land or by strand, and changes settings',
   await seed(page, progressed());
   await page.goto('/?scene=map');
   await openCorner(page);
-  await expect(page.locator('.skill-table tr[data-skill]')).toHaveCount(48);
+  await expect(page.locator('.skill-table tr[data-skill]')).toHaveCount(SKILL_IDS.length);
   await expect(page.locator('.skill-table tr[data-skill="count-10"]')).not.toHaveClass(/unseen/);
   await expect(page.locator('.skill-table .p-group').first()).toHaveText('1. The Enchanted Wood');
   await page.getByRole('button', { name: 'By strand' }).click();
