@@ -8,3 +8,6 @@ screenshots
 __pycache__
 .dev.vars
 .wrangler
+
+# Screenshots a script once wrote to a folder literally called "undefined".
+undefined/
