@@ -153,7 +153,7 @@ const SLIDE_RUNS: Pt[][] = [
 
 /** One rider down the slippery-slip: visible on each run, hidden while it goes round the back. */
 async function slide(k: Kit, rider: HTMLElement): Promise<void> {
-  const place = (p: Pt) => goTo(k, rider, p[0], p[1] - 34, 0.01, 'none');
+  const place = (p: Pt) => goTo(k, rider, p[0], p[1] - 50, 0.01, 'none');
   await place(SLIDE_RUNS[0][0]);
   await k.fade(rider, 1, 0.2);
   whee();
@@ -165,7 +165,7 @@ async function slide(k: Kit, rider: HTMLElement): Promise<void> {
       await place(run[0]);
       await k.fade(rider, 1, 0.12);
     }
-    for (const p of run.slice(1)) await k.all(goTo(k, rider, p[0], p[1] - 34, 0.55, 'power1.in'), k.to(rider, 0.55, { rotation: p[0] > at(rider)[0] ? 8 : -8 }));
+    for (const p of run.slice(1)) await k.all(goTo(k, rider, p[0], p[1] - 50, 0.55, 'power1.in'), k.to(rider, 0.55, { rotation: p[0] > at(rider)[0] ? 8 : -8 }));
   }
   await k.to(rider, 0.2, { rotation: 0 });
   flump();
@@ -174,14 +174,14 @@ async function slide(k: Kit, rider: HTMLElement): Promise<void> {
 /** Lets off one firework at (x, y): a spark climbs, then a burst blooms slowly and fades. */
 async function letOff(k: Kit, x: number, y: number, i: number): Promise<void> {
   const colors: [string, string][] = [[C.goldLight, C.raspberry], [C.mint, C.goldLight], [C.sherbet, C.lilac], [C.candle, C.sky]];
-  const b = k.add(burst(i, colors[i % colors.length]), { x: x - 120, y: y - 120, w: 240, z: 6 });
+  const b = k.add(burst(i, colors[i % colors.length]), { x: x - 120, y: y - 120, w: 240, z: 36 });
   if (k.calm) {
     // Calm mode: no movement, just the blooms hanging quietly in the sky.
     k.set(b, { opacity: 0.6 });
     return;
   }
   firework(i);
-  const spark = k.add(svg({ w: 12, h: 12, name: 'ending-spark', boil: false }, [piece(circle(6, 6, 5), C.candle, { edge: 'cut', fibre: false, shadow: false })]), { x: x - 6, y: 560, w: 12, z: 6 });
+  const spark = k.add(svg({ w: 12, h: 12, name: 'ending-spark', boil: false }, [piece(circle(6, 6, 5), C.candle, { edge: 'cut', fibre: false, shadow: false })]), { x: x - 6, y: 560, w: 12, z: 36 });
   k.set(b, { opacity: 0, scale: 0.15 });
   await k.to(spark, 0.9, { y: y - 560, ease: 'power2.out' });
   k.remove(spark);
@@ -228,12 +228,8 @@ export default defineStory({
   },
 
   async play(k) {
-    let scene = 0;
     const next = async (build: () => void): Promise<void> => {
-      await k.cut(() => {
-        scene++;
-        build();
-      });
+      await k.cut(build);
     };
 
     // ================================================ 1. The wood, with Mum and Dad
@@ -355,6 +351,8 @@ export default defineStory({
     void k.quake(3);
     await k.to(giant, 1.2, { x: 0, ease: 'power2.out' });
     await k.say('giant', giant);
+    // He ducks back out a little, so everyone can see.
+    void k.to(giant, 1, { x: 260, ease: 'power1.inOut' });
     void k.all(...party.map((el, i) => k.wait(i * 60).then(() => k.hop(el, 18))));
 
     // A treasure from every land, hung over the party: count them, one to ten.
@@ -400,16 +398,17 @@ export default defineStory({
       k.dim(0.08, '#2a2236');
       const ids = ['moonface', 'hero', ...AVATARS.filter((x) => x !== k.hero), 'mum', 'dad'];
       riders = ids.map((id, i) => {
-        const ride = k.add(svg({ w: 90, h: 100, name: 'ending-ride', boil: false }, []), { x: 0, y: 0, w: 90, h: 100, z: 20 + i });
-        const c = k.add(cushion(CUSHIONS[i % CUSHIONS.length]), { x: 0, y: 64, w: 90, h: 45, z: 2 });
-        const who = k.character(id, { x: 8, y: 0, w: 74, z: 1 });
+        const ride = k.add(svg({ w: 120, h: 140, name: 'ending-ride', boil: false }, []), { x: 0, y: 0, w: 120, h: 140, z: 20 + i });
+        const c = k.add(cushion(CUSHIONS[i % CUSHIONS.length]), { x: 0, y: 92, w: 120, h: 60, z: 2 });
+        const who = k.character(id, { x: 10, y: 0, w: 100, z: 1 });
         ride.append(who, c);
         k.set(ride, { opacity: 0 });
         return ride;
       });
       k.light(596, 224, 80, { strength: 0.45, flicker: true });
     });
-    await k.say('slip', undefined);
+    void k.camera({ zoom: 1.2, x: 560, y: 480 }, 1.2);
+    await k.say('slip');
     await k.all(...riders.map((r, i) => k.wait(i * 1100).then(() => slide(k, r))));
     // A heap at the bottom, and Dad wants another go.
     const dad = riders[riders.length - 1];
