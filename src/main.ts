@@ -10,6 +10,7 @@ import './styles/activities-a.css';
 import './styles/activities-b.css';
 import './styles/activities-c.css';
 import './styles/activities-l13.css';
+import './styles/activities-l14.css';
 import './styles/login.css';
 import './styles/finale.css';
 import './styles/scenes-perf.css';
