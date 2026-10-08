@@ -4,6 +4,7 @@
  * `choose`.
  */
 import type { ActivityKind } from '../core/problem';
+import { change, tally } from './l11';
 import type { ActivityFactory } from './types';
 
-export const SET_L11: Partial<Record<ActivityKind, ActivityFactory>> = {};
+export const SET_L11: Partial<Record<ActivityKind, ActivityFactory>> = { tally, change };

@@ -61,6 +61,7 @@ export type ActivityKind =
   // The second adventure (lands 11–14). Until a module is registered for
   // one of these, `choose` shows the problem.
   | 'tally'
+  | 'change'
   | 'turn'
   | 'solid'
   | 'measure';
