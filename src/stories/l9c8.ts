@@ -194,8 +194,8 @@ function towerBack(): string {
     piece(rect(x, y, w, h, w / 2), '#15121b', { edge: 'cut', fibre: false }),
     group({ part: 'bell', origin: [x + w / 2, y + 20] }, [
       ink([[x + w / 2, y + 6], [x + w / 2, y + 30]], { width: 5, color: C.iron }),
-      piece(curve([[x + w / 2 - 22, y + 30], [x + w / 2 + 22, y + 30], [x + w / 2 + 34, y + 96], [x + w / 2 + 46, y + 110], [x + w / 2 - 46, y + 110], [x + w / 2 - 34, y + 96]], 1), C.brassDark),
-      piece(circle(x + w / 2, y + 116, 9), C.iron, { edge: 'cut' }),
+      piece(curve([[x + w / 2 - 14, y + 24], [x + w / 2 + 14, y + 24], [x + w / 2 + 22, y + 58], [x + w / 2 + 30, y + 66], [x + w / 2 - 30, y + 66], [x + w / 2 - 22, y + 58]], 1), C.brassDark),
+      piece(circle(x + w / 2, y + 70, 6), C.iron, { edge: 'cut' }),
     ]),
   ]);
 }
@@ -421,7 +421,7 @@ export default defineStory({
     let snap!: HTMLElement;
     await k.cut(() => {
       back = k.backdrop(towerBack());
-      snap = k.snap('shriek', { x: ARCH.x + 10, y: ARCH.y + 40, w: 220, z: 8 });
+      snap = k.snap('shriek', { x: ARCH.x + 10, y: ARCH.y + 60, w: 220, z: 8 });
       k.add(towerFront(), { x: 0, y: 0, w: 1180, h: 820, z: 12, still: true });
       k.set(snap, { y: 260, opacity: 0 });
     });
