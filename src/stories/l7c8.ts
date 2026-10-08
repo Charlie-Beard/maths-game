@@ -259,20 +259,20 @@ export default defineStory({
     await clacks;
     k.music('spooky');
     // The Enchanter shrinks back out of her way.
-    void k.to(ench, 0.7, { x: -250, ease: 'power2.out' });
-    const snap = k.snap('loom', { x: 790, y: 80, w: 380, z: 18, flip: true });
+    void k.to(ench, 0.7, { x: -330, ease: 'power2.out' });
+    const snap = k.snap('loom', { x: 790, y: 170, w: 380, z: 18, flip: true });
     k.set(snap, { opacity: 0, y: 80 });
     k.fx.rumble(1.2);
     await k.all(k.to(snap, 1.2, { opacity: 1, y: 0, ease: 'power2.out' }), k.shake(silky, 4, 2), k.shake(hero, 5, 2));
     snapSound.ruler();
-    void k.camera({ zoom: 1.3, x: 860, y: 300 }, 0.9);
+    void k.camera({ zoom: 1.3, x: 860, y: 380 }, 0.9);
     await k.say('take', snap);
 
     // She holds up the lantern, and it wakes.
-    const lan = k.add(lanternArt(), { x: 728, y: 180, w: 160, z: 28 });
+    const lan = k.add(lanternArt(), { x: 728, y: 270, w: 160, z: 28 });
     const door = k.part(lan, 'door');
     k.set(door, { y: -96 });
-    const lanGlow = k.light(808, 320, 150, { color: C.goldLight, strength: 0, z: 17 });
+    const lanGlow = k.light(808, 410, 150, { color: C.goldLight, strength: 0, z: 17 });
     k.set(lan, { opacity: 0 });
     void k.camera({}, 0.7);
     k.pose(snap, 'point');
@@ -283,12 +283,12 @@ export default defineStory({
     await k.say('lantern', ench);
 
     // A beam of light, and Silky is drawn in, fluttering. Nobody touches her.
-    void k.beam([808, 320], [655, 258], C.goldLight, 0.5);
+    void k.beam([808, 410], [655, 258], C.goldLight, 0.5);
     drawnIn();
     void k.fade(halo, 0, 0.6);
     void flutter(k, silky, 6);
     const told = k.say('pulled');
-    await k.to(silky, 1.2, { x: 153, y: 64, scale: 0.6, ease: 'power2.in' });
+    await k.to(silky, 1.2, { x: 153, y: 146, scale: 0.6, ease: 'power2.in' });
     await k.to(door, 0.2, { y: 0, ease: 'power2.in' });
     click();
     void k.pop(lan, 1.06);
@@ -296,17 +296,17 @@ export default defineStory({
     await k.all(k.say('brave', silky), flutter(k, silky, 6));
 
     // Her ribbon, with one glowing dewdrop tied in it, falls through the bars.
-    const ribbon = k.keepsake(k.chapter!.keepsake, { x: 760, y: 360, w: 90, z: 29 });
-    const drop = k.add(dewdrop(), { x: 793, y: 384, w: 24, z: 30 });
-    const dropGlow = k.light(805, 400, 50, { color: C.dew, strength: 0.6, z: 29 });
+    const ribbon = k.keepsake(k.chapter!.keepsake, { x: 760, y: 450, w: 90, z: 29 });
+    const drop = k.add(dewdrop(), { x: 793, y: 474, w: 24, z: 30 });
+    const dropGlow = k.light(805, 490, 50, { color: C.dew, strength: 0.6, z: 29 });
     k.set([ribbon, drop, dropGlow], { opacity: 0 });
     void k.all(k.fade(ribbon, 1, 0.3), k.fade(drop, 1, 0.3), k.fade(dropGlow, 0.6, 0.3));
     k.fx.twinkle();
-    const falling = drift(k, [ribbon, drop, dropGlow], -620, 180, 3.2);
+    const falling = drift(k, [ribbon, drop, dropGlow], -620, 90, 3.2);
 
     // She shrieks, and stalks off into the mist with the lantern.
     k.pose(snap, 'shriek');
-    void k.camera({ zoom: 1.2, x: 860, y: 330 }, 0.6);
+    void k.camera({ zoom: 1.2, x: 860, y: 400 }, 0.6);
     void k.shake(snap, 5, 2);
     await k.say('mine', snap);
     void k.camera({}, 0.8);
@@ -366,9 +366,9 @@ export default defineStory({
       m3 = k.character('moonface', { x: 780, y: 350, w: 250, z: 20, flip: true });
     });
     flump();
-    const keep = k.keepsake(k.chapter!.keepsake, { x: 500, y: 420, w: 180, z: 24 });
-    const dew = k.add(dewdrop(), { x: 568, y: 474, w: 44, z: 25 });
-    const dewGlow = k.light(590, 500, 110, { color: C.dew, strength: 0, flicker: true, z: 23 });
+    const keep = k.keepsake(k.chapter!.keepsake, { x: 500, y: 420, w: 180, z: 36 });
+    const dew = k.add(dewdrop(), { x: 568, y: 474, w: 44, z: 37 });
+    const dewGlow = k.light(590, 500, 110, { color: C.dew, strength: 0, flicker: true, z: 35 });
     k.set([keep, dew], { opacity: 0 });
     await k.wait(500);
     k.fx.twinkle();
@@ -377,7 +377,7 @@ export default defineStory({
     await k.say('dewdrop', m3);
     k.sparkle(590, 490, 10, 100);
     await k.all(k.say('magic', h3), k.hop(h3, 16, 1));
-    const seal = k.add(landSeal(7), { x: 480, y: 50, w: 220, z: 30 });
+    const seal = k.add(landSeal(7), { x: 480, y: 50, w: 220, z: 40 });
     k.set(seal, { opacity: 0 });
     k.fx.jingle();
     await k.appear(seal, 0.6);
