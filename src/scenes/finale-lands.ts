@@ -264,10 +264,12 @@ export const FINALES: Record<number, FinaleLand> = {
     sky: ['#f6dcc4', '#eeb48a', C.duskSky],
     clouds: C.cloud,
     hazard: 'spin',
+    // The Saucepan Man isn't on the ladder: the story after (l13c8) finds
+    // out why. The goblins have him.
     lines: {
       start: 'The land is spinning away! Down the ladder, {name}!',
-      beats: ['Round and round!', 'Hold on tight!', 'One more rung!', 'Don’t get dizzy!', 'Nearly down!'],
-      end: 'Jump! Safe. But where is the Saucepan Man?',
+      beats: ['Round and round it goes!', 'Hold on tight!', 'One more rung!', 'Is the Saucepan Man behind us?', 'Don’t get dizzy!', 'Nearly down!'],
+      end: 'Jump! We made it. Goodbye, Land of Roundabouts!',
     },
   },
 

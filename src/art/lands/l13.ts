@@ -200,7 +200,10 @@ export function farNodes(): Node[] {
   const base = farBase('#e8a45c', 1301, { cloud: '#f7eddc', shade: '#e0d4bc' });
   return [
     ...base.back,
-    helterSkelter(110, 146, 0.4),
+    // Small enough that its flag stays inside the 180-high box (at 0.4 the
+    // cap and flag were cut off at the top), and far enough left to clear
+    // the map's ladder.
+    helterSkelter(64, 148, 0.3),
     bigWheel(450, 146, 44),
     carousel(285, 146, 0.4),
     teacup(536, 150, 0.5, FAIR_TEAL),
