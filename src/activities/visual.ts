@@ -722,6 +722,13 @@ function describe(v: Visual): string {
       if (v.ask) return `A ${names}: count its ${v.ask === 'faces' ? 'flat faces' : v.ask}`;
       return `A 3D shape: ${names}`;
     }
+    // The labels never give the answer away: no counts, no readings.
+    case 'tally':
+      return `A ${v.style === 'tally' ? 'tally chart' : 'pictogram'} of ${v.rows.map((r) => r.label).join(', ')}`;
+    case 'measure': {
+      const thing = { balance: v.values.length > 2 ? 'Sacks on a shelf' : 'A balance with a sack on each side', dial: 'A kitchen scale in kilograms', jug: v.values.length > 1 ? 'Jugs of soup' : 'A jug in litres', thermometer: v.values.length > 1 ? 'Thermometers' : 'A thermometer in degrees Celsius' };
+      return thing[v.gauge];
+    }
     default:
       return `A picture (${v.type})`;
   }
