@@ -50,11 +50,18 @@ export class Director {
       return;
     }
     this.busy = true;
+    // From here the old scene must not take taps (it stays on screen for the wipe).
+    const prev = this.current;
+    prev?.retire();
     this.stage.classList.toggle('no-gear', next.hidesGear);
     try {
-      next.build();
-      const prev = this.current;
-      prev?.leave();
+      try {
+        next.build();
+      } catch (err) {
+        prev?.resume();
+        throw err;
+      }
+      prev?.depart();
 
       if (!prev || transition === 'none') {
         this.stage.insertBefore(next.root, this.sheet);

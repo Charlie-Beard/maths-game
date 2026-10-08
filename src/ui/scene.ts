@@ -45,6 +45,8 @@ export abstract class Scene {
   private cleanups: (() => void)[] = [];
   private timers = new Set<ReturnType<typeof setTimeout>>();
   protected alive = true;
+  /** Set the moment the director starts moving away; taps are ignored from then on. */
+  private leaving = false;
   /** Hides the grown-ups' gear (on the password screen and in the corner itself). */
   readonly hidesGear: boolean = false;
 
@@ -62,6 +64,29 @@ export abstract class Scene {
   /** Called before the scene is removed. */
   leave(): void {}
 
+  /**
+   * The director calls this as soon as it starts a change of scene. The old
+   * scene stays on screen for the wipe, so it must stop listening at once
+   * (two quick taps on Back would build the next scene twice). `alive` goes
+   * false after `leave()`, which stops pending sleeps and enter chains; the
+   * real clean-up is still `destroy()`.
+   */
+  retire(): void {
+    this.leaving = true;
+  }
+
+  /** The change of scene failed before it began, so this scene is still the one on screen. */
+  resume(): void {
+    this.leaving = false;
+  }
+
+  /** Runs `leave()`, then stops the scene's pending timers and chains. */
+  depart(): void {
+    this.leaving = true;
+    this.leave();
+    this.alive = false;
+  }
+
   destroy(): void {
     this.alive = false;
     this.cleanups.forEach((fn) => fn());
@@ -73,7 +98,12 @@ export abstract class Scene {
   }
 
   protected tap(el: HTMLElement, fn: (e: PointerEvent) => void): void {
-    this.cleanups.push(onTap(el, fn));
+    this.cleanups.push(
+      onTap(el, (e) => {
+        if (this.leaving) return;
+        fn(e);
+      }),
+    );
   }
 
   protected onCleanup(fn: () => void): void {

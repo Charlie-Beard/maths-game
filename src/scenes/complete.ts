@@ -113,6 +113,7 @@ export class CompleteScene extends Scene {
   async enter(): Promise<void> {
     const { chapter: c, news } = this.o;
     const calm = isCalm();
+    if (!this.alive) return;
     sfx.fanfare();
     // Next pops in straight away, then breathes (once it has arrived, so the two never fight).
     void sm(this.next, 0.4, { startAt: { scale: 0 }, scale: 1, ease: 'back.out(2)' }).then(() => {
@@ -121,11 +122,15 @@ export class CompleteScene extends Scene {
 
     // The keepsake rises out of the glow.
     await sm(this.keepsake, 0.6, { startAt: { y: 60, scale: 0.4, rotation: -14 }, opacity: 1, y: 0, scale: 1, rotation: 0, ease: 'back.out(1.6)' });
+    // After each line, check the scene is still here: leaving it stops the
+    // voice, which ends the pending line, and the rest must not play over the map.
+    if (!this.alive) return;
     sfx.reveal();
     this.onCleanup(breathe(this.glow, 0.05, 2.4));
     await voice.say(PHRASES.chapterDone);
     if (!this.alive) return;
     if (news.keepsake) await voice.say(PHRASES.newKeepsake);
+    if (!this.alive) return;
     void pop(this.keepsake, 1.06);
     await voice.say(keepsakeName(c.keepsake));
     if (!this.alive) return;
@@ -141,6 +146,7 @@ export class CompleteScene extends Scene {
         sfx.whoosh();
         await sm(inner, 0.8, { rotationY: 0, ease: 'power2.inOut' });
       }
+      if (!this.alive) return;
       sfx.sparkle();
       void pop(this.card, 1.05);
       await voice.say(PHRASES.newCard);
@@ -168,6 +174,7 @@ export class CompleteScene extends Scene {
       }
       gsap.fromTo(this.root, { y: 6 }, { y: 0, duration: 0.3, ease: stepped(0.3, 'elastic.out(1, 0.4)') });
     }
+    if (!this.alive) return;
     sfx.triumph();
     await voice.say(PHRASES.newSeal);
   }

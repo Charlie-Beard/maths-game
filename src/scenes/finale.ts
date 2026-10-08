@@ -59,7 +59,7 @@ import { finaleFor, FINALE_LINES, waveLine, type FinaleLand, type SnapWave } fro
 import { PlayScene, type PlayOptions } from './play';
 
 /** Races a voice line against a timeout, so a stuck clip never stalls the show. */
-const capped = (p: Promise<void>, ms: number): Promise<void> => Promise.race([p, wait(ms)]);
+const capped = (p: Promise<unknown>, ms: number): Promise<void> => Promise.race([p, wait(ms)]).then(() => undefined);
 
 /** Where a puppet stands (gsap transform values). */
 interface Spot {
