@@ -384,8 +384,9 @@ export function doorway(name: string): string {
 /**
  * A hanging cage, in two layers so someone can sit inside it: `cageBack`
  * (the dark inside and the floor) goes behind them and `cageFront` (the
- * bars, the dome, the ring and the lock) in front. Both 280 × 400, laid
- * at the same place. `lock` writes a sum on the lock's tag; `open` draws
+ * bars, the dome, the ring and the lock) in front. The back is 280 × 400 and
+ * the front 280 × 440 (the lock's tag hangs below the floor); lay both at
+ * the same top-left corner and width. `lock` writes a sum on the lock's tag; `open` draws
  * the door swung wide (for the finale).
  */
 export function cageBack(name: string): string {
@@ -404,7 +405,7 @@ export function cageFront(name: string, o: { lock?: string; open?: boolean } = {
     const top: Pt = [140 + (x - 140) * 0.35, 30];
     bars.push(piece(band([top, [x, 110], [x, 372]], 8), C.iron, { edge: 'cut', fibre: false }));
   }
-  return svg({ w: 280, h: 400, name: `l10-cage-${name}-${o.lock ?? ''}-${o.open ? 'o' : 'c'}`, label: 'a cage' }, [
+  return svg({ w: 280, h: 440, name: `l10-cage-${name}-${o.lock ?? ''}-${o.open ? 'o' : 'c'}`, label: 'a cage' }, [
     ink(circle(140, 14, 13), { width: 6, color: C.iron, closed: true }),
     piece(ellipse(140, 32, 30, 10), C.iron, { edge: 'cut' }),
     ...bars,
@@ -413,11 +414,11 @@ export function cageFront(name: string, o: { lock?: string; open?: boolean } = {
     ...(o.open
       ? [piece(poly([[114, 120], [60, 140], [60, 360], [114, 372]]), C.ironLight, { edge: 'cut', fibre: false, opacity: 0.5 })]
       : [
-          // The lock, with its sum on a chalk tag.
-          piece(band([[124, 270], [124, 252], [140, 242], [156, 252], [156, 270]], 7), C.ironLight, { edge: 'cut' }),
-          piece(rect(116, 266, 48, 44, 8), C.iron, { edge: 'cut' }),
-          piece(circle(140, 284, 5), C.snapInk, { edge: 'clean', shadow: false }),
-          ...(o.lock ? [piece(rect(70, 312, 140, 46, 6), C.chalk, { edge: 'cut' }), text(140, 347, o.lock, 32, C.snapInk)] : []),
+          // The lock, low on the door (clear of the face inside), its sum on a tag hanging below.
+          piece(band([[126, 346], [126, 332], [140, 324], [154, 332], [154, 346]], 6), C.ironLight, { edge: 'cut' }),
+          piece(rect(118, 342, 44, 38, 8), C.iron, { edge: 'cut' }),
+          piece(circle(140, 358, 4), C.snapInk, { edge: 'clean', shadow: false }),
+          ...(o.lock ? [ink([[140, 380], [140, 394]], { width: 2, color: C.ironLight }), piece(rect(70, 392, 140, 46, 6), C.chalk, { edge: 'cut' }), text(140, 427, o.lock, 32, C.snapInk)] : []),
         ]),
   ]);
 }
