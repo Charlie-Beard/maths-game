@@ -35,8 +35,19 @@ let current: { stop: () => void } | null = null;
 
 const base = (): string => new URL('./audio/', document.baseURI).href;
 
+/**
+ * A fetch that gives up after a while. The play scene waits for the voice
+ * after every right answer, so a request stuck on a poor connection must
+ * not hold the screen: giving up just means the iPad's own voice speaks.
+ */
+function fetchSoon(url: string, ms = 6000): Promise<Response> {
+  const ctl = new AbortController();
+  const t = setTimeout(() => ctl.abort(), ms);
+  return fetch(url, { signal: ctl.signal }).finally(() => clearTimeout(t));
+}
+
 export function loadManifest(): Promise<void> {
-  manifestLoaded ??= fetch(base() + 'manifest.json')
+  manifestLoaded ??= fetchSoon(base() + 'manifest.json')
     .then((r) => (r.ok ? r.json() : manifest))
     .then((m: Partial<Manifest>) => {
       manifest = { lines: m.lines ?? [], pieces: m.pieces ?? [], numbers: m.numbers ?? [] };
@@ -48,7 +59,7 @@ export function loadManifest(): Promise<void> {
 function fetchBuffer(url: string): Promise<AudioBuffer | null> {
   let p = buffers.get(url);
   if (!p) {
-    p = fetch(url)
+    p = fetchSoon(url)
       .then((r) => (r.ok ? r.arrayBuffer() : Promise.reject(new Error(String(r.status)))))
       .then((data) => audio().decodeAudioData(data))
       .catch(() => null);
@@ -82,6 +93,18 @@ function playBuffer(buf: AudioBuffer, rate = 1): Promise<boolean> {
     };
     // Stopping a source also fires onended, so `stopThis` must get in first.
     src.onended = () => finish(true);
+    // Safety net: when iOS suspends the audio (a call, Siri, coming back to
+    // the app) the clip never plays and onended never fires. Carry on as if
+    // it was said, and make sure it can't start late over the next line.
+    setTimeout(() => {
+      if (done) return;
+      try {
+        src.stop();
+      } catch {
+        /* never started */
+      }
+      finish(true);
+    }, (buf.duration / rate) * 1000 + 1500);
     current = { stop: stopThis };
     src.start();
   });

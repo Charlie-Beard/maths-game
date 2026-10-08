@@ -115,24 +115,19 @@ test('every Visual kind draws through choose', async ({ page }) => {
   await page.goto('/?scene=fixtures&kind=choose&seed=1');
   await expect(page.locator('.activity-choose')).toBeVisible();
   const kinds = new Set<string>();
-  for (let i = 0; i < 120; i++) {
-    // Wait for the next problem (i done), or the map after the last one.
-    await expect
-      .poll(async () => (await page.locator('.map-stop').count()) > 0 || (await page.locator('.pdot.done').count()) === i, { timeout: 20_000 })
-      .toBe(true);
-    if (await page.locator('.map-stop').count()) break;
-    // Every dot done: the round is over and the map is on its way (on a busy
-    // machine it can take a while), so don't tap the last problem again.
-    if (i === (await page.locator('.pdot').count())) {
-      await expect(page.locator('.map-stop').first()).toBeVisible({ timeout: 20_000 });
-      break;
-    }
+  // Count the round once, up front: after the last answer the play scene (and
+  // its dots) can be gone a moment before the map has drawn its stops.
+  const total = await page.locator('.pdot').count();
+  expect(total).toBeGreaterThan(0);
+  for (let i = 0; i < total; i++) {
+    await expect(page.locator('.pdot.done')).toHaveCount(i, { timeout: 20_000 });
     await expect(page.locator('.activity-choose')).toBeVisible();
     const kind = await page.locator('.activity-choose .visual').getAttribute('data-kind');
     if (kind) kinds.add(kind);
     if (kind && kind !== 'none') expect(await page.locator('.activity-choose .visual svg').count()).toBeGreaterThan(0);
     await solve(page);
   }
+  await expect(page.locator('.map-stop').first()).toBeVisible({ timeout: 20_000 });
   for (const k of ['objects', 'dots', 'tenFrame', 'numberLine', 'partWhole', 'compare', 'tensOnes', 'groups', 'share', 'fraction', 'clock', 'coins', 'shape', 'length']) expect(kinds).toContain(k);
 });
 
