@@ -222,13 +222,13 @@ export const LANDS: Land[] = [
     ['The Roundabout Spins Away', 'whirligig', ['turns', 'shapes-3d', 'count-3s', 'change'], [2, 3], 'The land is spinning away! Hold on, and down the ladder!', 'roundaboutTicket'],
   ]),
   land(14, 'The Land of the Red Goblins', 'Red Goblins', '#a32a2a', 'Heavier, fuller, hotter: reading scales', 'escape', [
-    ['Down the Goblin Hole', 'moonface', ['compare-measures'], [1, 2], 'The goblins took him down here. Quiet now, {name}. Which sack is heavier?', 'goldSack'],
+    ['Down the Goblin Hole', 'moonface', ['compare-measures'], [1, 2], 'The goblins took the Saucepan Man down here. Quiet now, {name}. Which sack is heavier?', 'goldSack'],
     ['Sacks of Gold', 'pixie', ['compare-measures', 'read-scales'], [1, 2], 'Goblin gold! Heavy, heavy! Let’s weigh it.', 'goblinGold'],
     ['The Goblin Kitchen', 'washalot', ['read-scales'], [1, 2], 'Jugs and jugs of goblin soup! How many litres?', 'goblinJug'],
     ['Hot Caves, Cold Caves', 'joe', ['read-scales', 'compare-measures'], [2, 3], 'This cave is hot! That one is cold! Look at the thermometer.', 'thermometer'],
     ['The Goblins’ Scales', 'beth', ['read-scales'], [3, 4], 'The goblins weigh everything! Can you read their scales?', 'goblinScales'],
     ['Clank! Clank!', 'silky', ['read-scales', 'missing-100'], [2, 3], 'Listen! Clank, clank! That’s the Saucepan Man!', 'glowWorm'],
-    ['The Saucepan Man is Free!', 'saucepan', ['compare-measures', 'read-scales', 'add-2d2d', 'time-5'], [2, 4], 'EH? FREE? I’M FREE! Thank you, {name}! Now, let’s get out of here!', 'saucepanLid'],
+    ['The Saucepan Man is Free!', 'saucepan', ['compare-measures', 'read-scales', 'add-2d2d', 'time-5'], [2, 4], 'EH? A KEY? Quick, {name}! Let me out before the goblins wake up!', 'saucepanLid'],
     ['Run from the Red Goblins!', 'redGoblin', ['compare-measures', 'read-scales', 'tally', 'turns', 'count-3s'], [2, 3], 'Come BACK here! Nobody leaves the goblin caves!', 'goblinHat'],
   ]),
 ];
