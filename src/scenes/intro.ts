@@ -47,7 +47,7 @@ export class IntroScene extends Scene {
     this.tap(this.play, () => this.start());
     r.append(this.play);
 
-    const back = sealButton('map', { x: 90, y: 16, size: 64, color: C.slate, aria: 'Back to the map' });
+    const back = sealButton('map', { x: 100, y: 16, size: 76, color: C.slate, aria: 'Back to the map' });
     this.tap(back, () => {
       sfx.tap();
       voice.stop();

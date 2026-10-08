@@ -64,9 +64,15 @@ export class Stage {
   }
 
   private update(): void {
+    // Fit to the window, not the visual viewport. On iPad Safari the
+    // on-screen keyboard (the password screen) shrinks visualViewport.height
+    // but not innerHeight, and the whole stage would shrink and jump while
+    // typing. Pinch-zoom is off (see index.html), so the visual viewport has
+    // nothing else to tell us. We only fall back to it if the window reports
+    // no size at all.
     const vv = window.visualViewport;
-    const w = vv?.width ?? window.innerWidth;
-    const h = vv?.height ?? window.innerHeight;
+    const w = window.innerWidth > 0 ? window.innerWidth : (vv?.width ?? 0);
+    const h = window.innerHeight > 0 ? window.innerHeight : (vv?.height ?? 0);
     this.scale = fitScale(w, h);
     document.documentElement.style.setProperty('--scale', String(this.scale));
 

@@ -66,7 +66,9 @@ export function tenFrame(p: Problem, ctx: ActivityContext): Activity {
   const fx0 = 590 - (nFrames * fw + (nFrames - 1) * between) / 2;
   const fy = hasTray ? 124 : 290 - fh / 2;
   const trayY = fy + fh + 30;
-  const size = cell - 10;
+  // The button fills the whole cell (72 px or more to tap, even with two
+  // frames); the biscuit is drawn 10 px smaller inside it by CSS padding.
+  const size = cell;
   const cellXY = (i: number) => {
     const f = Math.floor(i / 10);
     const k = i % 10;
