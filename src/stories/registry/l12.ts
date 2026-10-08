@@ -9,4 +9,5 @@ export const L12: Record<string, Loader> = {
   l12c5: () => import('../l12c5'),
   l12c6: () => import('../l12c6'),
   l12c7: () => import('../l12c7'),
+  l12c8: () => import('../l12c8'),
 };

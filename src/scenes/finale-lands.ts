@@ -250,9 +250,9 @@ export const FINALES: Record<number, FinaleLand> = {
     hazard: 'march',
     chaser: 'redGoblin',
     lines: {
-      start: 'The goblins are marching off with the big drum! The land is going! Down, {name}!',
-      beats: ['Boom! Boom! Boom!', 'Oom-pah-pah!', 'One more rung!', 'Hold on tight!', 'Nearly down!'],
-      end: 'Jump! We’re safe. But the goblins still have my drum…',
+      start: 'The goblins are marching off with my big drum! And the land is moving on! Down, {name}!',
+      beats: ['Boom! Boom! That’s my drum!', 'Left, right! Here they come!', 'One more rung!', 'Come back with my drum!', 'Nearly down!'],
+      end: 'Phew! We’re safe on the ladder. But look! The goblins still have my drum…',
     },
   },
 

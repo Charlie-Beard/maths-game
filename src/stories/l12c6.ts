@@ -52,9 +52,9 @@ export default defineStory({
     // ---- Boom… BOOM… boom! Three red goblins, sneaking past with the drum.
     k.music('spooky');
     const gobs = [
-      goblin(k, 'l12c6-gob-a', { x: 200, y: 400, w: 110, z: 8 }),
-      goblin(k, 'l12c6-gob-b', { x: 330, y: 396, w: 120, z: 9, drum: true }),
-      goblin(k, 'l12c6-gob-c', { x: 480, y: 404, w: 105, z: 8 }),
+      goblin(k, 'l12c6-gob-a', { x: 270, y: 380, w: 130, z: 8 }),
+      goblin(k, 'l12c6-gob-b', { x: 410, y: 372, w: 140, z: 9, drum: true }),
+      goblin(k, 'l12c6-gob-c', { x: 570, y: 384, w: 126, z: 8 }),
     ];
     k.set(gobs, { x: -620 });
     badBoom(6);

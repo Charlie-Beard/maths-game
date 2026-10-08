@@ -387,6 +387,8 @@ export function landEdge(name: string): string {
   const pts: Pt[] = [[-40, g - 6], [EDGE.end - 40, g - 10], [EDGE.end, g + 30], [EDGE.end - 30, g + 120], [EDGE.end - 70, g + 230], [EDGE.end - 150, 900], [-40, 900]];
   const { x: cx, y: cy, w: cw } = EDGE.clock;
   return svg({ w: 1000, h: 900, name, boil: false }, [
+    // a far field behind, so the edge reads as land and not a ledge
+    piece(curve([[-40, g - 70], [260, g - 96], [560, g - 70], [EDGE.end - 70, g - 50], [EDGE.end - 30, g + 20], [-40, g + 20]], 1), '#74b8ac', { rough: 1, shadow: false }),
     ...noteString([-20, 60], [700, 120], 50, [[0.15, 16, 'crotchet', L12.cream], [0.38, 34, 'pair', L12.brass], [0.62, 10, 'quaver', L12.cream], [0.86, 30, 'crotchet', L12.brassLight]]),
     // the clock post
     piece(rect(cx + cw / 2 - 12, cy + cw - 10, 24, g - cy - cw + 14), L12.brassDark, { edge: 'cut' }),
@@ -414,8 +416,11 @@ export function holeBack(name: string): string {
  * it in front of the goblins, and anything that sinks below the lip is hidden.
  */
 export function holeFront(name: string): string {
+  // The same bands as landEdge's ground below the hole (local y = stage y - (ground - 35)).
   return svg({ w: 200, h: 240, name, boil: false }, [
-    piece(curve([[2, 34], [30, 52], [100, 66], [170, 52], [198, 34], [200, 240], [0, 240]], 1), L12.grass, { edge: 'cut', fibre: false, shadow: false }),
+    piece(curve([[2, 34], [30, 52], [100, 66], [170, 52], [198, 34], [200, 240], [0, 240]], 1), L12.grass, { edge: 'clean', fibre: false, shadow: false }),
+    piece(rect(0, 74, 200, 170), L12.grassFront, { edge: 'clean', fibre: false, shadow: false }),
+    piece(rect(0, 198, 200, 50), '#8a6a4a', { edge: 'clean', fibre: false, shadow: false }),
     ink([[8, 36], [40, 54], [100, 66], [160, 54], [192, 36]], { width: 4, color: '#3a2a1e', opacity: 0.8 }),
   ]);
 }

@@ -208,8 +208,8 @@ export const LANDS: Land[] = [
     ['When Does the Band Play?', 'moonface', ['time-5'], [1, 2], 'The band plays at five past! Or was it ten past? Let’s look.', 'pocketWatch'],
     ['Five Minutes to Showtime', 'beth', ['time-5', 'time'], [1, 3], 'Hurry! The show starts soon. What time is it now?', 'showTicket'],
     ['The Big Drum is Gone!', 'oomboom', ['count-3s', 'time-5'], [2, 3], 'My big drum! Somebody has taken my big drum!', 'drumstick'],
-    ['Little Red Footprints', 'fran', ['time-5', 'count-3s'], [2, 4], 'Little red footprints, in threes! They went that way!', 'muddyPrint'],
-    ['The Grand Parade', 'oomboom', ['count-3s', 'time-5', 'times-5', 'add-2d2d'], [2, 3], 'The land is moving on! March, march, down the ladder!', 'bigDrum'],
+    ['Little Red Footprints', 'fran', ['time-5', 'count-3s'], [2, 4], 'Little red footprints, in threes! The goblins went that way!', 'muddyPrint'],
+    ['The Grand Parade', 'oomboom', ['count-3s', 'time-5', 'times-5', 'add-2d2d'], [2, 3], 'The goblins are marching off with my drum! And the land is moving on!', 'bigDrum'],
   ]),
   land(13, 'The Land of Roundabouts', 'Roundabouts', '#e07b39', 'Turns, directions and 3D shapes', 'escape', [
     ['Round and Round', 'whirligig', ['turns'], [1, 2], 'Roll up, roll up! Everything here goes round and round!', 'carouselHorse'],

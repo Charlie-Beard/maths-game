@@ -42,7 +42,7 @@ export default defineStory({
       [310, 246],
       [600, 246],
     ];
-    const sheet = k.add(musicSheet(600, 320, 'l12c2-sheet'), { x: 292, y: 70, z: 21, still: true });
+    const sheet = k.add(musicSheet(600, 300, 'l12c2-sheet'), { x: 292, y: 70, z: 21, still: true });
     k.set(sheet, { opacity: 0 });
     await k.fade(sheet, 1, 0.3);
     const rows = SPOTS.map(([x, y], i) => {
