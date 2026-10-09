@@ -8,7 +8,8 @@
  *
  *   - chapters: the record with more plays, done if either side finished it
  *   - skills: the record that has seen more problems (it holds the newer
- *     tier, score and review box); on a tie, the one practised last
+ *     tier, score and review box); on a tie, the one practised last. A
+ *     skill mastered on either side stays mastered.
  *   - keepsakes, cards and seals: everything either side won
  *   - toffees: the larger count (both sides count up from the same start)
  *   - everything else (name, avatar, settings, unlocks) takes whichever
@@ -56,8 +57,14 @@ function mergeChapter(l: ChapterRecord | undefined, r: ChapterRecord | undefined
 
 function mergeSkill(l: SkillState | undefined, r: SkillState | undefined): SkillState {
   if (!l || !r) return structuredClone((l ?? r)!);
-  if (l.seen !== r.seen) return structuredClone(l.seen > r.seen ? l : r);
-  return structuredClone(l.last > r.last ? l : r);
+  // On a full tie the text decides, so both devices pick the same one.
+  const ahead = l.seen !== r.seen ? l.seen > r.seen : l.last !== r.last ? l.last > r.last : canonical(l) > canonical(r);
+  const [win, other] = ahead ? [l, r] : [r, l];
+  const st = structuredClone(win);
+  // Mastery is never taken back (mastery.ts), so a skill mastered on
+  // either side stays mastered, with that side's review box.
+  if (other.mastered && !st.mastered) Object.assign(st, { mastered: true, box: other.box, due: other.due });
+  return st;
 }
 
 export function mergeProgress(base: Progress, local: Progress, remote: Progress): Progress {
