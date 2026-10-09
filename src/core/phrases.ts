@@ -38,7 +38,7 @@ export const PHRASES = {
   practiceDone: 'Lovely practising, {name}!',
   leaveAsk: 'Back to the tree?',
   turnSideways: 'Please turn the iPad sideways.',
-  comeBackTomorrow: 'That’s all the new adventures for today. You can play old ones, or practise with Silky!',
+  comeBackTomorrow: 'That’s all the new adventures for today. The story goes on tomorrow! You can play old ones, or practise with Silky.',
   allDone: 'Hooray! All done!',
 } as const;
 

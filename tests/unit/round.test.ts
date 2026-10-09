@@ -161,3 +161,12 @@ describe('Round', () => {
     expect(round.problems[8].key).not.toBe(solved.key);
   });
 });
+
+describe('carrying on part way', () => {
+  it('starts a round at the problem he left on', () => {
+    const problems = buildRound(findChapter('l1c6')!.chapter, defaultProgress(), makeRand(4), now);
+    const round = new Round(problems, (p) => p, 3);
+    expect(round.index).toBe(3);
+    expect(round.current).toBe(round.problems[3]);
+  });
+});

@@ -154,13 +154,17 @@ These are design choices backed by the simulation, not bugs:
 - **Story captions cover the actors' feet** in a few frames. That's the caption band's fixed place.
 - **Plain-equation problems leave the picture box empty.** That's by design for the abstract tiers.
 
-### Open: design choices for the parent
+### Fixed after the parent's go-ahead
 
-1. **The progress dots grow from 8 to 9 or 10** when a problem Silky helped with comes back at the end. That's the design (PLAN §6), but the "always 8" shape changes in front of him. One option: keep 8 dots and show the extra one as a small "bonus" star.
-2. **The working line (up to about 7 s) can't be skipped**, and nothing can be tapped while it plays. With recorded voices this could feel long for an ADHD child.
-3. **Finales have 6–17 s gaps** between problems and before the story, with nothing to do. One option: cap them at about 5 s and move the drama into the story.
-4. **The daily limit line follows straight after a cliffhanger story** (e.g. l1c3 ends "Water came pouring down the tree!", then "That's all for today").
-5. **Leaving mid-chapter** keeps toffees and skill progress. Coming back starts the chapter again at problem 1, with new numbers.
+- **The progress dots grew from 8 to 9 or 10** when a problem Silky helped with came back at the end. Now the row is always the chapter's own count (8, or a finale's 10). An extra problem is a small star just after the row, so the dots never move.
+- **The working line couldn't be skipped**, and it runs up to about 7 s. Now a tap anywhere ends the working (and any praise) and moves on. The answer is already counted.
+- **Finale gaps of 6–17 s:**
+  - Finales no longer add random praise; the beat after each answer is the praise.
+  - The desk comes and goes faster, and two fixed pauses are gone.
+  - With the working now skippable, the gap between finale problems is mostly the beat itself.
+  - The climax after the last answer stays as it is: it's the payoff, not waiting.
+- **The daily limit line ran straight on from a cliffhanger story.** Now it waits a moment, and it says "The story goes on tomorrow!"
+- **Leaving mid-chapter started it again with new numbers.** Now his place is kept on that iPad, and picking the chapter again carries on from the same problem. Finishing the chapter clears it. Finales start again, since their set piece builds step by step.
 
 ## Still to do
 

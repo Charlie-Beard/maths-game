@@ -130,10 +130,15 @@ export class Round {
   private requeued = 0;
   private regen: (p: Problem) => Problem;
 
-  /** `regen` makes a fresh problem like the one given (for the retry at the end). */
-  constructor(problems: Problem[], regen: (p: Problem) => Problem) {
+  /**
+   * `regen` makes a fresh problem like the one given (for the retry at the
+   * end). `start` carries on from a problem part way through (a chapter he
+   * left and came back to).
+   */
+  constructor(problems: Problem[], regen: (p: Problem) => Problem, start = 0) {
     this.problems = problems.slice();
     this.regen = regen;
+    this.i = Math.max(0, Math.min(start, this.problems.length - 1));
   }
 
   get current(): Problem {

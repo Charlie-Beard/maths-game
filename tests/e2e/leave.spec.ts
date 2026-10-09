@@ -57,3 +57,37 @@ test("Practice ends with Silky's sign-off, then the map", async ({ page }) => {
   await on.click({ force: true });
   await expect(page.locator('.map-stop').first()).toBeVisible({ timeout: 10_000 });
 });
+
+test('leaving part way and coming back carries on from the same problem', async ({ page }) => {
+  await page.goto('/?scene=chapter&id=l1c1&seed=7');
+  const go = page.getByRole('button', { name: 'Play' });
+  await settled(go);
+  await go.click({ force: true });
+  const scene = page.locator('.scene.play');
+  for (let i = 0; i < 2; i++) {
+    await expect(page.locator('.pdot.done')).toHaveCount(i, { timeout: 20_000 });
+    await expect(scene).toHaveAttribute('data-answer', /.+/);
+    const answer = await scene.getAttribute('data-answer');
+    const card = page.locator(`.choice[data-value="${answer}"]`);
+    await settled(card);
+    await card.click({ force: true });
+  }
+  await expect(page.locator('.pdot.done')).toHaveCount(2, { timeout: 20_000 });
+  const third = await scene.getAttribute('data-answer');
+  const back = page.getByRole('button', { name: 'Back to the tree' });
+  await settled(back);
+  await back.click({ force: true });
+  const yes = page.getByRole('button', { name: 'Yes, back to the tree' });
+  await settled(yes);
+  await yes.click({ force: true });
+  await expect(page.locator('.map-stop[data-chapter="l1c1"]')).toBeVisible({ timeout: 10_000 });
+
+  // Back into the same chapter: two dots already done, the same third problem.
+  await page.goto('/?scene=chapter&id=l1c1&seed=99');
+  const again = page.getByRole('button', { name: 'Play' });
+  await settled(again);
+  await again.click({ force: true });
+  await expect(page.locator('.pdot')).toHaveCount(8);
+  await expect(page.locator('.pdot.done')).toHaveCount(2, { timeout: 20_000 });
+  await expect(scene).toHaveAttribute('data-answer', third!);
+});

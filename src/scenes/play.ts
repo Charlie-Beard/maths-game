@@ -21,6 +21,7 @@ import type { Chapter, Land } from '../core/curriculum';
 import { generate } from '../core/generators';
 import { personalise, PHRASES, PRAISE } from '../core/phrases';
 import type { Answer, Problem } from '../core/problem';
+import { saveResume } from '../save/resume';
 import { recordOutcome } from '../core/progress';
 import { makeRand, randomSeed, type Rand } from '../core/random';
 import { Round } from '../core/round';
@@ -42,6 +43,10 @@ export interface PlayOptions {
    * with the toffees earned, and one big button carries on.
    */
   signOff?: boolean;
+  /** Carry on from this problem (a chapter he left and came back to). */
+  start?: number;
+  /** How many problems the chapter set out with, when carrying on. */
+  base?: number;
 }
 
 const portrait = (): boolean => document.body.classList.contains('is-portrait');
@@ -58,6 +63,8 @@ export class PlayScene extends Scene {
   protected desk: HTMLElement;
   private activity: Activity | null = null;
   private dots: HTMLElement[] = [];
+  /** How many problems the round started with (one dot each). */
+  private baseDots = 0;
   private dotsBox!: HTMLElement;
   private jar!: HTMLElement;
   private silky!: HTMLElement;
@@ -86,7 +93,7 @@ export class PlayScene extends Scene {
     super(app, 'play');
     this.o = o;
     this.rand = o.rand ?? makeRand(randomSeed());
-    this.round = new Round(o.problems, (p) => generate(p.skill, Math.max(1, p.tier - 1), this.rand));
+    this.round = new Round(o.problems, (p) => generate(p.skill, Math.max(1, p.tier - 1), this.rand), o.start ?? 0);
     this.desk = h('div', { class: 'play-desk' });
     this.toffeesAtStart = app.progress.toffees;
   }
@@ -99,6 +106,7 @@ export class PlayScene extends Scene {
 
     this.dotsBox = place(h('div', { class: 'progress-dots' }), 200, 26, 780, 40);
     r.append(this.dotsBox);
+    this.baseDots = this.o.base ?? this.round.problems.length;
     this.drawDots();
 
     this.jar = place(h('div', { class: 'toffee-jar' }, String(this.app.progress.toffees)), 1040, 18, 120, 60);
@@ -135,6 +143,8 @@ export class PlayScene extends Scene {
    * the problem just answered.
    */
   protected async afterRight(_i: number, _last: boolean): Promise<void> {}
+  /** Whether a first-try right sometimes gets a word of praise (a finale's own beat is its praise). */
+  protected praiseRights = true;
 
   /** Just before a problem appears: finales bring the desk back here. */
   protected async beforeProblem(): Promise<void> {}
@@ -150,13 +160,23 @@ export class PlayScene extends Scene {
     super.destroy();
   }
 
+  /**
+   * One dot per problem the chapter set out with: always the same row, so
+   * the shape he expects (8, or a finale's 10) never changes. A problem
+   * that comes back at the end (Silky helped) is a small star just after
+   * the row, which doesn't move the dots.
+   */
   private drawDots(): void {
-    this.dotsBox.replaceChildren();
+    const row = h('div', { class: 'pdot-row' });
+    const bonus = h('div', { class: 'pdot-bonus' });
+    row.append(bonus);
     this.dots = this.round.problems.map((_, i) => {
-      const d = h('div', { class: `pdot${i < this.round.index ? ' done' : i === this.round.index ? ' now' : ''}` });
-      this.dotsBox.append(d);
+      const extra = i >= this.baseDots;
+      const d = h('div', { class: `pdot${extra ? ' bonus' : ''}${i < this.round.index ? ' done' : i === this.round.index ? ' now' : ''}` });
+      (extra ? bonus : row).insertBefore(d, extra ? null : bonus);
       return d;
     });
+    this.dotsBox.replaceChildren(row);
   }
 
   private async showProblem(): Promise<void> {
@@ -251,11 +271,20 @@ export class PlayScene extends Scene {
     // resolves: whatever an activity does, the next problem must still come.
     await Promise.race([this.activity?.right(), this.sleep(8000)]);
     if (!this.alive) return;
-    if (this.explained !== p) await voice.speech(p.explain);
-    // Leaving stops the voice, which ends these lines early: don't go on to the next one.
-    if (!this.alive) return;
-    if (outcome.wrong === 0 && this.rand.chance(0.35)) await voice.say(this.rand.pick(PRAISE));
-    if (!this.alive) return;
+    // The working and the praise can be cut short: a tap anywhere ends the
+    // line and moves on (the answer is already counted), so a child who has
+    // understood isn't kept waiting.
+    const skip = () => voice.stop();
+    this.root.addEventListener('pointerdown', skip);
+    try {
+      if (this.explained !== p) await voice.speech(p.explain);
+      // Leaving stops the voice, which ends these lines early: don't go on to the next one.
+      if (!this.alive) return;
+      if (this.praiseRights && outcome.wrong === 0 && this.rand.chance(0.35)) await voice.say(this.rand.pick(PRAISE));
+      if (!this.alive) return;
+    } finally {
+      this.root.removeEventListener('pointerdown', skip);
+    }
     await this.sleep(300);
     await this.afterRight(this.round.index, this.round.index + 1 >= this.round.total);
     if (!this.alive) return;
@@ -339,6 +368,14 @@ export class PlayScene extends Scene {
     this.tap(yes, () => {
       sfx.tap();
       voice.stop();
+      // Keep his place, so picking this chapter again carries on from here.
+      // (Not in a finale, whose set piece is built up step by step.)
+      const c = this.o.chapter;
+      if (c && c.kind !== 'finale') {
+        // Mid-celebration, the problem on screen is already done.
+        const index = this.round.index + (this.busy ? 1 : 0);
+        if (index > 0 && index < this.round.total) saveResume(this.app.profile.id, { chapter: c.id, problems: this.round.problems, index, base: this.baseDots });
+      }
       this.app.nav.map();
     });
     this.tap(keep, () => {

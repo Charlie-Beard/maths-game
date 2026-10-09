@@ -189,6 +189,10 @@ export class MapScene extends Scene {
       const today = new Date().toDateString();
       if (toldTomorrow !== today) {
         toldTomorrow = today;
+        // A breath after the story (which may have ended on a cliffhanger),
+        // then the promise that it carries on tomorrow.
+        await this.sleep(1200);
+        if (!this.alive) return;
         void voice.say(PHRASES.comeBackTomorrow);
       }
     }

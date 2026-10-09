@@ -175,6 +175,11 @@ export class FinaleScene extends PlayScene {
     super.destroy();
   }
 
+  // Kept brisk between problems: the beat after each answer says "well
+  // done" in its own way, so there's no extra praise, and the desk moves
+  // quickly. (Nothing on the set moves while a problem is up.)
+  protected praiseRights = false;
+
   /** Brings the desk back (and stills the set piece) before every problem. */
   protected async beforeProblem(): Promise<void> {
     this.bed?.stop();
@@ -183,7 +188,7 @@ export class FinaleScene extends PlayScene {
     this.set.classList.add('still');
     if (!this.deskDown) return;
     this.deskDown = false;
-    await sm(this.desk, 0.55, { y: 0, ease: 'power2.out' });
+    await sm(this.desk, 0.4, { y: 0, ease: 'power2.out' });
   }
 
   /** One beat of drama after a right answer; the climax after the last. */
@@ -210,13 +215,12 @@ export class FinaleScene extends PlayScene {
     if (this.cfg.mode === 'climb') await this.beatClimb(s, line);
     else if (this.cfg.mode === 'escape') await this.beatEscape(s, line);
     else await this.beatSnap(prev, s, line);
-    await this.sleep(350);
   }
 
   private async deskAway(): Promise<void> {
     if (this.deskDown) return;
     this.deskDown = true;
-    await sm(this.desk, 0.5, { y: 880, ease: 'power2.in' });
+    await sm(this.desk, 0.35, { y: 880, ease: 'power2.in' });
   }
 
   /**
@@ -711,7 +715,6 @@ export class FinaleScene extends PlayScene {
     // A new wave (land 10): wipe the board and chalk up the next.
     const next = this.waveAt(s);
     if (next.wave !== wave) {
-      await this.sleep(300);
       sfx.whoosh();
       await sm(this.board, 0.4, { opacity: 0, y: 20 });
       this.drawWave(next.wave);
