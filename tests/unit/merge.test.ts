@@ -26,7 +26,7 @@ describe('mergeProgress', () => {
     const local = play(copy(base), 1);
     expect(same(mergeProgress(base, local, copy(base)), local)).toBe(true);
     const remote = copy(base);
-    remote.settings.newPerDay = 5;
+    remote.settings.idleHintSeconds = 20;
     remote.unlockedTo = 12;
     expect(same(mergeProgress(base, copy(base), remote), remote)).toBe(true);
   });
@@ -104,13 +104,13 @@ describe('mergeProgress', () => {
     const remote = copy(base);
     local.settings.volume = 0.3;
     remote.settings.volume = 0.6;
-    remote.settings.newPerDay = 5;
+    remote.settings.idleHintSeconds = 20;
     local.avatar = 'beth';
     remote.avatar = 'joe';
     remote.unlockAll = true;
     const m = mergeProgress(base, local, remote);
     expect(m.settings.volume).toBe(0.3);
-    expect(m.settings.newPerDay).toBe(5);
+    expect(m.settings.idleHintSeconds).toBe(20);
     expect(m.avatar).toBe('beth');
     expect(m.unlockAll).toBe(true);
   });

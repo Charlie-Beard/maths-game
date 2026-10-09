@@ -1,6 +1,5 @@
 import { describe, expect, it } from 'vitest';
 import { ALL_CHAPTERS } from '../../src/core/curriculum';
-import { DAY } from '../../src/core/mastery';
 import { currentIndex, defaultProgress, finishChapter, isOpen, recordOutcome, restore } from '../../src/core/progress';
 import { makeRand } from '../../src/core/random';
 import { buildPractice, buildRound } from '../../src/core/round';
@@ -10,7 +9,7 @@ const now = new Date('2026-10-06T10:00:00').getTime();
 
 describe('progress', () => {
   it('restores junk and partial saves with defaults', () => {
-    expect(restore(null).settings.newPerDay).toBe(2);
+    expect(restore(null).settings.idleHintSeconds).toBe(12);
     const p = restore({ name: 'Jasper', avatar: 'ron', skills: { 'add-10': { tier: 3 }, bogus: {} }, settings: { volume: 0.2 } });
     expect(p.avatar).toBeNull();
     expect(p.skills['add-10']!.tier).toBe(3);
@@ -20,27 +19,25 @@ describe('progress', () => {
     expect(p.settings.idleHintSeconds).toBe(12);
   });
 
-  it('opens chapters in order, up to the daily limit of new ones', () => {
+  it('opens chapters in order, with no daily limit', () => {
     const p = defaultProgress();
-    expect(isOpen(p, 0, now)).toBe(true);
-    expect(isOpen(p, 1, now)).toBe(false);
-    finishChapter(p, ALL_CHAPTERS[0], now);
-    finishChapter(p, ALL_CHAPTERS[1], now);
-    expect(currentIndex(p)).toBe(2);
-    expect(isOpen(p, 2, now)).toBe(false); // two new today already
-    expect(isOpen(p, 0, now)).toBe(true); // replays are fine
-    expect(isOpen(p, 2, now + DAY)).toBe(true); // tomorrow
-    p.settings.newPerDay = 0;
-    expect(isOpen(p, 2, now)).toBe(true); // no limit
+    expect(isOpen(p, 0)).toBe(true);
+    expect(isOpen(p, 1)).toBe(false);
+    // However many he finishes in one day, the next one is open.
+    for (let i = 0; i < 12; i++) finishChapter(p, ALL_CHAPTERS[i], now);
+    expect(currentIndex(p)).toBe(12);
+    expect(isOpen(p, 12)).toBe(true);
+    expect(isOpen(p, 13)).toBe(false);
+    expect(isOpen(p, 0)).toBe(true); // replays are fine
   });
 
   it('honours grown-up unlocks', () => {
     const p = defaultProgress();
     p.unlockedTo = 10;
-    expect(isOpen(p, 10, now)).toBe(true);
-    expect(isOpen(p, 11, now)).toBe(false);
+    expect(isOpen(p, 10)).toBe(true);
+    expect(isOpen(p, 11)).toBe(false);
     p.unlockAll = true;
-    expect(isOpen(p, 79, now)).toBe(true);
+    expect(isOpen(p, 79)).toBe(true);
   });
 
   it('hands out rewards once', () => {
@@ -62,10 +59,11 @@ describe('progress', () => {
 });
 
 describe('older saves', () => {
-  it('drop the calm-mode setting the game no longer has', () => {
+  it('drop the calm-mode and daily-limit settings the game no longer has', () => {
     const old = { ...defaultProgress(), settings: { volume: 0.5, calm: true, idleHintSeconds: 12, newPerDay: 2 } };
     const p = restore(JSON.parse(JSON.stringify(old)));
     expect(p.settings).not.toHaveProperty('calm');
+    expect(p.settings).not.toHaveProperty('newPerDay');
     expect(p.settings.volume).toBe(0.5);
   });
 });
@@ -105,7 +103,6 @@ describe('saves that went wrong', () => {
       expect(p.settings.volume).toBeGreaterThanOrEqual(0);
       expect(p.settings.volume).toBeLessThanOrEqual(1);
       expect(Number.isFinite(p.settings.idleHintSeconds) && p.settings.idleHintSeconds >= 0 && p.settings.idleHintSeconds <= 60).toBe(true);
-      expect(Number.isInteger(p.settings.newPerDay) && p.settings.newPerDay >= 0).toBe(true);
       expect(Number.isInteger(p.unlockedTo) && p.unlockedTo >= -1 && p.unlockedTo < ALL_CHAPTERS.length).toBe(true);
       expect(typeof p.unlockAll).toBe('boolean');
       expect(typeof p.seenOpening).toBe('boolean');
@@ -130,7 +127,7 @@ describe('saves that went wrong', () => {
       // And the game can play on from it.
       const rand = makeRand(7);
       for (const c of [ALL_CHAPTERS[0], ALL_CHAPTERS[2], ALL_CHAPTERS[20]]) {
-        isOpen(p, ALL_CHAPTERS.indexOf(c), now);
+        isOpen(p, ALL_CHAPTERS.indexOf(c));
         buildRound(c, p, rand, now);
       }
       buildPractice(p, rand, now);

@@ -97,7 +97,7 @@ describe('cloud sync', () => {
       keepsakes: ['acorn'],
       toffees: 8,
       chapters: { l1c1: { plays: 1, done: true, firstDone: 5 } },
-      settings: { newPerDay: 3 },
+      settings: { idleHintSeconds: 8 },
     };
     const ipad = await device({ 'faraway-maths:v1:jasper': before });
     await ipad.on(() => ipad.api.signIn('owl'));
@@ -110,7 +110,7 @@ describe('cloud sync', () => {
     const saved = JSON.parse(env.DB.rows.get('jasper')!.data);
     expect(saved).toMatchObject({ avatar: 'joe', seenOpening: true, cards: ['moonface'], keepsakes: ['acorn'], toffees: 8 });
     expect(saved.chapters.l1c1.done).toBe(true);
-    expect(saved.settings.newPerDay).toBe(3);
+    expect(saved.settings.idleHintSeconds).toBe(8);
   });
 
   it('merges the save from before sign-in into a cloud profile that already has play in it', async () => {
@@ -152,7 +152,7 @@ describe('cloud sync', () => {
     await phone.on(() => onPhone.sync());
     expect(onPhone.progress.cards).toEqual(onIpad.progress.cards);
     await phone.on(() => {
-      onPhone.progress.settings.newPerDay = 3;
+      onPhone.progress.settings.volume = 0.4;
       onPhone.progress.settings.idleHintSeconds = 20;
       onPhone.save();
       return onPhone.sync();
@@ -173,7 +173,7 @@ describe('cloud sync', () => {
 
     expect(onIpad.state).toBe('synced');
     expect(changed).toHaveBeenCalled();
-    expect(onIpad.progress.settings.newPerDay).toBe(3);
+    expect(onIpad.progress.settings.volume).toBe(0.4);
     expect(onIpad.progress.settings.idleHintSeconds).toBe(20);
     expect(onIpad.progress.chapters[ALL_CHAPTERS[1].id]?.done).toBe(true);
     expect(onIpad.progress.toffees).toBe(16);

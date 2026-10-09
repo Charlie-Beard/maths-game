@@ -102,41 +102,6 @@
 .map-stop.is-next .stop-tag {
   filter: drop-shadow(0 0 10px var(--hint-glow));
 }
-.tomorrow-tag {
-  position: absolute;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  padding: 6px 12px;
-  border-radius: 14px;
-  background: var(--parchment-100);
-  box-shadow: 0 3px 0 rgba(40, 25, 10, 0.35);
-  font-size: 19px;
-  font-weight: 700;
-  color: var(--ink-700);
-  white-space: nowrap;
-  pointer-events: none;
-}
-.tomorrow-tag .moon {
-  position: relative;
-  width: 22px;
-  height: 22px;
-  border-radius: 50%;
-  background: var(--gold-500);
-  overflow: hidden;
-}
-.tomorrow-tag .moon::after {
-  content: '';
-  position: absolute;
-  left: 8px;
-  top: -4px;
-  width: 22px;
-  height: 22px;
-  border-radius: 50%;
-  background: var(--parchment-100);
-}
-
 /* Finished lands' seals on strings from the branch tips: in front of the leaves. */
 .tree-seal {
   position: absolute;

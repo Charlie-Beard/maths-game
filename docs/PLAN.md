@@ -120,12 +120,10 @@ have lighter menace (a giant, a goblin).
   mode (escape the land before it moves on, or rescue the Folk from Dame
   Snap) with a longer cutscene.
 - A chapter is **8 problems**, about 4–5 minutes including its story.
-- **New chapters per day: 2 by default** (a grown-ups' setting, 1–5 or
-  unlimited). After that, the map offers **"Practice with Silky"**
-  (spaced review) and replays of chapters he's done, with all their
-  stories. 80 chapters at about 1.5 a day over 5 days a week is about 11
-  weeks of new chapters, and with replays, review days, holidays and
-  "again!" about 6 months.
+- **No daily limit.** However much he plays, the next chapter is always
+  open: he is never blocked. Alongside it the map offers **"Practice
+  with Silky"** (spaced review) and replays of chapters he's done, with
+  all their stories.
 - **Each land has a skill focus.** Mastered skills keep coming back in
   later lands, so nothing is forgotten (see §6).
 
@@ -362,8 +360,7 @@ with a paper wipe. Every story is a script in its own file.
 - **Play:** §5.
 - **Complete:** the keepsake (and card or seal), then back to the map.
 - **Grown-ups' corner** (gear + sum, as in Wizard Words): profiles, cloud
-  status, progress by skill (tier and score), levels (unlock, lock), new
-  chapters per day, volume, idle hint, the player's name, start
+  status, progress by skill (tier and score), levels (unlock, lock), volume, idle hint, the player's name, start
   again.
 
 ## 10. Visual style

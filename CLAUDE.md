@@ -75,7 +75,7 @@ Look at screenshots of anything visual you change, using Playwright at
 | `src/core/mastery.ts` | Per-skill tiers, scores, mastery, Leitner review |
 | `src/core/round.ts` | Building a chapter's 8 problems; playing a round with help levels |
 | `src/core/curriculum.ts` | 10 lands × 8 chapters: the order of the whole game |
-| `src/core/progress.ts` | The save: chapters, skills, rewards, settings, daily limit |
+| `src/core/progress.ts` | The save: chapters, skills, rewards, settings |
 | `src/activities/` | How he answers: one module per ActivityKind (`choose` is the fallback) |
 | `src/scenes/` | Title, choose, map, intro, play, story, complete, album, parent |
 | `src/stories/` | `kit.ts` (the puppet-show kit) and one script per story |

@@ -300,16 +300,6 @@ export class ParentScene extends Scene {
       },
     );
 
-    const perDay = select(
-      [['1', '1'], ['2', '2'], ['3', '3'], ['5', '5'], ['0', 'No limit']],
-      String(s.newPerDay),
-      'New chapters per day',
-      (v) => {
-        s.newPerDay = Number(v);
-        save();
-      },
-    );
-
     const resetBtn = this.confirmButton('Start again', 'Tap again to really start again', 'danger', () => {
       target.reset();
       this.show('settings');
@@ -346,7 +336,6 @@ export class ParentScene extends Scene {
       h('div', { class: 'p-row' }, [h('div', {}, [h('strong', {}, 'Climbing with'), h('small', {}, 'Who goes up the tree with him. Keeps all his progress.')]), climb]),
       row('Volume', vol),
       row('Say the question again', idle, 'If nothing is tapped for a while.'),
-      row('New chapters per day', perDay, 'After that the map says “come back tomorrow”. Old chapters and practice with Silky are always open.'),
       row('Start again', resetBtn, 'Clears chapters, skills, keepsakes, cards, seals and the character choice. Keeps these settings and the levels.'),
     );
   }
