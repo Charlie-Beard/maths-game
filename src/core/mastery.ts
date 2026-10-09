@@ -74,10 +74,12 @@ export function record(prev: SkillState, o: Outcome, ceiling = tierCount(o.skill
     st.streak = 0;
   }
   // Down a tier: Silky had to help twice in the last four.
+  let steppedDown = false;
   if (st.recent.filter((w) => w >= 3).length >= 2 && st.tier > 1) {
     st.tier -= 1;
     st.streak = 0;
     st.recent = [];
+    steppedDown = true;
   }
 
   if (!st.mastered) {
@@ -95,10 +97,14 @@ export function record(prev: SkillState, o: Outcome, ceiling = tierCount(o.skill
       st.due = o.at + BOX_DAYS[st.box - 1] * DAY;
     }
   } else {
-    // Slipped: review again soon, a tier gentler.
+    // Slipped: review again soon. Only a slip on a review that was due
+    // (the long gap was too long) also makes it a tier gentler; one slip
+    // among several problems in one sitting is left to the step-down rule
+    // above, so a mastered skill doesn't drop a tier at every wobble. And
+    // never two tiers for one answer.
     st.box = 1;
     st.due = o.at + BOX_DAYS[0] * DAY;
-    st.tier = Math.max(1, st.tier - 1);
+    if (o.at >= prev.due && !steppedDown) st.tier = Math.max(1, st.tier - 1);
   }
   return st;
 }
@@ -116,10 +122,14 @@ export function dueForReview(skills: Partial<Record<SkillId, SkillState>>, now: 
     .map(([id]) => id);
 }
 
-/** Mastered skills, most overdue (or soonest due) first: for practice when nothing is strictly due. */
+/**
+ * Mastered skills, least recently practised first: for practice when
+ * nothing is strictly due. (Not by due date: a right answer that wasn't due
+ * leaves the date alone, so the same skill would head the list every time.)
+ */
 export function reviewOrder(skills: Partial<Record<SkillId, SkillState>>): SkillId[] {
   return (Object.entries(skills) as [SkillId, SkillState][])
     .filter(([, st]) => st.mastered)
-    .sort((a, b) => a[1].due - b[1].due)
+    .sort((a, b) => a[1].last - b[1].last)
     .map(([id]) => id);
 }

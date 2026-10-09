@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { BOX_DAYS, DAY, dueForReview, newSkillState, record, tierFor, type SkillState } from '../../src/core/mastery';
+import { BOX_DAYS, DAY, dueForReview, newSkillState, record, reviewOrder, tierFor, type SkillState } from '../../src/core/mastery';
 
 const at = 1_000_000_000_000;
 const play = (st: SkillState, wrongs: number[], ceiling = 5, start = at) =>
@@ -89,5 +89,30 @@ describe('mastery', () => {
       st = record(st, { skill: 'add-10', tier: st.tier, wrong: 1, at: st.last + 1000 }, 3);
       expect(st.box).toBe(1);
     });
+
+    it('keeps the tier for a slip that was not a due review', () => {
+      let st = mastered();
+      const tier = st.tier;
+      st = record(st, { skill: 'add-10', tier: st.tier, wrong: 1, at: st.last + 1000 }, 3);
+      expect(st.box).toBe(1);
+      expect(st.tier).toBe(tier);
+    });
+
+    it('drops only one tier when a due review slips and Silky helped twice', () => {
+      let st = mastered();
+      const tier = st.tier;
+      st = record(st, { skill: 'add-10', tier: st.tier, wrong: 3, at: st.last + 1000 }, 3);
+      st = record(st, { skill: 'add-10', tier: st.tier, wrong: 3, at: st.due + 1 }, 3);
+      expect(st.tier).toBe(tier - 1);
+    });
+  });
+
+  it('offers the least recently practised mastered skill when nothing is due', () => {
+    const m = (last: number) => ({ ...newSkillState(), mastered: true, box: 1, last, due: at + DAY });
+    const skills = { 'add-10': m(at - 3000), 'sub-10': m(at - 2000), 'bonds-10': m(at - 1000) };
+    expect(reviewOrder(skills)[0]).toBe('add-10');
+    // Practising it (right, not due) sends it to the back.
+    skills['add-10'] = record(skills['add-10'], { skill: 'add-10', tier: 1, wrong: 0, at }, 1);
+    expect(reviewOrder(skills)).toEqual(['sub-10', 'bonds-10', 'add-10']);
   });
 });
