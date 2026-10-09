@@ -123,6 +123,20 @@ export function dueForReview(skills: Partial<Record<SkillId, SkillState>>, now: 
 }
 
 /**
+ * Skills he has played but not mastered yet, least recently practised
+ * first. Review brings these back too, so a skill he found hard in an
+ * earlier land isn't left behind for good when the land moves on. Taking
+ * turns (rather than weakest first) means one hard skill doesn't come up
+ * every single time.
+ */
+export function needsPractice(skills: Partial<Record<SkillId, SkillState>>): SkillId[] {
+  return (Object.entries(skills) as [SkillId, SkillState][])
+    .filter(([, st]) => !st.mastered && st.seen > 0)
+    .sort((a, b) => a[1].last - b[1].last)
+    .map(([id]) => id);
+}
+
+/**
  * Mastered skills, least recently practised first: for practice when
  * nothing is strictly due. (Not by due date: a right answer that wasn't due
  * leaves the date alone, so the same skill would head the list every time.)

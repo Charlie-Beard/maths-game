@@ -10,7 +10,7 @@
  */
 import { ALL_CHAPTERS, LANDS, type Chapter } from './curriculum';
 import { generate } from './generators';
-import { dueForReview, reviewOrder, tierFor, type Outcome } from './mastery';
+import { dueForReview, needsPractice, reviewOrder, tierFor, type Outcome } from './mastery';
 import type { Answer, Problem } from './problem';
 import type { Progress } from './progress';
 import type { Rand } from './random';
@@ -34,7 +34,7 @@ export function recentSkills(c: Chapter): SkillId[] {
 export function planRound(c: Chapter, p: Progress, r: Rand, now: number): RoundPlan[] {
   const total = c.problems;
   const recent = recentSkills(c);
-  const review = [...dueForReview(p.skills, now), ...reviewOrder(p.skills)].filter((s) => !c.skills.includes(s) && !recent.includes(s));
+  const review = reviewQueue(p, now).filter((s) => !c.skills.includes(s) && !recent.includes(s));
   const nRecent = recent.length ? (c.kind === 'finale' ? Math.round(total * 0.2) : 2) : 0;
   const nReview = review.length && c.kind !== 'finale' ? 1 : 0;
   const nFocus = total - nRecent - nReview;
@@ -93,10 +93,18 @@ export function buildRound(c: Chapter, p: Progress, r: Rand, now: number): Probl
   return makeProblems(planRound(c, p, r, now), r);
 }
 
-/** "Practice with Silky": 8 review problems from mastered (or at least practised) skills. */
+/**
+ * Skills for review, in order: mastered ones that are due, then ones he has
+ * played but not mastered (from any earlier land), then the other mastered
+ * ones.
+ */
+function reviewQueue(p: Progress, now: number): SkillId[] {
+  return [...new Set([...dueForReview(p.skills, now), ...needsPractice(p.skills), ...reviewOrder(p.skills)])];
+}
+
+/** "Practice with Silky": 8 review problems from the review queue (anything he has played). */
 export function buildPractice(p: Progress, r: Rand, now: number, count = 8): Problem[] {
-  let skills = [...new Set([...dueForReview(p.skills, now), ...reviewOrder(p.skills)])];
-  if (!skills.length) skills = (Object.keys(p.skills) as SkillId[]).filter((s) => (p.skills[s]?.seen ?? 0) > 0);
+  let skills = reviewQueue(p, now);
   if (!skills.length) skills = ALL_CHAPTERS[0].skills;
   const plans: RoundPlan[] = [];
   for (let i = 0; i < count; i++) {
