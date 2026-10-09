@@ -133,7 +133,12 @@ if (import.meta.env.DEV && !getAuth() && !new URLSearchParams(location.search).h
 if (getAuth()) void start();
 else void director.go(new LoginScene(app, () => void start()));
 
-// Offline support (production builds only).
+// Offline support (production builds only). The worker caches the app on
+// install; the voice clips are filled in gently afterwards, carrying on
+// from where the last visit stopped (see vite.config.ts).
 if (import.meta.env.PROD && 'serviceWorker' in navigator) {
-  window.addEventListener('load', () => void navigator.serviceWorker.register('./sw.js').catch(() => {}));
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js').catch(() => {});
+    void navigator.serviceWorker.ready.then((r) => r.active?.postMessage('fill-audio'));
+  });
 }
