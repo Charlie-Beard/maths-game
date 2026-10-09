@@ -8,6 +8,7 @@
  *
  * Ids match CHARACTER_NAMES in core/names.ts.
  */
+import { cached } from '../paper';
 import { family } from './family';
 import { folk } from './folk';
 import { lands } from './lands';
@@ -29,4 +30,4 @@ export const characters: Record<string, () => string> = {
   ...L14_CHARACTERS,
 };
 
-export const characterArt = (id: string): string => (characters[id] ?? characters.moonface)();
+export const characterArt = cached((id: string): string => (characters[id] ?? characters.moonface)(), 24);
