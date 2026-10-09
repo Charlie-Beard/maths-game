@@ -6,7 +6,8 @@ A review of the finished game (all 14 lands) against the rules in
 - **Phase 0:** the baseline.
 - **Phase 1:** the rules that never bend.
 - **Phase 2:** the maths. That covers the generators, the curriculum, mastery and Silky's help.
-- **Still to do:** a play-through, audio, and robustness.
+- **Phase 3:** a play-through: every screen, and the pacing.
+- **Still to do:** audio, and robustness.
 
 Each finding says what was done about it: **fixed**, **left** (with the
 reason), or **open** (a choice still to make).
@@ -113,9 +114,56 @@ These are design choices backed by the simulation, not bugs:
 5. **With only two choices** (odd/even, two cards), help 2 has no wrong card to take away, so it adds nothing.
 6. **Asking Silky first** gets "Hmm, have another look", although he hasn't answered yet.
 
+## Phase 3: play-through
+
+**How it was checked:**
+- **Screens:** screenshots at 1180 × 820 and 1180 × 760, put together into 57 contact sheets. They cover every scene, the map for all 14 lands, the first problems of every land, every activity fixture (at help 0 and help 3), every finale, and story frames.
+- **Pacing:** the real flow played with a simulated voice (about 2.5 words a second) on a virtual clock. Spoken lengths are estimates; everything else is measured.
+
+### Pacing (measured, with estimated speech)
+
+| | |
+|---|---|
+| Returning day, open to first problem | 3 taps, about 5 s |
+| New child, open to first problem | 5 taps, about 16 s (the opening film is 119 s, or 1 tap to skip) |
+| Right answer to next question | about 4 s typical, up to about 7 s (the working line) |
+| Ordinary chapter, all right first time | about 37 s of play, plus the story |
+| Stories | ordinary 20–43 s (median 30 s); finales 67–120 s; the ending 144 s; Skip on every one |
+| Reward screen | Next can be tapped at once; the voice runs about 5–11 s |
+
+- **Shape:** every chapter has the same shape: intro, 8 problems, story, reward.
+- **Daily limit:** "Come back tomorrow" is gentle and said once. Replays and Practice stay open after it.
+- **Errors:** none from the game, and no stuck screens.
+
+### Fixed
+
+- **Three story lines were cut off mid-sentence** (land 9, chapters 2–4): the next line started before the first finished. Now each first line finishes.
+- **Silky's working was said twice:** once when she helps, then again when he taps the answer. Now it's said once.
+- **The idle hint repeated forever** (every 12 s) if he walked away. Now it repeats at most twice per question.
+- **The story safety cut-off** (180 s for long stories) was close to the ending's 144 s. Slower recorded voices could have hit it. Now it's 240 s (90 s for ordinary stories).
+- **Answer rows ran off the finale desk:** four clock cards reached x 1083, over the ladder strip. And on the fraction fixtures a "half" card sat behind the child's portrait. Answer rows now stay between x 160 and 1030.
+- **Map seals crowded the tree:** they sat on Silky's hammock, against stop 6's badge, and on the Treasures button. Four hooks were moved into clear space. (The title banner covering the land, noted in the roadmap, was already fixed.)
+- **Low contrast:**
+  - The reward screen's gold keepsake name sat on the gold glow. It now has a dark halo.
+  - The dark finale intros (Dame Snap's) had a dim brown land line on near-black. It's now pale.
+
+### Left, with the reason
+
+- **The measure dial overlaps the scale's base.** It reads as the scale's face.
+- **Silky sits over the finale's progress strip.** She covers part of the ladder or trunk. The climbers stay visible, and moving her would break where she always is.
+- **Story captions cover the actors' feet** in a few frames. That's the caption band's fixed place.
+- **Plain-equation problems leave the picture box empty.** That's by design for the abstract tiers.
+
+### Open: design choices for the parent
+
+1. **The progress dots grow from 8 to 9 or 10** when a problem Silky helped with comes back at the end. That's the design (PLAN §6), but the "always 8" shape changes in front of him. One option: keep 8 dots and show the extra one as a small "bonus" star.
+2. **The working line (up to about 7 s) can't be skipped**, and nothing can be tapped while it plays. With recorded voices this could feel long for an ADHD child.
+3. **Finales have 6–17 s gaps** between problems and before the story, with nothing to do. One option: cap them at about 5 s and move the drama into the story.
+4. **The daily limit line follows straight after a cliffhanger story** (e.g. l1c3 ends "Water came pouring down the tree!", then "That's all for today").
+5. **Leaving mid-chapter** keeps toffees and skill progress. Coming back starts the chapter again at problem 1, with new numbers.
+
 ## Still to do
 
-- **Phase 3, play-through:** screenshot every scene and the first problem of each land, and time the gaps between problems.
 - **Phase 4, audio and voice:** check every spoken line is exported, and check pronunciation of numbers.
 - **Phase 5, robustness:**
   - the save
