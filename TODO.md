@@ -1,34 +1,28 @@
-# TODO: lands 11–14 (session 6, in progress)
+# TODO
 
-These four lands come after Dame Snap is beaten: the Old Woman's Shoe, the
-Land of Music, Roundabouts and the Red Goblins. The plan, the story arc and
-who owns which files are in [docs/ROADMAP.md](docs/ROADMAP.md) under
-"Session 6". The branch is `claude/new-lands`, and it has not been merged
-into `main` yet.
+All 14 lands are finished: the curriculum, the maths, the art, every
+chapter story and every land finale, from the opening film to the feast at
+the end of land 14. Typecheck, the unit tests and the full Playwright suite
+pass. The voice script (`scripts/voice/lines.json`) has been exported with
+every line in the game.
 
-## Done (on `claude/new-lands`)
-- The foundation:
-  - the curriculum for lands 11–14
-  - 8 new skills
-  - the `tally`, `turn`, `solid` and `measure` visual types
-  - the ending film now plays after `l10c8`
-  - 14 seal hooks on the map tree
-  - stub files for each land
-- The art for all four lands: the hosts (`oldWoman`, `whirligig` and `redGoblin`), the backdrops, the keepsakes and the seals.
-- The maths for land 11 (`tally`, `change`) and land 12 (`count-3s`, `time-5`).
+## Still to do: the voices (with a grown-up)
 
-## Still to merge
-1. **The land 13 maths (`turns`, `shapes-3d`) and the land 14 maths (`compare-measures`, `read-scales`).** These were still running in local worktrees under `.claude/worktrees/agent-*`, on branches named `worktree-agent-*`. Find them with `git branch --list "worktree-agent-*"`, and merge any that aren't merged yet. If they never finished, redo them from the M-13 and M-14 briefs in ROADMAP.md.
-2. **The stories.** The S-11 to S-14 agents push to the remote branches `s11-stories`, `s12-stories`, `s13-stories` and `s14-stories`. Merge each one into `claude/new-lands`. If a branch is missing, that land's stories still need writing (brief in ROADMAP.md).
-   - Story 13 also fixes the helter-skelter being clipped at the top of land 13's far view.
+The game speaks with the iPad's own voice until the recordings exist. The
+steps are under "W8: voice" in [docs/ROADMAP.md](docs/ROADMAP.md):
 
-## Then
-- Run `npm run typecheck`, `npm test` and `npx playwright test --workers=8 --fully-parallel`.
-- Look at screenshots of each new land: the map, a chapter at every tier, and each story.
-- Open a pull request from `claude/new-lands` to `main`.
+1. Choose an ElevenLabs voice for each character (`pick-voice.py`). The
+   three new hosts (`oldWoman`, `whirligig`, `redGoblin`) still have
+   stand-in voices in `scripts/voice/elevenlabs.json`.
+2. Record the risky lines first, then everything (`generate.py`).
+3. Check and review (`check.py`, `/review.html`).
 
-## Known issues
-- The `activities-c.spec.ts` test "real generated problems play: time, coins and shapes" already failed before this work began (at cfdc1ff). It isn't caused by the new lands. After a right answer on `?scene=skill`, the next problem never appears, so the play scene seems stuck waiting for the voice or the activity after a right answer. This needs looking into.
-- `finale.spec.ts` "land 3" failed once under heavy load. It may be flaky.
-- The three new characters (`oldWoman`, `whirligig`, `redGoblin`) have stand-in voices in `scripts/voice/elevenlabs.json`. A parent should choose real ones.
-- The `describe()` function in `src/activities/visual.ts` gives a generic label for the new visual types.
+If a story line changes later, run `npx tsx scripts/voice/export.ts` again.
+A changed line gets a new id and drops back to the iPad's voice until it is
+recorded.
+
+## Open questions for the parent
+
+These are in ROADMAP.md, "Open questions for the parent": the voices, the
+cloud save password (`wrangler login`), the name and icon, and how many
+new chapters a day.

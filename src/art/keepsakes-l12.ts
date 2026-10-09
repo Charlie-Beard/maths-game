@@ -126,7 +126,7 @@ const muddyPrint: Draw = () => [
   ...[[40, 150], [168, 52], [172, 142], [58, 40]].map(([x, y]) => piece(circle(x, y, 5), C.brownDark, { edge: 'clean', shadow: false, opacity: 0.6 })),
 ];
 
-/** Mr Oom Boom Boom's big drum, got back: a few sparkles round it. */
+/** Mr Oom Boom Boom’s big drum, as it was before the goblins took it: a few sparkles round it. */
 const bigDrum: Draw = () => [
   at(100, 150, 0.72, stageDrum(0, 0, 1)),
   ...[[26, 56, 1], [176, 50, 0.8], [166, 112, 0.6]].map(([x, y, s]) => piece(poly([[x, y - 12 * s], [x + 3 * s, y - 3 * s], [x + 12 * s, y], [x + 3 * s, y + 3 * s], [x, y + 12 * s], [x - 3 * s, y + 3 * s], [x - 12 * s, y], [x - 3 * s, y - 3 * s]]), L12.brassLight, cutFlat)),

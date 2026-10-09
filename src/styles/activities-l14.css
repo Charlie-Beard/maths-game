@@ -1,0 +1,89 @@
+/*
+ * Styles owned by workstream M-14 (docs/ROADMAP.md): the `measure` activity
+ * (tap the heavier sack, the fuller jug, the hotter thermometer). Nothing
+ * here moves or flashes by itself.
+ */
+
+.activity-measure .m-item {
+  position: absolute;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  z-index: 2;
+  -webkit-tap-highlight-color: transparent;
+}
+.m-frame {
+  position: absolute;
+  inset: 4px;
+  border: 5px dashed transparent;
+  border-radius: 26px;
+  pointer-events: none;
+}
+/* The frame is the glow, so the invisible button itself needs none. */
+.m-item.hint-glow,
+.m-item.hint-answer {
+  filter: none;
+}
+.m-item.hint-glow .m-frame {
+  border-color: rgba(216, 164, 63, 0.75);
+}
+.m-item.hint-answer .m-frame {
+  border-style: solid;
+  border-color: var(--gold-500, #d8a43f);
+  background: rgba(255, 231, 163, 0.4);
+  box-shadow: 0 0 22px var(--hint-glow);
+}
+.m-item.is-wrong .m-frame {
+  border-style: solid;
+  border-color: rgba(169, 65, 58, 0.8);
+}
+.m-item.is-right .m-frame {
+  border-style: solid;
+  border-color: rgba(111, 154, 90, 0.95);
+  background: rgba(111, 154, 90, 0.18);
+}
+.m-item.is-pressed .m-frame {
+  background: rgba(255, 231, 163, 0.3);
+}
+
+/* The wrong one, washed out for "show me". */
+.m-wash {
+  position: absolute;
+  border-radius: 26px;
+  background: rgba(241, 228, 196, 0.72);
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* The number he gave a thing (or the order Silky shows). */
+.m-badge {
+  position: absolute;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--parchment-100, #f7f2e6);
+  border: 5px solid var(--gold-500, #d8a43f);
+  box-shadow: 2px 5px 0 rgba(60, 38, 14, 0.3);
+  font-size: 44px;
+  font-weight: 700;
+  color: var(--ink-900, #2b2620);
+  pointer-events: none;
+  z-index: 3;
+}
+.m-badge.m-ghost {
+  opacity: 0.7;
+  border-style: dashed;
+}
+
+/* The question, written under the picture. */
+.m-caption {
+  display: grid;
+  place-items: center;
+  text-align: center;
+  font-size: 44px;
+  font-weight: 700;
+  line-height: 1.1;
+  color: var(--ink-900, #2b2620);
+  pointer-events: none;
+}

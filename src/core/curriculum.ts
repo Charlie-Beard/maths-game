@@ -198,8 +198,8 @@ export const LANDS: Land[] = [
     ['Broth for Breakfast', 'saucepan', ['change'], [1, 2], 'EH? BROTH? I’ve got the saucepans! Who’s got the pennies?', 'brothBowl'],
     ['The Bread Shop', 'beth', ['change', 'coins'], [1, 3], 'A loaf for every child! Let’s pay, and count the change.', 'loaf'],
     ['Bedtime in the Toe', 'fran', ['tally', 'share'], [3, 4], 'Time for bed! Who sleeps where? Let’s look at the chart.', 'nightlight'],
-    ['A Red Cap in the Laces', 'silky', ['change', 'tally'], [2, 3], 'Did you see that? A little red cap, hiding in the laces…', 'redCap'],
-    ['The Shoe Walks Away!', 'oldWoman', ['tally', 'change', 'add-2d1d', 'times-2'], [2, 3], 'Oh my! The land is moving on! Run along home, my dears!', 'shoeBuckle'],
+    ['A Red Cap in the Laces', 'silky', ['change', 'tally'], [2, 3], 'Buns for breakfast! Let’s count the change. Keep your eyes open…', 'redCap'],
+    ['The Shoe Walks Away!', 'oldWoman', ['tally', 'change', 'add-2d1d', 'times-2'], [2, 3], 'Oh my! The shoe wants to walk! Run along home, my dears!', 'shoeBuckle'],
   ]),
   land(12, 'The Land of Music', 'Music', '#2f8a84', 'Counting in 3s and time to 5 minutes', 'escape', [
     ['Oom-Pah-Pah!', 'oomboom', ['count-3s'], [1, 2], 'Oom boom boom! This is MY land! Music here goes in threes!', 'baton'],
@@ -208,8 +208,8 @@ export const LANDS: Land[] = [
     ['When Does the Band Play?', 'moonface', ['time-5'], [1, 2], 'The band plays at five past! Or was it ten past? Let’s look.', 'pocketWatch'],
     ['Five Minutes to Showtime', 'beth', ['time-5', 'time'], [1, 3], 'Hurry! The show starts soon. What time is it now?', 'showTicket'],
     ['The Big Drum is Gone!', 'oomboom', ['count-3s', 'time-5'], [2, 3], 'My big drum! Somebody has taken my big drum!', 'drumstick'],
-    ['Little Red Footprints', 'fran', ['time-5', 'count-3s'], [2, 4], 'Little red footprints, in threes! They went that way!', 'muddyPrint'],
-    ['The Grand Parade', 'oomboom', ['count-3s', 'time-5', 'times-5', 'add-2d2d'], [2, 3], 'The land is moving on! March, march, down the ladder!', 'bigDrum'],
+    ['Little Red Footprints', 'fran', ['time-5', 'count-3s'], [2, 4], 'Little red footprints, in threes! The goblins went that way!', 'muddyPrint'],
+    ['The Grand Parade', 'oomboom', ['count-3s', 'time-5', 'times-5', 'add-2d2d'], [2, 3], 'The goblins are marching off with my drum! And the land is moving on!', 'bigDrum'],
   ]),
   land(13, 'The Land of Roundabouts', 'Roundabouts', '#e07b39', 'Turns, directions and 3D shapes', 'escape', [
     ['Round and Round', 'whirligig', ['turns'], [1, 2], 'Roll up, roll up! Everything here goes round and round!', 'carouselHorse'],
@@ -222,13 +222,13 @@ export const LANDS: Land[] = [
     ['The Roundabout Spins Away', 'whirligig', ['turns', 'shapes-3d', 'count-3s', 'change'], [2, 3], 'The land is spinning away! Hold on, and down the ladder!', 'roundaboutTicket'],
   ]),
   land(14, 'The Land of the Red Goblins', 'Red Goblins', '#a32a2a', 'Heavier, fuller, hotter: reading scales', 'escape', [
-    ['Down the Goblin Hole', 'moonface', ['compare-measures'], [1, 2], 'The goblins took him down here. Quiet now, {name}. Which sack is heavier?', 'goldSack'],
+    ['Down the Goblin Hole', 'moonface', ['compare-measures'], [1, 2], 'The goblins took the Saucepan Man down here. Quiet now, {name}. Which sack is heavier?', 'goldSack'],
     ['Sacks of Gold', 'pixie', ['compare-measures', 'read-scales'], [1, 2], 'Goblin gold! Heavy, heavy! Let’s weigh it.', 'goblinGold'],
     ['The Goblin Kitchen', 'washalot', ['read-scales'], [1, 2], 'Jugs and jugs of goblin soup! How many litres?', 'goblinJug'],
     ['Hot Caves, Cold Caves', 'joe', ['read-scales', 'compare-measures'], [2, 3], 'This cave is hot! That one is cold! Look at the thermometer.', 'thermometer'],
     ['The Goblins’ Scales', 'beth', ['read-scales'], [3, 4], 'The goblins weigh everything! Can you read their scales?', 'goblinScales'],
     ['Clank! Clank!', 'silky', ['read-scales', 'missing-100'], [2, 3], 'Listen! Clank, clank! That’s the Saucepan Man!', 'glowWorm'],
-    ['The Saucepan Man is Free!', 'saucepan', ['compare-measures', 'read-scales', 'add-2d2d', 'time-5'], [2, 4], 'EH? FREE? I’M FREE! Thank you, {name}! Now, let’s get out of here!', 'saucepanLid'],
+    ['The Saucepan Man is Free!', 'saucepan', ['compare-measures', 'read-scales', 'add-2d2d', 'time-5'], [2, 4], 'EH? A KEY? Quick, {name}! Let me out before the goblins wake up!', 'saucepanLid'],
     ['Run from the Red Goblins!', 'redGoblin', ['compare-measures', 'read-scales', 'tally', 'turns', 'count-3s'], [2, 3], 'Come BACK here! Nobody leaves the goblin caves!', 'goblinHat'],
   ]),
 ];

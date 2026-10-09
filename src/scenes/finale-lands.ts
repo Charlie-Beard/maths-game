@@ -224,6 +224,8 @@ export const FINALES: Record<number, FinaleLand> = {
   // The second adventure. Each land's story workstream owns its own entry
   // below (and may change anything in it); the lines here are first drafts.
 
+  // The Old Woman follows them down the ladder, kindly, calling them back
+  // for supper (she never catches them). The story l11c8 picks up from there.
   11: {
     n: 11,
     mode: 'escape',
@@ -234,9 +236,9 @@ export const FINALES: Record<number, FinaleLand> = {
     hazard: 'chase',
     chaser: 'oldWoman',
     lines: {
-      start: 'The shoe is walking away! Down the ladder, {name}!',
-      beats: ['Come back for supper, dears!', 'Hold on tight!', 'One more rung!', 'Mind the laces!', 'Nearly down!'],
-      end: 'Jump! Safe on the tree. Goodbye, Old Woman! Goodbye, children!',
+      start: 'The shoe is waking up, and the land is moving on! Down the ladder, {name}!',
+      beats: ['Come back for supper, my dears!', 'Hold on tight!', 'Wait for me, dears!', 'One more rung!', 'Nearly down!'],
+      end: 'Jump! Safe on the tree. But what is she calling?',
     },
   },
 
@@ -250,9 +252,9 @@ export const FINALES: Record<number, FinaleLand> = {
     hazard: 'march',
     chaser: 'redGoblin',
     lines: {
-      start: 'The goblins are marching off with the big drum! The land is going! Down, {name}!',
-      beats: ['Boom! Boom! Boom!', 'Oom-pah-pah!', 'One more rung!', 'Hold on tight!', 'Nearly down!'],
-      end: 'Jump! We’re safe. But the goblins still have my drum…',
+      start: 'The goblins are marching off with my big drum! And the land is moving on! Down, {name}!',
+      beats: ['Boom! Boom! That’s my drum!', 'Left, right! Here they come!', 'One more rung!', 'Come back with my drum!', 'Nearly down!'],
+      end: 'Phew! We’re safe on the ladder. But look! The goblins still have my drum…',
     },
   },
 
@@ -264,10 +266,12 @@ export const FINALES: Record<number, FinaleLand> = {
     sky: ['#f6dcc4', '#eeb48a', C.duskSky],
     clouds: C.cloud,
     hazard: 'spin',
+    // The Saucepan Man isn't on the ladder: the story after (l13c8) finds
+    // out why. The goblins have him.
     lines: {
       start: 'The land is spinning away! Down the ladder, {name}!',
-      beats: ['Round and round!', 'Hold on tight!', 'One more rung!', 'Don’t get dizzy!', 'Nearly down!'],
-      end: 'Jump! Safe. But where is the Saucepan Man?',
+      beats: ['Round and round it goes!', 'Hold on tight!', 'One more rung!', 'Is the Saucepan Man behind us?', 'Don’t get dizzy!', 'Nearly down!'],
+      end: 'Jump! We made it. Goodbye, Land of Roundabouts!',
     },
   },
 
@@ -275,15 +279,15 @@ export const FINALES: Record<number, FinaleLand> = {
     n: 14,
     mode: 'escape',
     folk: ['moonface', 'saucepan'],
-    mood: 'sneaky',
-    sky: ['#4a2a2a', '#7a3a32', C.duskSky],
+    mood: 'adventure',
+    sky: ['#3a2438', '#6a3a48', C.duskSky],
     clouds: '#d8c4bc',
     hazard: 'chase',
     chaser: 'redGoblin',
     lines: {
-      start: 'The goblins are coming! Up and out, {name}! Down the ladder home!',
-      beats: ['Come BACK here!', 'Clank! Clank! Faster!', 'One more rung!', 'They’re too slow!', 'Nearly down!'],
-      end: 'Jump! Home at last! Goodbye, Red Goblins, for ever!',
+      start: 'The goblins are awake! Out of here, {name}! Down the ladder home, drum and all!',
+      beats: ['Come BACK here!', 'Clank! Clank! Hold on to that drum!', 'One more rung!', 'Goblin legs are too short!', 'Nearly home!'],
+      end: 'Jump! Home at last, and the big drum too!',
     },
   },
 };

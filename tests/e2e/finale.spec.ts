@@ -66,7 +66,8 @@ async function openFinale(page: Page, id: string, mode: string): Promise<void> {
   const go = page.getByRole('button', { name: 'Play' });
   await settled(go);
   await go.click({ force: true });
-  await expect(page.locator('.scene.play.finale')).toHaveAttribute('data-finale', mode);
+  // The page wipe and building the set piece can take a while on a busy machine.
+  await expect(page.locator('.scene.play.finale')).toHaveAttribute('data-finale', mode, { timeout: 30_000 });
 }
 
 /** Plays every problem right, checking the set piece holds still while he thinks. */

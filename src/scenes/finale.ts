@@ -406,9 +406,11 @@ export class FinaleScene extends PlayScene {
   private async openEscape(): Promise<void> {
     fx.rumble(1.6);
     const calm = isCalm();
-    if (!calm) gsap.to(this.land, { rotation: 3, duration: 0.2, yoyo: true, repeat: 5, ease: stepped(0.2, 'sine.inOut') });
+    // Wait for the rocking too: it outlasts the clouds, and on a busy iPad it
+    // could still be going when the first problem is up (or undo the tilt).
+    const rock = calm ? null : gsap.to(this.land, { rotation: 3, duration: 0.2, yoyo: true, repeat: 5, ease: stepped(0.2, 'sine.inOut') });
     sfx.whoosh();
-    await Promise.all(this.clouds.map((c, k) => sm(c, 0.9, { x: this.cloudX(0, k), ease: 'power2.out' })));
+    await Promise.all([rock, ...this.clouds.map((c, k) => sm(c, 0.9, { x: this.cloudX(0, k), ease: 'power2.out' }))]);
     gsap.set(this.land, { rotation: this.landTilt(0) });
   }
 

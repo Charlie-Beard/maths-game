@@ -219,7 +219,9 @@ export class PlayScene extends Scene {
     this.jar.textContent = String(this.app.progress.toffees);
     void pop(this.jar, 1.2);
     void this.cheer();
-    await this.activity?.right();
+    // The celebration is a few short tweens, but a tween that is killed never
+    // resolves: whatever an activity does, the next problem must still come.
+    await Promise.race([this.activity?.right(), this.sleep(8000)]);
     if (!this.alive) return;
     await voice.speech(p.explain);
     // Leaving stops the voice, which ends these lines early: don't go on to the next one.
