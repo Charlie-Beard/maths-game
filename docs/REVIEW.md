@@ -222,9 +222,12 @@ These are design choices backed by the simulation, not bugs:
 - **Lazy-loading the grown-ups' corner, album and finales** would save only about 25 kB gzipped of `main.js`, so it wasn't done.
 - **Real iPad sound after coming back** can't be tested here. If iOS needs a tap first, the next tap brings it back (that was already there).
 
+**Found by the full run** (`src/scenes/finale.ts`)
+- **Balloons were still rising when the next question came up** (land 5's finale). Since Phase 3's brisker desk, a beat's balloons (2.7 s) and drips could outlast the gap, so something moved while he answered. This was already failing on `main`. Now anything still flying fades as the desk slides back.
+
 ### e2e speed
 
-`finale.spec.ts` is now five files (`finale-1` … `finale-5`, with helpers in `finale-helpers.ts`), so they run in parallel. It is the same 176 tests.
+`finale.spec.ts` is now five files (`finale-1` … `finale-5`, with helpers in `finale-helpers.ts`), so they run in parallel. It is the same 176 tests. The whole suite now takes **16 minutes** with 3 workers (it was 25).
 
 ## Still to do
 

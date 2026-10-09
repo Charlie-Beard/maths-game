@@ -186,9 +186,18 @@ export class FinaleScene extends PlayScene {
     this.bed = null;
     this.placeStrip();
     this.set.classList.add('still');
-    if (!this.deskDown) return;
+    // Balloons and drips fly on their own after a beat, and the brisk desk
+    // can come back before they're done: fade them as it slides in, so the
+    // set is still once the question is up.
+    const flying = [...this.set.querySelectorAll<HTMLElement>('.finale-particle, .finale-dust')];
+    gsap.killTweensOf(flying);
+    const gone = flying.map((p) => sm(p, 0.3, { opacity: 0 }).then(() => p.remove()));
+    if (!this.deskDown) {
+      await Promise.all(gone);
+      return;
+    }
     this.deskDown = false;
-    await sm(this.desk, 0.4, { y: 0, ease: 'power2.out' });
+    await Promise.all([sm(this.desk, 0.4, { y: 0, ease: 'power2.out' }), ...gone]);
   }
 
   /** One beat of drama after a right answer; the climax after the last. */
