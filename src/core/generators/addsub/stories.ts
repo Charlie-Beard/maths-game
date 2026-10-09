@@ -52,12 +52,15 @@ export function wordProblems(tier: number, r: Rand): Problem {
       b = r.int(1, Math.min(9, 20 - a));
       mid = a + b;
       d = r.int(1, Math.min(9, mid - 1));
+      // Not the same number back again (that story ends where it started).
+      if (d === b) d = d > 1 ? d - 1 : d + 1;
       c = mid - d;
     } else {
       a = r.int(4, 20);
       b = r.int(1, Math.min(9, a - 1));
       mid = a - b;
       d = r.int(1, Math.min(9, 20 - mid));
+      if (d === b && Math.min(9, 20 - mid) > 1) d = d > 1 ? d - 1 : d + 1;
       c = mid + d;
     }
     const [who, other] = twoFolk(r);

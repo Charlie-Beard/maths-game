@@ -186,4 +186,11 @@ describe('land 13 generators', () => {
       if (v.solids[0] === 'cylinder' || v.solids[0] === 'cone') expect(v.lying).toBe(true);
     }
   });
+
+  it('turns tier 4 explains turns the way the path is walked: turn, then step', () => {
+    for (const p of all('turns', 4).slice(0, 50)) {
+      expect(speechText(p.explain!)).toContain('turn, then one step');
+      expect(speechText(p.say)).toContain('turn, then step');
+    }
+  });
 });

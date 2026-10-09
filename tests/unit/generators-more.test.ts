@@ -99,7 +99,7 @@ describe('W1c generators', () => {
     it('offers wrong times that are real readings of a clock', () => {
       for (let tier = 1; tier <= 5; tier++) {
         for (const p of all('time', tier)) {
-          for (const c of p.choices!) expect(String(c)).toMatch(/^(\d+ o’clock|(\d+|quarter|half) (past|to) ([1-9]|1[0-2]))$/);
+          for (const c of p.choices!) expect(String(c)).toMatch(/^(\d+ o’clock|(5|10|20|25|quarter|half) (past|to) ([1-9]|1[0-2]))$/);
           expect(p.choices!.length).toBeGreaterThanOrEqual(3);
         }
       }
@@ -319,6 +319,15 @@ describe('W1c generators', () => {
         expect(['circle', 'square', 'triangle', 'rectangle']).toContain(v.shape);
         expect(v.turned ?? 0).toBe(0);
         expect(p.answer).toBe(v.shape);
+      }
+    });
+
+    it('shapes tier 2 never turns a shape so it looks upright again', () => {
+      for (const p of all('shapes-2d', 2)) {
+        const v = visual(p, 'shape');
+        const t = v.turned ?? 0;
+        if (v.shape === 'square') expect(t % 90).not.toBe(0);
+        if (v.shape === 'rectangle') expect(t % 180).not.toBe(0);
       }
     });
 
