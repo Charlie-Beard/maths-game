@@ -165,7 +165,7 @@ export function shape(p: Problem, ctx: ActivityContext): Activity {
   return {
     el,
     show() {
-      enter([...cards.values()], ctx.calm);
+      enter([...cards.values()]);
     },
     wrong(value: Answer) {
       const card = cards.get(String(value));
@@ -190,7 +190,7 @@ export function shape(p: Problem, ctx: ActivityContext): Activity {
         }
         if (mode === 'find') drawFindButtons(true);
         const wrong = wrongCards();
-        if (wrong.length > 1) removeCard(wrong[0][1], ctx.calm);
+        if (wrong.length > 1) removeCard(wrong[0][1]);
         return;
       }
       if (mode === 'sides') {

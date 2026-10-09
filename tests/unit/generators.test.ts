@@ -78,3 +78,31 @@ describe('generators', () => {
   // Workstream W1 (docs/ROADMAP.md) writes these. Remove from here as they land.
   for (const skill of unbuiltSkills()) it.todo(`generator for ${skill}`);
 });
+
+// Problems that teach little ("1 + 1", "how many more to fill a full tin?",
+// a story that ends where it started) may come up, but only now and then.
+describe('generators: no one dull problem crowds out the rest', () => {
+  const share = (skill: (typeof SKILL_IDS)[number], tier: number, dull: (p: Problem) => boolean) => {
+    let n = 0;
+    for (let i = 0; i < 2000; i++) if (dull(generate(skill, tier, makeRand(i + 1)))) n++;
+    return n / 2000;
+  };
+
+  it('add-5 and sub-10 spread their sums evenly', () => {
+    expect(share('add-5', 1, (p) => p.key === 'add-5:1+1')).toBeLessThan(0.15);
+    expect(share('sub-10', 1, (p) => p.answer === 1 && speechText(p.say).includes(' has 2 '))).toBeLessThan(0.15);
+  });
+
+  it('bonds-10 rarely starts from 0 or 10', () => {
+    for (let tier = 1; tier <= tierCount('bonds-10'); tier++) {
+      expect(share('bonds-10', tier, (p) => p.answer === 0 || p.answer === 10)).toBeLessThan(0.1);
+    }
+  });
+
+  it('two-step word problems rarely give back what came', () => {
+    expect(share('word-problems', 4, (p) => {
+      const n = speechText(p.say).match(/\d+/g)?.map(Number) ?? [];
+      return n.length >= 3 && n[1] === n[2];
+    })).toBeLessThan(0.02);
+  });
+});

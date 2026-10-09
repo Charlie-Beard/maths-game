@@ -227,7 +227,7 @@ export default defineStory({
     rise();
     void k.blink(hero);
     await k.all(k.to(shade, 1.6, { y: 0, ease: 'power1.out' }), k.camera({ zoom: 1.15, x: 700, y: 400 }, 1.6));
-    if (!k.calm) gsap.to(shade, { scaleY: 0.97, scaleX: 1.03, transformOrigin: '50% 100%', duration: 0.5, yoyo: true, repeat: -1, ease: 'sine.inOut' });
+    gsap.to(shade, { scaleY: 0.97, scaleX: 1.03, transformOrigin: '50% 100%', duration: 0.5, yoyo: true, repeat: -1, ease: 'sine.inOut' });
     spoon();
     await k.wait(900);
     // …and a furious voice from just out of sight.

@@ -340,7 +340,10 @@ export function coinNodes(value: number, cx: number, cy: number, d: number): Nod
   // A soft shine at the top left.
   nodes.push(raw(`<ellipse cx="${cx - r * 0.32}" cy="${cy - r * 0.38}" rx="${r * 0.28}" ry="${r * 0.13}" transform="rotate(-30 ${cx - r * 0.32} ${cy - r * 0.38})" fill="#fff" fill-opacity="0.32"/>`));
   const text = value >= 100 ? `£${value / 100}` : `${value}p`;
-  const size = r * (text.length >= 3 ? 0.62 : 0.78);
+  // As big as fits inside the beaded ring. Coins keep their real sizes, so
+  // a small coin's label can't reach the 64 px of an answer number: the
+  // amount he answers with is on the price tag or the answer cards.
+  const size = r * (text.length >= 3 ? 0.74 : 0.92);
   nodes.push(label(cx, cy + r * 0.03, text, size, value >= 100 ? SILVER.text : col.text));
   return nodes;
 }

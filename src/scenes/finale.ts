@@ -32,7 +32,7 @@ import { LAND_ART } from '../art/lands';
 import { C } from '../art/palette';
 import { tree, TREE_PLACES } from '../art/scenery';
 import { parchment } from '../art/ui';
-import { isCalm, sm, stepped } from '../ui/anim';
+import { sm, stepped } from '../ui/anim';
 import { h, place, wait } from '../ui/dom';
 import type { App } from '../ui/scene';
 import {
@@ -144,7 +144,7 @@ export class FinaleScene extends PlayScene {
 
     // The desk starts away: the set piece opens the show.
     this.deskDown = true;
-    gsap.set(this.desk, isCalm() ? { opacity: 0 } : { y: 880 });
+    gsap.set(this.desk, { y: 880 });
   }
 
   async enter(): Promise<void> {
@@ -175,6 +175,11 @@ export class FinaleScene extends PlayScene {
     super.destroy();
   }
 
+  // Kept brisk between problems: the beat after each answer says "well
+  // done" in its own way, so there's no extra praise, and the desk moves
+  // quickly. (Nothing on the set moves while a problem is up.)
+  protected praiseRights = false;
+
   /** Brings the desk back (and stills the set piece) before every problem. */
   protected async beforeProblem(): Promise<void> {
     this.bed?.stop();
@@ -183,8 +188,7 @@ export class FinaleScene extends PlayScene {
     this.set.classList.add('still');
     if (!this.deskDown) return;
     this.deskDown = false;
-    if (isCalm()) await sm(this.desk, 0.25, { opacity: 1 });
-    else await sm(this.desk, 0.55, { y: 0, ease: 'power2.out' });
+    await sm(this.desk, 0.4, { y: 0, ease: 'power2.out' });
   }
 
   /** One beat of drama after a right answer; the climax after the last. */
@@ -211,14 +215,12 @@ export class FinaleScene extends PlayScene {
     if (this.cfg.mode === 'climb') await this.beatClimb(s, line);
     else if (this.cfg.mode === 'escape') await this.beatEscape(s, line);
     else await this.beatSnap(prev, s, line);
-    await this.sleep(isCalm() ? 150 : 350);
   }
 
   private async deskAway(): Promise<void> {
     if (this.deskDown) return;
     this.deskDown = true;
-    if (isCalm()) await sm(this.desk, 0.25, { opacity: 0 });
-    else await sm(this.desk, 0.5, { y: 880, ease: 'power2.in' });
+    await sm(this.desk, 0.35, { y: 880, ease: 'power2.in' });
   }
 
   /**
@@ -226,7 +228,7 @@ export class FinaleScene extends PlayScene {
    * read the moment (the iPad's voice can finish early, or not speak at all).
    */
   private say(line: string, ms = 3000): Promise<void> {
-    const least = Math.min(ms, isCalm() ? 900 : 1500);
+    const least = Math.min(ms, 1500);
     return Promise.all([capped(voice.say(line), ms), wait(least)]).then(() => undefined);
   }
 
@@ -284,10 +286,6 @@ export class FinaleScene extends PlayScene {
   }
 
   private async hopTo(el: HTMLElement, to: Spot, hop = 40): Promise<void> {
-    if (isCalm()) {
-      await sm(el, 0.25, to);
-      return;
-    }
     const x0 = gsap.getProperty(el, 'x') as number;
     const y0 = gsap.getProperty(el, 'y') as number;
     const x1 = Number(to.x);
@@ -298,7 +296,7 @@ export class FinaleScene extends PlayScene {
 
   private async openClimb(): Promise<void> {
     fx.patter(4);
-    if (!isCalm()) await Promise.all(this.climbers.map((el, k) => this.hopTo(el, this.climbPos(0, k), 24)));
+    await Promise.all(this.climbers.map((el, k) => this.hopTo(el, this.climbPos(0, k), 24)));
     await this.sleep(300);
   }
 
@@ -405,10 +403,9 @@ export class FinaleScene extends PlayScene {
 
   private async openEscape(): Promise<void> {
     fx.rumble(1.6);
-    const calm = isCalm();
     // Wait for the rocking too: it outlasts the clouds, and on a busy iPad it
     // could still be going when the first problem is up (or undo the tilt).
-    const rock = calm ? null : gsap.to(this.land, { rotation: 3, duration: 0.2, yoyo: true, repeat: 5, ease: stepped(0.2, 'sine.inOut') });
+    const rock = gsap.to(this.land, { rotation: 3, duration: 0.2, yoyo: true, repeat: 5, ease: stepped(0.2, 'sine.inOut') });
     sfx.whoosh();
     await Promise.all([rock, ...this.clouds.map((c, k) => sm(c, 0.9, { x: this.cloudX(0, k), ease: 'power2.out' }))]);
     gsap.set(this.land, { rotation: this.landTilt(0) });
@@ -420,7 +417,6 @@ export class FinaleScene extends PlayScene {
   }
 
   private async beatEscape(s: number, line: string): Promise<void> {
-    const calm = isCalm();
     fx.creak();
     const talk = this.say(line, 2600);
     // Down a rung.
@@ -431,20 +427,17 @@ export class FinaleScene extends PlayScene {
     // The clouds swirl in a little closer.
     fx.wind(1.4);
     const swirl = Promise.all(this.clouds.map(async (c, k) => {
-      if (!calm) {
-        await sm(c, 0.5, { rotation: k ? -5 : 5, y: -20, ease: 'sine.inOut' });
-        await sm(c, 0.6, { x: this.cloudX(s, k), rotation: 0, y: 0, ease: 'sine.inOut' });
-      } else await sm(c, 0.25, { x: this.cloudX(s, k) });
+      await sm(c, 0.5, { rotation: k ? -5 : 5, y: -20, ease: 'sine.inOut' });
+      await sm(c, 0.6, { x: this.cloudX(s, k), rotation: 0, y: 0, ease: 'sine.inOut' });
     }));
     // The land moves on, and its hazard.
-    const spins = this.cfg.hazard === 'spin' && !calm;
+    const spins = this.cfg.hazard === 'spin';
     const drift = sm(this.land, 0.8, { x: s * 6, y: -s * 3, ...(spins ? {} : { rotation: this.landTilt(s) }), ease: 'power1.inOut' });
     await Promise.all([climb, swirl, drift, this.hazard(s), talk]);
   }
 
   /** The land's own menace, one beat's worth. */
   private async hazard(s: number): Promise<void> {
-    const calm = isCalm();
     const [c] = this.chaser;
     switch (this.cfg.hazard) {
       case 'chase': {
@@ -452,13 +445,12 @@ export class FinaleScene extends PlayScene {
         if (!c) return;
         fx.sneak();
         await sm(c, 0.6, { opacity: 1, y: this.rungY(Math.max(-3, s - 5.4)) - 90, ease: 'power1.inOut' });
-        if (!calm) await sm(c, 0.25, { rotation: 6, yoyo: true, repeat: 1 });
+        await sm(c, 0.25, { rotation: 6, yoyo: true, repeat: 1 });
         return;
       }
       case 'stomp': {
         if (!c) return;
         fx.stomp(2, 0.4);
-        if (calm) return;
         await sm(c, 0.3, { y: 20, ease: 'power2.in' });
         this.shake(8);
         await sm(c, 0.4, { y: 0, ease: 'power1.out' });
@@ -472,12 +464,11 @@ export class FinaleScene extends PlayScene {
       }
       case 'melt': {
         if (c) void sm(c, 0.6, { scaleY: 1 - (s / this.steps) * 0.45, scaleX: 1 + (s / this.steps) * 0.12 });
-        if (!calm) for (let k = 0; k < 4; k++) this.particle(dripArt(`drip${s}-${k}`), 340 + k * 150 + (s % 3) * 20, 150, 24, 36, { y: 340, opacity: 0, delay: k * 0.15 }, 1.1);
+        for (let k = 0; k < 4; k++) this.particle(dripArt(`drip${s}-${k}`), 340 + k * 150 + (s % 3) * 20, 150, 24, 36, { y: 340, opacity: 0, delay: k * 0.15 }, 1.1);
         fx.bubbles(3);
         return;
       }
       case 'balloons': {
-        if (calm) return;
         fx.pop();
         const cols = [C.balloon, C.giftBlue, C.ribbon, C.raspberry];
         for (let k = 0; k < 3; k++) this.particle(balloonArt(`bal${s}-${k}`, cols[(s + k) % cols.length]), 180 + ((s * 290 + k * 330) % 820), 840, 60, 130, { y: -1000, x: k % 2 ? 40 : -40, delay: k * 0.25 }, 2.2);
@@ -486,10 +477,8 @@ export class FinaleScene extends PlayScene {
       case 'spin':
         // Round it goes, a whole turn, and settles at its new tilt.
         fx.whizz();
-        if (!calm) {
-          await sm(this.land, 0.9, { rotation: this.landTilt(s) + (s % 2 ? 360 : -360), ease: 'power1.inOut' });
-          gsap.set(this.land, { rotation: this.landTilt(s) });
-        }
+        await sm(this.land, 0.9, { rotation: this.landTilt(s) + (s % 2 ? 360 : -360), ease: 'power1.inOut' });
+        gsap.set(this.land, { rotation: this.landTilt(s) });
         return;
       default:
         return;
@@ -497,7 +486,6 @@ export class FinaleScene extends PlayScene {
   }
 
   private async endEscape(): Promise<void> {
-    const calm = isCalm();
     fx.creak();
     await Promise.all(this.climbers.map((el, k) => sm(el, 0.4, this.rungPos(this.steps - 1, k))));
     await this.say('Jump!', 1200);
@@ -506,12 +494,9 @@ export class FinaleScene extends PlayScene {
       const el = this.climbers[k];
       const to = { x: BRANCH[0] - LADDER.x + 10 - k * 70, y: BRANCH[1] - 70 - k * 4 };
       fx.boing();
-      if (calm) await sm(el, 0.25, to);
-      else {
-        const y0 = gsap.getProperty(el, 'y') as number;
-        await sm(el, 0.3, { x: to.x / 2, y: Math.min(y0, to.y) - 90, rotation: -10, ease: 'power1.out' });
-        await sm(el, 0.3, { ...to, rotation: 0, ease: 'power1.in' });
-      }
+      const y0 = gsap.getProperty(el, 'y') as number;
+      await sm(el, 0.3, { x: to.x / 2, y: Math.min(y0, to.y) - 90, rotation: -10, ease: 'power1.out' });
+      await sm(el, 0.3, { ...to, rotation: 0, ease: 'power1.in' });
       fx.thud();
     }
     // The land drifts away, and the clouds close over where it was.
@@ -524,7 +509,7 @@ export class FinaleScene extends PlayScene {
       ...this.clouds.map((c, k) => sm(c, 1.6, { x: k ? -620 : 560, y: -560, ease: 'power1.inOut' })),
     ]);
     sfx.fanfare();
-    if (!calm) this.climbers.forEach((el) => gsap.to(el, { y: '-=30', duration: 0.25, yoyo: true, repeat: 3, ease: stepped(0.25, 'power1.out') }));
+    this.climbers.forEach((el) => gsap.to(el, { y: '-=30', duration: 0.25, yoyo: true, repeat: 3, ease: stepped(0.25, 'power1.out') }));
     await this.say(this.cfg.lines.end, 5000);
     await this.sleep(500);
   }
@@ -680,10 +665,8 @@ export class FinaleScene extends PlayScene {
             fx.creak();
             await sm(bars, 0.4, { y: -bh * 0.9, opacity: 0, ease: 'power2.inOut' });
             fx.boing();
-            if (!isCalm()) {
-              await sm(captive, 0.2, { y: -18, ease: 'power1.out' });
-              await sm(captive, 0.2, { y: 0, ease: 'power1.in' });
-            }
+            await sm(captive, 0.2, { y: -18, ease: 'power1.out' });
+            await sm(captive, 0.2, { y: 0, ease: 'power1.in' });
           },
         });
       }
@@ -691,15 +674,12 @@ export class FinaleScene extends PlayScene {
   }
 
   private async openSnap(): Promise<void> {
-    const calm = isCalm();
     fx.stomp(3, 0.4);
-    if (!calm) {
-      gsap.set(this.snap, { x: 300 });
-      await sm(this.snap, 1.2, { x: 0, ease: 'power2.inOut' });
-    }
+    gsap.set(this.snap, { x: 300 });
+    await sm(this.snap, 1.2, { x: 0, ease: 'power2.inOut' });
     this.setPose('shriek');
     sfx.ominous();
-    if (!calm) this.shake(6);
+    this.shake(6);
     await this.sleep(500);
     this.setPose('loom');
   }
@@ -715,7 +695,6 @@ export class FinaleScene extends PlayScene {
   }
 
   private async beatSnap(prev: number, s: number, line: string): Promise<void> {
-    const calm = isCalm();
     const { wave, start } = this.waveAt(prev);
     // Break the item for the answer just given.
     const item = this.items[prev - start];
@@ -728,7 +707,7 @@ export class FinaleScene extends PlayScene {
     if (pose === 'shriek') sfx.ominous();
     else if (pose === 'stomp') {
       fx.stomp(2, 0.35);
-      if (!calm) this.shake(7);
+      this.shake(7);
     } else if (pose === 'point') fx.knock(2);
     else fx.rumble(1);
     const talk = this.say(line, 2400);
@@ -736,7 +715,6 @@ export class FinaleScene extends PlayScene {
     // A new wave (land 10): wipe the board and chalk up the next.
     const next = this.waveAt(s);
     if (next.wave !== wave) {
-      await this.sleep(300);
       sfx.whoosh();
       await sm(this.board, 0.4, { opacity: 0, y: 20 });
       this.drawWave(next.wave);
@@ -747,7 +725,6 @@ export class FinaleScene extends PlayScene {
   }
 
   private async endSnap(prev: number): Promise<void> {
-    const calm = isCalm();
     const { start } = this.waveAt(prev);
     // Everything left on the board breaks (an extra problem may have held the last one back).
     for (const item of this.items.slice(prev - start)) await item.breakIt();
@@ -764,30 +741,29 @@ export class FinaleScene extends PlayScene {
       fx.creak();
       await sm(this.cupDoor, 0.35, { scaleX: 1, ease: 'power2.in' });
       fx.thud();
-      if (!calm) this.shake(6);
+      this.shake(6);
       await this.sleep(400);
       fx.knock(3);
     } else {
       // She storms off, vowing revenge.
       this.setPose('stomp');
       fx.stomp(4, 0.3);
-      await sm(this.snap, calm ? 0.25 : 1.2, { x: 520, ease: 'power2.in' });
+      await sm(this.snap, 1.2, { x: 520, ease: 'power2.in' });
       gsap.set(this.snap, { opacity: 0 });
     }
     sfx.fanfare();
-    if (!calm) this.climbers.forEach((el) => gsap.to(el, { y: '-=30', duration: 0.25, yoyo: true, repeat: 3, ease: stepped(0.25, 'power1.out') }));
+    this.climbers.forEach((el) => gsap.to(el, { y: '-=30', duration: 0.25, yoyo: true, repeat: 3, ease: stepped(0.25, 'power1.out') }));
     await this.say(this.cfg.lines.end, 5000);
     await this.sleep(500);
   }
 
   /** The hero and Folk hop for joy. */
   private hooray(): void {
-    if (isCalm()) return;
     this.climbers.forEach((el, k) => gsap.timeline({ delay: k * 0.08 }).to(el, { y: '-=26', duration: 0.18, ease: stepped(0.18, 'power1.out') }).to(el, { y: '+=26', duration: 0.18, ease: stepped(0.18, 'power1.in') }));
   }
 
   // -------------------------------------------------------------------------
-  // Little effects (none in calm mode)
+  // Little effects
   // -------------------------------------------------------------------------
 
   /** The set piece jolts (a stomp). */
@@ -799,7 +775,6 @@ export class FinaleScene extends PlayScene {
 
   /** A puff of chalk dust. */
   private dust(x: number, y: number): void {
-    if (isCalm()) return;
     for (let k = 0; k < 8; k++) {
       const p = place(h('div', { class: 'finale-dust' }), x - 5, y - 5, 10, 10);
       this.set.append(p);

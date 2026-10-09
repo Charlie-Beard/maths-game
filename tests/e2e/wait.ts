@@ -13,6 +13,8 @@ export async function settled(locator: Locator): Promise<void> {
     const moved = !a || !b ? Infinity : Math.hypot(a.x + a.width / 2 - (b.x + b.width / 2), a.y + a.height / 2 - (b.y + b.height / 2));
     expect(moved).toBeLessThan(2);
   }).toPass({ timeout: 15_000 });
+  // After a wrong answer the play scene ignores answers for a moment.
+  await expect(locator.page().locator('.scene.play[data-settling]')).toHaveCount(0, { timeout: 5_000 });
 }
 
 /*

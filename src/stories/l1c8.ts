@@ -198,7 +198,7 @@ export default defineStory({
     best: { who: 'moonface', text: 'Now for the best bit. Grab a cushion. It’s the slippery-slip!' },
     whee: { who: 'hero', text: 'Wheeeee! Round and round and round we go!' },
     bump: { who: 'narrator', text: 'Whoosh! Out of the roots they shot, and flump! Right onto the cushions.' },
-    lands: { who: 'moonface', text: 'Up in the cloud at the top of the tree, a new land comes, then goes.' },
+    lands: { who: 'moonface', text: 'A new land comes to the cloud at the top of the tree. Then it goes.' },
     danger: { who: 'moonface', text: 'But never stay when a land moves on. You might never get home!' },
     promise: { who: 'hero', text: 'We’ll always come back down in time. Promise!' },
     seal: { who: 'narrator', text: 'And {name} won the seal of the Enchanted Wood!' },

@@ -101,7 +101,7 @@ const NEW_CUP: Pt = [600, 452];
 
 export default defineStory({
   lines: {
-    intro: { who: 'narrator', text: 'At the topsy-turvy tea party, the tea poured up out of the cups and into the pot!' },
+    intro: { who: 'narrator', text: 'It was a topsy-turvy tea party. The tea poured up out of the cups, and into the pot!' },
     ask: { who: 'silky', text: 'Five cups of tea. Two pour back into the pot. How many are left?' },
     four: { who: 'hero', text: 'Three! And the Topsy-Turvy Man adds one more. Four!' },
     gift: { who: 'silky', text: 'A teapot for you, {name}! Oh… what’s that rumble?' },
@@ -124,7 +124,7 @@ export default defineStory({
     const cups = CUPS_X.map((x, i) => k.prop('teacup', { x, y: CUP_Y, w: CUP, z: 9 + i }));
     const hero = k.character('hero', { x: 10, y: 400, w: 250, z: 12 });
     k.set(hero, { opacity: 0 });
-    if (!k.calm) flutter(k, wings);
+    flutter(k, wings);
 
     // ---- Tea pours the wrong way: up out of two cups, into the pot.
     const pour = async () => {

@@ -21,10 +21,11 @@ import type { Chapter, Land } from '../core/curriculum';
 import { generate } from '../core/generators';
 import { personalise, PHRASES, PRAISE } from '../core/phrases';
 import type { Answer, Problem } from '../core/problem';
+import { saveResume } from '../save/resume';
 import { recordOutcome } from '../core/progress';
 import { makeRand, randomSeed, type Rand } from '../core/random';
 import { Round } from '../core/round';
-import { isCalm, pop, sm } from '../ui/anim';
+import { pop, sm } from '../ui/anim';
 import { sealButton } from '../ui/components';
 import { h, place } from '../ui/dom';
 import { Scene, type App } from '../ui/scene';
@@ -42,9 +43,17 @@ export interface PlayOptions {
    * with the toffees earned, and one big button carries on.
    */
   signOff?: boolean;
+  /** Carry on from this problem (a chapter he left and came back to). */
+  start?: number;
+  /** How many problems the chapter set out with, when carrying on. */
+  base?: number;
 }
 
 const portrait = (): boolean => document.body.classList.contains('is-portrait');
+/** After a wrong answer, how long other answers wait (see `settleUntil`). */
+const SETTLE_MS = 1000;
+/** Most times the idle hint re-reads one question. */
+const MAX_IDLE_HINTS = 2;
 
 export class PlayScene extends Scene {
   protected o: PlayOptions;
@@ -54,6 +63,8 @@ export class PlayScene extends Scene {
   protected desk: HTMLElement;
   private activity: Activity | null = null;
   private dots: HTMLElement[] = [];
+  /** How many problems the round started with (one dot each). */
+  private baseDots = 0;
   private dotsBox!: HTMLElement;
   private jar!: HTMLElement;
   private silky!: HTMLElement;
@@ -64,6 +75,16 @@ export class PlayScene extends Scene {
   private helping = false;
   /** The "back to the tree?" card is open. */
   private confirming = false;
+  /**
+   * Until when (ms) answers are let through again after a wrong one: a
+   * moment to see the wobble and hear the help, so quick taps on card after
+   * card don't race up the help to Silky showing the answer.
+   */
+  private settleUntil = 0;
+  /** The problem whose working Silky has just said, so it isn't said twice. */
+  private explained: Problem | null = null;
+  /** Times the idle hint has re-read this problem's question. */
+  private idleHints = 0;
   private backBtn!: HTMLElement;
   /** His toffees when the screen opened, so Practice can say how many it earned. */
   private toffeesAtStart: number;
@@ -72,7 +93,7 @@ export class PlayScene extends Scene {
     super(app, 'play');
     this.o = o;
     this.rand = o.rand ?? makeRand(randomSeed());
-    this.round = new Round(o.problems, (p) => generate(p.skill, Math.max(1, p.tier - 1), this.rand));
+    this.round = new Round(o.problems, (p) => generate(p.skill, Math.max(1, p.tier - 1), this.rand), o.start ?? 0);
     this.desk = h('div', { class: 'play-desk' });
     this.toffeesAtStart = app.progress.toffees;
   }
@@ -85,6 +106,7 @@ export class PlayScene extends Scene {
 
     this.dotsBox = place(h('div', { class: 'progress-dots' }), 200, 26, 780, 40);
     r.append(this.dotsBox);
+    this.baseDots = this.o.base ?? this.round.problems.length;
     this.drawDots();
 
     this.jar = place(h('div', { class: 'toffee-jar' }, String(this.app.progress.toffees)), 1040, 18, 120, 60);
@@ -121,6 +143,8 @@ export class PlayScene extends Scene {
    * the problem just answered.
    */
   protected async afterRight(_i: number, _last: boolean): Promise<void> {}
+  /** Whether a first-try right sometimes gets a word of praise (a finale's own beat is its praise). */
+  protected praiseRights = true;
 
   /** Just before a problem appears: finales bring the desk back here. */
   protected async beforeProblem(): Promise<void> {}
@@ -136,13 +160,23 @@ export class PlayScene extends Scene {
     super.destroy();
   }
 
+  /**
+   * One dot per problem the chapter set out with: always the same row, so
+   * the shape he expects (8, or a finale's 10) never changes. A problem
+   * that comes back at the end (Silky helped) is a small star just after
+   * the row, which doesn't move the dots.
+   */
   private drawDots(): void {
-    this.dotsBox.replaceChildren();
+    const row = h('div', { class: 'pdot-row' });
+    const bonus = h('div', { class: 'pdot-bonus' });
+    row.append(bonus);
     this.dots = this.round.problems.map((_, i) => {
-      const d = h('div', { class: `pdot${i < this.round.index ? ' done' : i === this.round.index ? ' now' : ''}` });
-      this.dotsBox.append(d);
+      const extra = i >= this.baseDots;
+      const d = h('div', { class: `pdot${extra ? ' bonus' : ''}${i < this.round.index ? ' done' : i === this.round.index ? ' now' : ''}` });
+      (extra ? bonus : row).insertBefore(d, extra ? null : bonus);
       return d;
     });
+    this.dotsBox.replaceChildren(row);
   }
 
   private async showProblem(): Promise<void> {
@@ -155,10 +189,15 @@ export class PlayScene extends Scene {
       answer: (v) => void this.onAnswer(v),
       say: (s) => void voice.speech(s),
       sfx: (name) => (name === 'place' ? sfx.place(0) : sfx[name]()),
-      calm: isCalm(),
     });
     this.desk.insertBefore(this.activity.el, this.silky);
     stackFractions(this.activity.el);
+    // Any touch on the activity (counting, filling a frame, adding a coin)
+    // means he's working: hold the idle hint, so Silky never re-reads the
+    // question in the middle of a slow count.
+    this.activity.el.addEventListener('pointerdown', () => {
+      if (this.idle) this.restartIdle();
+    });
     this.drawDots();
     const activity = this.activity;
     activity.lock(true);
@@ -167,6 +206,7 @@ export class PlayScene extends Scene {
     this.busy = false;
     if (!this.confirming) activity.lock(false);
     activity.show();
+    this.idleHints = 0;
     this.sayQuestion();
   }
 
@@ -185,6 +225,10 @@ export class PlayScene extends Scene {
       if (!this.alive || this.busy || this.confirming) return;
       // Portrait pauses the game: hold the hint and try again later.
       if (portrait()) return this.restartIdle();
+      // Twice is enough: if he has wandered off, the question doesn't
+      // repeat to an empty room every few seconds.
+      if (this.idleHints >= MAX_IDLE_HINTS) return;
+      this.idleHints += 1;
       sfx.rustle();
       this.sayQuestion();
     }, secs * 1000);
@@ -197,10 +241,14 @@ export class PlayScene extends Scene {
 
   private async onAnswer(value: Answer): Promise<void> {
     if (this.busy || this.confirming || this.round.done) return;
+    if (performance.now() < this.settleUntil) return;
     this.restartIdle();
     const p = this.round.current;
     const verdict = this.round.answer(value);
     if (verdict === 'wrong') {
+      this.settleUntil = performance.now() + SETTLE_MS;
+      this.root.dataset.settling = '';
+      this.later(SETTLE_MS, () => delete this.root.dataset.settling);
       sfx.wrong();
       this.activity?.wrong(value);
       this.stepHelp();
@@ -223,11 +271,20 @@ export class PlayScene extends Scene {
     // resolves: whatever an activity does, the next problem must still come.
     await Promise.race([this.activity?.right(), this.sleep(8000)]);
     if (!this.alive) return;
-    await voice.speech(p.explain);
-    // Leaving stops the voice, which ends these lines early: don't go on to the next one.
-    if (!this.alive) return;
-    if (outcome.wrong === 0 && this.rand.chance(0.35)) await voice.say(this.rand.pick(PRAISE));
-    if (!this.alive) return;
+    // The working and the praise can be cut short: a tap anywhere ends the
+    // line and moves on (the answer is already counted), so a child who has
+    // understood isn't kept waiting.
+    const skip = () => voice.stop();
+    this.root.addEventListener('pointerdown', skip);
+    try {
+      if (this.explained !== p) await voice.speech(p.explain);
+      // Leaving stops the voice, which ends these lines early: don't go on to the next one.
+      if (!this.alive) return;
+      if (this.praiseRights && outcome.wrong === 0 && this.rand.chance(0.35)) await voice.say(this.rand.pick(PRAISE));
+      if (!this.alive) return;
+    } finally {
+      this.root.removeEventListener('pointerdown', skip);
+    }
     await this.sleep(300);
     await this.afterRight(this.round.index, this.round.index + 1 >= this.round.total);
     if (!this.alive) return;
@@ -271,18 +328,17 @@ export class PlayScene extends Scene {
     this.helping = true;
     try {
       sfx.sparkle();
-      if (!isCalm()) {
-        await sm(this.silky, 0.6, { x: -440, y: -160, scale: 1.3, ease: 'power2.inOut' });
-      }
+      await sm(this.silky, 0.6, { x: -440, y: -160, scale: 1.3, ease: 'power2.inOut' });
       if (!this.alive) return;
       // Skip the working if something interrupted her opening line.
       if (await voice.say(PHRASES.silkyHere)) {
         if (!this.alive) return;
-        await voice.speech(this.round.current.explain);
+        const p = this.round.current;
+        if (await voice.speech(p.explain)) this.explained = p;
       }
     } finally {
       this.helping = false;
-      if (this.alive && !isCalm()) gsap.to(this.silky, { x: 0, y: 0, scale: 1, duration: 0.6, ease: 'power2.out' });
+      if (this.alive) gsap.to(this.silky, { x: 0, y: 0, scale: 1, duration: 0.6, ease: 'power2.out' });
     }
   }
 
@@ -301,7 +357,7 @@ export class PlayScene extends Scene {
     card.append(yes, keep);
     veil.append(card);
     this.root.append(veil);
-    if (!isCalm()) void sm(card, 0.25, { startAt: { scale: 0.92, opacity: 0 }, scale: 1, opacity: 1, ease: 'power2.out' });
+    void sm(card, 0.25, { startAt: { scale: 0.92, opacity: 0 }, scale: 1, opacity: 1, ease: 'power2.out' });
     const close = () => {
       veil.remove();
       this.confirming = false;
@@ -312,6 +368,14 @@ export class PlayScene extends Scene {
     this.tap(yes, () => {
       sfx.tap();
       voice.stop();
+      // Keep his place, so picking this chapter again carries on from here.
+      // (Not in a finale, whose set piece is built up step by step.)
+      const c = this.o.chapter;
+      if (c && c.kind !== 'finale') {
+        // Mid-celebration, the problem on screen is already done.
+        const index = this.round.index + (this.busy ? 1 : 0);
+        if (index > 0 && index < this.round.total) saveResume(this.app.profile.id, { chapter: c.id, problems: this.round.problems, index, base: this.baseDots });
+      }
       this.app.nav.map();
     });
     this.tap(keep, () => {
@@ -336,7 +400,7 @@ export class PlayScene extends Scene {
     card.append(on);
     veil.append(card);
     this.root.append(veil);
-    if (!isCalm()) void pop(card, 1.05);
+    void pop(card, 1.05);
     this.tap(on, () => {
       sfx.tap();
       voice.stop();
@@ -347,7 +411,6 @@ export class PlayScene extends Scene {
   }
 
   private async cheer(): Promise<void> {
-    if (isCalm()) return;
     await sm(this.hero, 0.2, { y: -40, ease: 'power2.out' });
     await sm(this.hero, 0.2, { y: 0, ease: 'power2.in' });
   }

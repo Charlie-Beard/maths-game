@@ -49,7 +49,7 @@ export const FIXTURES_L13: Problem[] = [
     skill: 'turns',
     tier: 4,
     activity: 'turn',
-    say: { text: 'Start at the arrow. Follow the picture cards, one at a time. Which flag do you land on?' },
+    say: { text: 'Start at the arrow. Follow the cards, one at a time. Left and right mean turn, then step. Which flag do you land on?' },
     answer: 'blue',
     choices: ['blue', 'gold', 'green', 'pink'],
     visual: {
@@ -69,7 +69,7 @@ export const FIXTURES_L13: Problem[] = [
         ],
       },
     },
-    explain: { text: 'Forwards is one step. Left and right are turns, not steps. You land on the blue flag!' },
+    explain: { text: 'Forwards is one step. Left and right mean turn, then one step. You land on the blue flag!' },
     key: 'fx-turn:path:blue',
   },
   // ---------------- solid ----------------

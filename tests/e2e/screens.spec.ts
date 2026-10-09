@@ -239,14 +239,12 @@ test('the corner shows every skill, by land or by strand, and changes settings',
   await expect(page.locator('.skill-table .p-group').first()).toHaveText('Number and place value');
 
   await page.locator('.p-tab[data-tab="settings"]').click();
-  await page.getByRole('switch', { name: 'Calm mode' }).click();
   await page.getByRole('combobox', { name: 'New chapters per day' }).selectOption('0');
   await page.getByRole('combobox', { name: 'Idle hint' }).selectOption('20');
   await page.getByRole('textbox', { name: 'Player’s name' }).fill('Sam');
   const s = await saved(page);
-  expect(s.settings).toMatchObject({ calm: true, newPerDay: 0, idleHintSeconds: 20 });
+  expect(s.settings).toMatchObject({ newPerDay: 0, idleHintSeconds: 20 });
   expect(s.name).toBe('Sam');
-  await expect(page.locator('html')).toHaveClass(/calm/);
 
   await page.getByRole('button', { name: 'Back to the game' }).click();
   await expect(page.locator('.map-stop')).toHaveCount(8);

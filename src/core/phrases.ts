@@ -38,14 +38,14 @@ export const PHRASES = {
   practiceDone: 'Lovely practising, {name}!',
   leaveAsk: 'Back to the tree?',
   turnSideways: 'Please turn the iPad sideways.',
-  comeBackTomorrow: 'That’s all the new adventures for today. You can play old ones, or practise with Silky!',
+  comeBackTomorrow: 'That’s all the new adventures for today. The story goes on tomorrow! You can play old ones, or practise with Silky.',
   allDone: 'Hooray! All done!',
 } as const;
 
 export type PhraseKey = keyof typeof PHRASES;
 
 /** Announced when a new land arrives at the top of the tree. */
-export const landLine = (title: string): string => `A new land has come to the top of the tree: ${title}!`;
+export const landLine = (title: string): string => `${title} has come to the top of the tree!`;
 
 /** The player's name. Lines may contain {name}. */
 export const DEFAULT_NAME = 'Jasper';

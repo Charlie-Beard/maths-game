@@ -51,17 +51,16 @@ function write(key: string, value: unknown): void {
   }
 }
 
-const reducedMotion = (): boolean => typeof matchMedia !== 'undefined' && matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 /** A blank save. Only Jasper's starts with his name in it. */
 export function freshProgress(id = JASPER): Progress {
-  return defaultProgress(reducedMotion(), id === JASPER ? undefined : '');
+  return defaultProgress(id === JASPER ? undefined : '');
 }
 
 /** Loads a saved copy of profile `id`, filling gaps from a blank one (so a demo without a name stays nameless). */
 function load(raw: unknown, id: string): Progress {
   if (!raw || typeof raw !== 'object') return freshProgress(id);
-  const p = restore(raw, reducedMotion());
+  const p = restore(raw);
   if (typeof (raw as { name?: unknown }).name !== 'string') p.name = freshProgress(id).name;
   return p;
 }

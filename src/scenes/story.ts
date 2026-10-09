@@ -29,8 +29,13 @@ export interface StoryOptions {
 /** Whether a story exists yet. */
 export const hasStory = (id: string): boolean => id in STORIES;
 
-/** Longest a story may run before it is ended anyway (a script bug must never trap him). */
-const maxSeconds = (id: string) => (id === 'opening' || id === 'ending' || id.endsWith('c8') ? 180 : 75);
+/**
+ * Longest a story may run before it is ended anyway (a script bug must never
+ * trap him). Well clear of the longest stories with the iPad's voice (the
+ * ending runs about 145 s, ordinary stories up to about 43 s), as recorded
+ * voices may speak more slowly.
+ */
+const maxSeconds = (id: string) => (id === 'opening' || id === 'ending' || id.endsWith('c8') ? 240 : 90);
 
 /** One torn curtain, 640 × 840, with gathered folds. */
 function curtain(color: string, side: 'l' | 'r'): string {

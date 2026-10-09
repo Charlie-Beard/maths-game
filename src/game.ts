@@ -12,6 +12,7 @@ import { ENDING_AFTER, findChapter, LANDS, type Chapter, type Land } from './cor
 import { finishChapter } from './core/progress';
 import { makeRand, randomSeed } from './core/random';
 import { buildPractice, buildRound, makeProblems } from './core/round';
+import { clearResume, takeResume } from './save/resume';
 import type { ActivityKind } from './core/problem';
 import type { SkillId } from './core/skills';
 import { fixturesFor } from './activities/fixtures';
@@ -104,13 +105,16 @@ export class Game implements Nav {
 
   private play(land: Land, chapter: Chapter): void {
     const rand = makeRand(seedParam());
-    const problems = buildRound(chapter, this.app.progress, rand, Date.now());
-    const o = { land, chapter, problems, rand, onDone: () => this.finish(land, chapter) };
+    // A chapter he left part way carries on where he was.
+    const resume = chapter.kind === 'finale' ? null : takeResume(this.app.profile.id, chapter.id);
+    const problems = resume?.problems ?? buildRound(chapter, this.app.progress, rand, Date.now());
+    const o = { land, chapter, problems, rand, start: resume?.index, base: resume?.base, onDone: () => this.finish(land, chapter) };
     // A land's chapter 8 plays inside its set piece (scenes/finale.ts).
     void this.app.go(chapter.kind === 'finale' ? new FinaleScene(this.app, o) : new PlayScene(this.app, o));
   }
 
   private finish(land: Land, chapter: Chapter): void {
+    clearResume(this.app.profile.id);
     const news = finishChapter(this.app.progress, chapter, Date.now());
     this.app.save();
     const reward = () => void this.app.go(new CompleteScene(this.app, { land, chapter, news, onNext: () => this.map() }));

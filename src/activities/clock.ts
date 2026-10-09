@@ -76,8 +76,10 @@ export function clock(p: Problem, ctx: ActivityContext): Activity {
   const cards = new Map<string, HTMLElement>();
   if (!setMode) {
     const choices = p.choices ?? [];
-    const w = choices.length > 3 ? 226 : 230;
-    const xs = choices.length > 3 ? rowX(choices.length, w, 6, 622) : rowX(choices.length, w, 24);
+    // Four cards fit between the child's portrait (x 150) and the finale's
+    // desk edge (x 1035), which is also clear of Silky.
+    const w = choices.length > 3 ? 212 : 230;
+    const xs = choices.length > 3 ? rowX(choices.length, w, 6, 595) : rowX(choices.length, w, 24);
     choices.forEach((c, i) => {
       const card = answerCard(String(c), c, xs[i], choices.length > 3 ? 585 : 600, w, choices.length > 3 ? 190 : 150);
       kit.tap(card, () => {
@@ -115,6 +117,12 @@ export function clock(p: Problem, ctx: ActivityContext): Activity {
     setClockHands(face, now.hour, now.minute, SIZE);
     face.dataset.time = `${now.hour}:${String(now.minute).padStart(2, '0')}`;
     for (const k of [`${hand}-`, `${hand}+`, `${hand}Icon`]) buttons[k]?.classList.remove('c-done');
+    // Silky's faint hands are showing: a "+" glows only while its hand
+    // still has a way to go.
+    if (ghost && target) {
+      buttons['hour+']?.classList.toggle('hint-answer', now.hour % 12 !== target.hour % 12);
+      buttons['minute+']?.classList.toggle('hint-answer', now.minute !== target.minute);
+    }
     ctx.sfx('tap');
   };
 
@@ -161,7 +169,7 @@ export function clock(p: Problem, ctx: ActivityContext): Activity {
   return {
     el,
     show() {
-      enter(setMode ? Object.values(buttons) : [...cards.values()], ctx.calm);
+      enter(setMode ? Object.values(buttons) : [...cards.values()]);
     },
     wrong(value: Answer) {
       const card = cards.get(String(value));
@@ -182,7 +190,7 @@ export function clock(p: Problem, ctx: ActivityContext): Activity {
         redraw();
         if (!setMode) {
           const wrong = [...cards.entries()].filter(([k, c]) => k !== String(p.answer) && c.isConnected && !c.hasAttribute('disabled'));
-          if (wrong.length > 1) removeCard(wrong[0][1], ctx.calm);
+          if (wrong.length > 1) removeCard(wrong[0][1]);
         } else if (target) {
           if (now.hour % 12 === target.hour % 12) markDone('hour');
           if (now.minute === target.minute) markDone('minute');

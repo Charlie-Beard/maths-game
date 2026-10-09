@@ -263,6 +263,32 @@
 .pdot.done {
   background: var(--gold-500);
 }
+.pdot-row {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+/* Extra problems sit after the row without moving it. */
+.pdot-bonus {
+  position: absolute;
+  left: calc(100% + 14px);
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  gap: 10px;
+}
+.pdot.bonus {
+  width: 22px;
+  height: 22px;
+  border-radius: 0;
+  box-shadow: none;
+  clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+}
+.pdot.bonus.now {
+  outline: none;
+  background: var(--gold-300);
+}
 .toffee-jar {
   position: absolute;
   display: grid;
@@ -301,6 +327,14 @@
   font-weight: 700;
   color: var(--ink-900);
   letter-spacing: 0.04em;
+}
+/* Help 1 with no picture: the written sum sits on a warm gold band (a pale
+   glow round dark ink doesn't show on cream paper). Still, never a flash. */
+.sum-text.hint-glow {
+  filter: none;
+  border-radius: 24px;
+  background: color-mix(in srgb, var(--gold-300) 55%, transparent);
+  box-shadow: 0 0 0 6px color-mix(in srgb, var(--gold-500) 45%, transparent);
 }
 .choice {
   position: absolute;
@@ -370,7 +404,7 @@
   font-size: 30px;
   font-weight: 700;
   color: var(--parchment-100);
-  text-shadow: 0 2px 0 rgba(0, 0, 0, 0.5);
+  text-shadow: 0 2px 0 rgba(0, 0, 0, 0.5), 0 0 10px rgba(40, 24, 8, 0.9);
 }
 .stamp-dust {
   position: absolute;

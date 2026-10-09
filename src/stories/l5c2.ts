@@ -131,7 +131,7 @@ export default defineStory({
     const silky = k.character('silky', { x: 10, y: 190, z: 22 });
     const wings = [...k.part(silky, 'wingL'), ...k.part(silky, 'wingR')];
     const flap = () => {
-      if (k.calm || !wings.length) return;
+      if (!wings.length) return;
       for (const w of wings) void k.to(w, 0.12, { scaleX: 0.7, ease: 'power1.inOut' }).then(() => k.to(w, 0.12, { scaleX: 1 }));
     };
 

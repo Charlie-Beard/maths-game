@@ -1,16 +1,8 @@
 /**
  * Animation helpers. All movement is smooth and eased (gentle in, gentle
- * out), while press feedback stays instant. In calm mode, movement is
- * shortened and simplified.
+ * out), while press feedback stays instant.
  */
 import { gsap } from 'gsap';
-
-let calm = false;
-export function setCalm(v: boolean): void {
-  calm = v;
-  document.documentElement.classList.toggle('calm', v);
-}
-export const isCalm = (): boolean => calm;
 
 /**
  * Movement used to be held in 12 fps steps; it is smooth now. Kept so the
@@ -22,15 +14,13 @@ export function stepped(_duration: number, ease: string | ((t: number) => number
 
 type Vars = gsap.TweenVars;
 
-/** A smooth eased tween (shorter in calm mode). */
+/** A smooth eased tween. */
 export function sm(target: gsap.TweenTarget, duration: number, vars: Vars & { ease?: string }): gsap.core.Tween {
-  const d = calm ? Math.min(duration, 0.25) : duration;
-  return gsap.to(target, { ...vars, duration: d, ease: vars.ease ?? 'power2.inOut' });
+  return gsap.to(target, { ...vars, duration, ease: vars.ease ?? 'power2.inOut' });
 }
 
 export function smFrom(target: gsap.TweenTarget, duration: number, vars: Vars & { ease?: string }): gsap.core.Tween {
-  const d = calm ? Math.min(duration, 0.25) : duration;
-  return gsap.from(target, { ...vars, duration: d, ease: vars.ease ?? 'power2.out' });
+  return gsap.from(target, { ...vars, duration, ease: vars.ease ?? 'power2.out' });
 }
 
 /**
@@ -39,10 +29,6 @@ export function smFrom(target: gsap.TweenTarget, duration: number, vars: Vars & 
  */
 export function wobble(el: Element): Promise<void> {
   return new Promise((resolve) => {
-    if (calm) {
-      gsap.fromTo(el, { x: -4 }, { x: 0, duration: 0.25, ease: 'sine.out', onComplete: resolve });
-      return;
-    }
     gsap
       .timeline({ onComplete: resolve })
       .to(el, { rotation: -7, x: -8, duration: 0.1, ease: 'sine.inOut' })
@@ -62,7 +48,6 @@ export function pop(el: Element, amount = 1.12): gsap.core.Timeline {
 
 /** A paper "breathing" idle loop (smooth), returns a stopper. */
 export function breathe(el: Element, amount = 0.03, period = 2.4): () => void {
-  if (calm) return () => {};
   const tw = gsap.to(el, {
     scale: 1 + amount,
     duration: period / 2,

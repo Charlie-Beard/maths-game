@@ -89,7 +89,7 @@ export function partWhole(p: Problem, ctx: ActivityContext): Activity {
     gsap.set(gap.value, { y: 0, opacity: 1 });
     gap.value.textContent = String(val);
     gap.el.classList.add('filled');
-    if (!ctx.calm) smFrom(gap.value, 0.2, { y: -30, opacity: 0 });
+    smFrom(gap.value, 0.2, { y: -30, opacity: 0 });
     ctx.answer(val);
   });
 
@@ -113,8 +113,8 @@ export function partWhole(p: Problem, ctx: ActivityContext): Activity {
   return {
     el: shell.el,
     show() {
-      enter([...(stalks ? [stalks] : []), whole.el, ...parts.map((b) => b.el)], ctx.calm);
-      cards.show(ctx.calm);
+      enter([...(stalks ? [stalks] : []), whole.el, ...parts.map((b) => b.el)]);
+      cards.show();
     },
     wrong(val: Answer) {
       cards.wrong(val);
@@ -124,8 +124,7 @@ export function partWhole(p: Problem, ctx: ActivityContext): Activity {
         gap.el.classList.remove('filled');
         gsap.set(gap.value, { y: 0, opacity: 1 });
       };
-      if (ctx.calm) clear();
-      else gsap.to(gap.value, { y: -24, opacity: 0, duration: 0.25, delay: 0.3, ease: 'power2.in', onComplete: clear });
+      gsap.to(gap.value, { y: -24, opacity: 0, duration: 0.25, delay: 0.3, ease: 'power2.in', onComplete: clear });
     },
     async right() {
       gap.el.classList.add('is-right');

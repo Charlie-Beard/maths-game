@@ -81,6 +81,21 @@ export function measure(p: Problem, ctx: ActivityContext): Activity {
     if (next !== undefined) byValue(next)?.classList.add('hint-answer');
   };
 
+  /** Takes back the picks from position `at` on (their badges too). */
+  const unpickFrom = (at: number) => {
+    picks.slice(at).forEach((j) => {
+      badges.get(j)?.remove();
+      badges.delete(j);
+    });
+    picks = picks.slice(0, at);
+  };
+
+  /** Keeps only the picks that are right so far, so help never points past a wrong one. */
+  const keepRightPicks = () => {
+    const bad = picks.findIndex((j, k) => j !== Number(truth[k]));
+    if (bad >= 0) unpickFrom(Math.max(bad, fixed));
+  };
+
   const showGhosts = () => {
     truth.forEach((idx, rank) => {
       const i = Number(idx);
@@ -97,18 +112,14 @@ export function measure(p: Problem, ctx: ActivityContext): Activity {
     const at = picks.indexOf(i);
     if (at >= 0) {
       if (at < fixed) return;
-      picks.slice(at).forEach((j) => {
-        badges.get(j)?.remove();
-        badges.delete(j);
-      });
-      picks = picks.slice(0, at);
+      unpickFrom(at);
       if (level >= 3) showGhosts();
       refreshHint();
       return;
     }
     picks.push(i);
     const b = badge(i, picks.length);
-    if (!ctx.calm) void pop(b, 1.2);
+    void pop(b, 1.2);
     if (level >= 3) refreshHint();
     if (picks.length === n) ctx.answer(picks.join(','));
   };
@@ -155,7 +166,7 @@ export function measure(p: Problem, ctx: ActivityContext): Activity {
         t?.classList.add('is-right');
         if (t) await pop(t, 1.06);
       }
-      await new Promise((r) => setTimeout(r, ctx.calm ? 100 : 500));
+      await new Promise((r) => setTimeout(r, 500));
     },
     help(lv) {
       level = lv;
@@ -165,7 +176,9 @@ export function measure(p: Problem, ctx: ActivityContext): Activity {
       }
       if (lv === 2) {
         if (ordering) {
-          if (!fixed && picks.length === 0) {
+          if (!fixed) {
+            // Start again from the first one, put in place for him.
+            unpickFrom(0);
             const first = Number(truth[0]);
             picks = [first];
             fixed = 1;
@@ -184,7 +197,10 @@ export function measure(p: Problem, ctx: ActivityContext): Activity {
         return;
       }
       targets.forEach((t) => t.classList.remove('hint-glow'));
-      if (ordering) showGhosts();
+      if (ordering) {
+        keepRightPicks();
+        showGhosts();
+      }
       refreshHint();
     },
     lock: k.lock,

@@ -27,8 +27,6 @@ export interface ActivityContext {
   say(s: Speech): void;
   /** Plays a small sound effect by name (see audio/sfx.ts). */
   sfx(name: 'tap' | 'lift' | 'place' | 'rustle' | 'sparkle'): void;
-  /** Calm mode is on: minimal movement. */
-  calm: boolean;
 }
 
 export interface Activity {

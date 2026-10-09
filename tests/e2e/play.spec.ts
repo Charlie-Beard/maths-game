@@ -81,3 +81,21 @@ test('a wrong answer brings help, and Silky shows the answer on the third', asyn
   }
   await expect(page.locator('.choice.hint-answer')).toHaveCount(1);
 });
+
+test('quick wrong taps don’t race up the help to the answer', async ({ page }) => {
+  await page.goto('/?scene=chapter&id=l1c6&seed=3');
+  const go = page.getByRole('button', { name: 'Play' });
+  await settled(go);
+  await go.click({ force: true });
+  const scene = page.locator('.scene.play');
+  await expect(scene).toBeVisible();
+  const answer = await scene.getAttribute('data-answer');
+  const wrongs = page.locator(`.choice:not([data-value="${answer}"])`);
+  await settled(wrongs.first());
+  // Card after card, a quarter of a second apart: only the first counts.
+  for (let k = 0; k < 3; k++) {
+    await wrongs.nth(k % (await wrongs.count())).click({ force: true });
+    await page.waitForTimeout(250);
+  }
+  await expect(page.locator('.choice.hint-answer')).toHaveCount(0);
+});

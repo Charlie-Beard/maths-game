@@ -24,6 +24,25 @@ describe('planRound', () => {
     expect(plan.filter((x) => x.role === 'review').map((x) => x.skill)).toEqual(['count-10']);
   });
 
+  it('brings back a skill from an earlier land he hasn’t mastered', () => {
+    const p = defaultProgress();
+    p.skills['count-10'] = { ...newSkillState(2), seen: 6, last: now - 9 * DAY };
+    const c = findChapter('l4c3')!.chapter;
+    const plan = planRound(c, p, makeRand(5), now);
+    expect(plan.filter((x) => x.role === 'review').map((x) => x.skill)).toEqual(['count-10']);
+    expect(plan.find((x) => x.role === 'review')!.tier).toBe(2);
+  });
+
+  it('puts a due review first, then unmastered skills, then other mastered ones', () => {
+    const p = defaultProgress();
+    p.skills['count-10'] = { ...newSkillState(3), mastered: true, box: 2, due: now + DAY, last: now - 20 * DAY };
+    p.skills['add-5'] = { ...newSkillState(1), seen: 4, last: now - DAY };
+    const c = findChapter('l4c3')!.chapter;
+    expect(planRound(c, p, makeRand(5), now).find((x) => x.role === 'review')!.skill).toBe('add-5');
+    p.skills['subitise'] = { ...newSkillState(2), mastered: true, box: 1, due: now - DAY, last: now - 2 * DAY };
+    expect(planRound(c, p, makeRand(5), now).find((x) => x.role === 'review')!.skill).toBe('subitise');
+  });
+
   it('keeps focus tiers inside the chapter’s range', () => {
     const p = defaultProgress();
     p.skills['add-10'] = { ...newSkillState(5) };
@@ -140,5 +159,14 @@ describe('Round', () => {
     round.answer(solved.answer);
     expect(round.total).toBe(9);
     expect(round.problems[8].key).not.toBe(solved.key);
+  });
+});
+
+describe('carrying on part way', () => {
+  it('starts a round at the problem he left on', () => {
+    const problems = buildRound(findChapter('l1c6')!.chapter, defaultProgress(), makeRand(4), now);
+    const round = new Round(problems, (p) => p, 3);
+    expect(round.index).toBe(3);
+    expect(round.current).toBe(round.problems[3]);
   });
 });

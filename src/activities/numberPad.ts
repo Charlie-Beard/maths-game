@@ -66,7 +66,7 @@ export function numberPad(p: Problem, ctx: ActivityContext): Activity {
       ctx.sfx('tap');
       typed = typeDigit(typed, d, max);
       show();
-      if (!ctx.calm) void pop(box, 1.06);
+      void pop(box, 1.06);
     });
   });
   const sideX = KX0 + 5 * (KEY + KGAP) + 10;
@@ -91,8 +91,7 @@ export function numberPad(p: Problem, ctx: ActivityContext): Activity {
     if (cards) return;
     keys.forEach((k) => (k.disabled = true));
     const goPad = () => pad.remove();
-    if (ctx.calm) goPad();
-    else gsap.to(pad, { opacity: 0, y: 40, duration: 0.25, ease: 'power2.in', onComplete: goPad });
+    gsap.to(pad, { opacity: 0, y: 40, duration: 0.25, ease: 'power2.in', onComplete: goPad });
     typed = '';
     show();
     // One wrong card is gone already.
@@ -104,13 +103,12 @@ export function numberPad(p: Problem, ctx: ActivityContext): Activity {
       show();
       ctx.answer(val);
     });
-    if (!ctx.calm) smFrom([...cards.cards.values()], 0.3, { y: 60, opacity: 0, delay: 0.2 });
+    smFrom([...cards.cards.values()], 0.3, { y: 60, opacity: 0, delay: 0.2 });
   };
 
   return {
     el: shell.el,
     show() {
-      if (ctx.calm) return;
       gsap.from(keys, { y: 50, opacity: 0, duration: 0.3, stagger: 0.025, ease: 'power2.out' });
     },
     wrong(val: Answer) {

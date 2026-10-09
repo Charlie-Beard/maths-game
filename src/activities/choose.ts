@@ -22,7 +22,8 @@ export function choose(p: Problem, ctx: ActivityContext): Activity {
 
   const picture = place(renderVisual(p.visual, 860, 360), 160, 110, 860, 360);
   el.append(picture);
-  if (p.text) el.append(place(h('div', { class: 'sum-text' }, p.text), 160, 470, 860, 90));
+  const sum = p.text ? place(h('div', { class: 'sum-text' }, p.text), 160, 470, 860, 90) : null;
+  if (sum) el.append(sum);
 
   // Count by tapping: each object gets the next number.
   let counted = 0;
@@ -47,13 +48,15 @@ export function choose(p: Problem, ctx: ActivityContext): Activity {
   // Word answers ("the same", "half past 3") need wider cards and smaller type.
   const longest = Math.max(...choices.map((c) => String(c).length));
   const cw = longest <= 3 ? 150 : Math.min(240, Math.floor((860 - (choices.length - 1) * 24) / choices.length));
+  // Wide word cards stay at most 160 tall, so they end by y 760 on the stage.
+  const ch = Math.min(cw, 160);
   const gap = longest <= 3 ? 40 : 24;
   const fontSize = longest <= 3 ? undefined : longest <= 5 ? 48 : longest <= 8 ? 36 : 28;
   const x0 = 590 - (choices.length * cw + (choices.length - 1) * gap) / 2;
   choices.forEach((c, i) => {
-    const card = h('button', { class: 'choice', 'aria-label': String(c), 'data-value': String(c), html: tileCard(cw, cw, hashString('choice' + i + String(c)), C.cream) });
+    const card = h('button', { class: 'choice', 'aria-label': String(c), 'data-value': String(c), html: tileCard(cw, ch, hashString('choice' + i + String(c)), C.cream) });
     card.append(h('span', { class: 'choice-text', style: fontSize ? `font-size:${fontSize}px;padding:0 10px;text-align:center;line-height:1.1` : undefined }, String(c)));
-    place(card, x0 + i * (cw + gap), 600, cw, cw);
+    place(card, x0 + i * (cw + gap), 600, cw, ch);
     cleanups.push(
       onTap(card, () => {
         if (locked) return;
@@ -70,7 +73,6 @@ export function choose(p: Problem, ctx: ActivityContext): Activity {
   return {
     el,
     show() {
-      if (ctx.calm) return;
       gsap.from([...cards.values()], { y: 60, opacity: 0, duration: 0.3, stagger: 0.06, ease: 'power2.out' });
     },
     wrong(value: Answer) {
@@ -84,7 +86,8 @@ export function choose(p: Problem, ctx: ActivityContext): Activity {
     },
     help(level) {
       if (level === 1) {
-        picture.classList.add('hint-glow');
+        // The picture glows, or the written sum when there's no picture.
+        (p.visual.type === 'none' && sum ? sum : picture).classList.add('hint-glow');
         return;
       }
       if (level === 2) {

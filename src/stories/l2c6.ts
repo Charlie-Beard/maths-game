@@ -148,7 +148,7 @@ export default defineStory({
       );
       k.fx.thud();
       // Hair dangles the other way now.
-      if (!k.calm) void k.to(hair, 0.4, { rotation: 10, yoyo: true, repeat: -1, ease: 'sine.inOut' });
+      void k.to(hair, 0.4, { rotation: 10, yoyo: true, repeat: -1, ease: 'sine.inOut' });
     };
     await k.all(k.say('intro'), flipUp());
 

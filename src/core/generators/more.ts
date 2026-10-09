@@ -166,7 +166,12 @@ export function shapes2d(tier: number, r: Rand): Problem {
   const shape: ShapeId =
     tier === 1 ? r.pick(BASIC_SHAPES) : tier === 2 ? r.pick(BASIC_SHAPES) : r.pick<ShapeId>(['pentagon', 'hexagon', 'pentagon', 'hexagon', 'triangle', 'rectangle']);
   // Topsy-turvy: tilted or upside down. A square on its point still counts!
-  const turned = tier === 1 ? 0 : shape === 'circle' ? 0 : r.pick(tier === 2 ? [30, 45, 90, 135, 180] : [0, 20, 90, 180]);
+  // At tier 2 it must look turned: a square turned 90 or 180, or a
+  // rectangle turned 180, looks just the same as upright.
+  const turned =
+    tier === 1 || shape === 'circle'
+      ? 0
+      : r.pick(tier === 2 ? [30, 45, 90, 135, 180].filter((t) => t % (shape === 'square' ? 90 : shape === 'rectangle' ? 180 : 360) !== 0) : [0, 20, 90, 180]);
   const options = tier === 3 ? SHAPE_MIXUPS[shape] : BASIC_SHAPES.filter((s) => s !== shape);
   const say =
     tier === 1
@@ -751,7 +756,8 @@ export function time(tier: number, r: Rand): Problem {
   const nx = nextHour(h);
   const pv = prevHour(h);
   // Likely mistakes as clock readings [hour, minute]: the hour one out,
-  // past and to mixed up, or the big hand read as the hour.
+  // past and to mixed up, or the hands swapped (the big hand read as the
+  // hour). Every choice is a real reading of a clock.
   const likely: [number, number][] =
     minute === 0
       ? [[h === 12 ? 6 : 12, 0], [nx, 0], [pv, 0], [h, 30]]
@@ -762,8 +768,8 @@ export function time(tier: number, r: Rand): Problem {
           : minute === 45
             ? [[nx, 15], [h, 15], [pv, 45], [h === 9 ? 3 : 9, 0]]
             : minute < 30
-              ? [[pv, 60 - minute], [h, minute / 5], [nx, minute]]
-              : [[nx, 60 - minute], [h, minute / 5], [pv, minute]];
+              ? [[pv, 60 - minute], [minute / 5, (h % 12) * 5], [nx, minute]]
+              : [[nx, 60 - minute], [minute / 5, (h % 12) * 5], [pv, minute]];
   const choices = pickChoices<Answer>(answer, likely.map(([lh, lm]) => timeWords(hour12(lh), lm)), r);
   const who = r.pick(['Moon-Face', 'Silky', 'the Saucepan Man', 'Dame Washalot']);
   const say =

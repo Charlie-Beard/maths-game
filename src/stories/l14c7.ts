@@ -65,8 +65,8 @@ export default defineStory({
     sleepy(k, gob, true);
     const zzz = k.add(snoreArt('l14c7-z'), { x: 900, y: 250, w: 80, z: 19 });
     k.float(zzz, 10, 2.4);
-    // Snoring: a slow breath in and out (none in calm mode).
-    const breath = k.calm ? null : gsap.to(gob, { scaleY: 1.03, transformOrigin: '50% 100%', duration: 1.6, yoyo: true, repeat: -1, ease: 'sine.inOut' });
+    // Snoring: a slow breath in and out.
+    const breath = gsap.to(gob, { scaleY: 1.03, transformOrigin: '50% 100%', duration: 1.6, yoyo: true, repeat: -1, ease: 'sine.inOut' });
 
     const hero = k.character('hero', { x: 20, y: 420, w: 220, z: 30 });
     const silky = k.character('silky', { x: 560, y: 400, w: 210, z: 30 });

@@ -23,7 +23,6 @@ import { CloudProfile, keepInSync, onSignedOut } from './cloud/profile';
 import { Game } from './game';
 import { LoginScene } from './scenes/login';
 import { Stage } from './stage';
-import { setCalm } from './ui/anim';
 import { Director } from './ui/director';
 import { h, place, wait } from './ui/dom';
 import { installGear } from './ui/gear';
@@ -88,12 +87,9 @@ void loadManifest();
 function applySettings(): void {
   if (!profile) return;
   const p = profile.progress;
-  setCalm(p.settings.calm);
   setPlayerName(p.name);
   if (audioOn) setVolumes({ master: p.settings.volume });
 }
-// Before sign-in there are no settings yet: follow the iPad's own motion setting.
-setCalm(matchMedia('(prefers-reduced-motion: reduce)').matches);
 
 async function start(): Promise<void> {
   const active = activeProfile();

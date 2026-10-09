@@ -26,8 +26,7 @@
  *      opening, and says goodnight. The End.
  *
  * No menace at all: the first story in the game where nobody is in danger.
- * Fireworks are slow fades and grow from nothing; in calm mode they simply
- * hang still in the sky. The invitation, fireworks, cushions and the end
+ * Fireworks are slow fades and grow from nothing. The invitation, fireworks, cushions and the end
  * card are drawn here.
  */
 import { AVATARS } from '../core/curriculum';
@@ -175,11 +174,6 @@ async function slide(k: Kit, rider: HTMLElement): Promise<void> {
 async function letOff(k: Kit, x: number, y: number, i: number): Promise<void> {
   const colors: [string, string][] = [[C.goldLight, C.raspberry], [C.mint, C.goldLight], [C.sherbet, C.lilac], [C.candle, C.sky]];
   const b = k.add(burst(i, colors[i % colors.length]), { x: x - 120, y: y - 120, w: 240, z: 36 });
-  if (k.calm) {
-    // Calm mode: no movement, just the blooms hanging quietly in the sky.
-    k.set(b, { opacity: 0.6 });
-    return;
-  }
   firework(i);
   const spark = k.add(svg({ w: 12, h: 12, name: 'ending-spark', boil: false }, [piece(circle(6, 6, 5), C.candle, { edge: 'cut', fibre: false, shadow: false })]), { x: x - 6, y: 560, w: 12, z: 36 });
   k.set(b, { opacity: 0, scale: 0.15 });
@@ -209,7 +203,7 @@ export default defineStory({
     wisha: { who: 'hero', text: 'Listen! The trees are whispering again. Wisha-wisha-wisha!' },
     invite: { who: 'mum', text: 'A card, on a balloon! “Come to a party at the top of the Faraway Tree.”' },
     dad: { who: 'dad', text: 'A party? Up a tree? Well, I never! Come on, then!' },
-    climb: { who: 'narrator', text: 'Up they all went: past Dame Washalot’s tub, past the Pixie’s window, and into the cloud.' },
+    climb: { who: 'narrator', text: 'Up they all went! Past Dame Washalot’s tub, past the Pixie’s window, and into the cloud.' },
     pixie: { who: 'pixie', text: 'Hello, hello! Peep in my window all you like today. Hee hee!' },
     waiting: { who: 'narrator', text: 'And there, in the Land of Birthdays, everyone they had ever met was waiting.' },
     giant: { who: 'giant', text: 'HAPPY PARTY, little ones! Oops. Was that too loud?' },
@@ -277,7 +271,7 @@ export default defineStory({
       top = k.character('moonface', { x: 556, y: 120, w: 80, z: 12 });
       k.set([tub, pixie, top], { opacity: 0 });
       climbers = family(k, [520, 580, 620, 660, 700], 650, 70, 30);
-      if (!k.calm) k.set(k.root, { x: 590 - 600 * 1.8, y: Math.max(820 - 820 * 1.8, 410 - 700 * 1.8), scale: 1.8, transformOrigin: '0 0' });
+      k.set(k.root, { x: 590 - 600 * 1.8, y: Math.max(820 - 820 * 1.8, 410 - 700 * 1.8), scale: 1.8, transformOrigin: '0 0' });
     });
     // Up the trunk, past the Folk at their windows, the camera climbing with them.
     const path: Pt[] = [[700, 640], [640, 560], [580, 470], [640, 380], [560, 300], [470, 250], [420, 150]];
@@ -430,7 +424,7 @@ export default defineStory({
     const shows = k.say('fireworks');
     for (const [i, [x, y]] of spots.entries()) {
       void letOff(k, x, y, i);
-      await k.wait(k.calm ? 300 : 1300);
+      await k.wait(1300);
     }
     await shows;
     void wave(k, mf5, 'armL', 2);

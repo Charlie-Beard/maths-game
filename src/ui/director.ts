@@ -6,7 +6,7 @@ import { gsap } from 'gsap';
 import { sfx } from '../audio/sfx';
 import { parchment } from '../art/ui';
 import { C } from '../art/palette';
-import { isCalm, stepped } from './anim';
+import { stepped } from './anim';
 import { h } from './dom';
 import type { Scene } from './scene';
 
@@ -66,7 +66,7 @@ export class Director {
       if (!prev || transition === 'none') {
         this.stage.insertBefore(next.root, this.sheet);
         prev?.destroy();
-      } else if (transition === 'fade' || isCalm()) {
+      } else if (transition === 'fade') {
         next.root.style.opacity = '0';
         this.stage.insertBefore(next.root, this.sheet);
         await gsap.to(next.root, { opacity: 1, duration: 0.35, ease: 'none' });

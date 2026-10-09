@@ -11,7 +11,9 @@ import { wobble } from './anim';
 import { h, onTap, place } from './dom';
 
 export function installGear(stage: HTMLElement, openCorner: () => void): void {
-  const gear = place(h('button', { class: 'gear-btn', 'aria-label': 'Grown-ups', html: waxSeal('cog', C.slate, 60, 'gear') }), 14, 12, 60, 60);
+  // A small 60 px seal (it's for grown-ups, so it stays out of the way), with
+  // a 72 px tap area round it like every other button.
+  const gear = place(h('button', { class: 'gear-btn', 'aria-label': 'Grown-ups', html: waxSeal('cog', C.slate, 60, 'gear') }), 8, 6, 72, 72);
   stage.append(gear);
   onTap(gear, () => {
     sfx.tap();

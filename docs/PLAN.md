@@ -28,7 +28,7 @@ an **iPad (11th gen) held in landscape**.
 | Villain | Voldemort (book 7) | **Dame Snap**, who comes back again and again, and the end of the game is in her prison |
 
 Everything else is kept: the fixed 1180 × 820 stage, landscape only, touch
-only, no failing, no timers, calm mode, the grown-ups' gear with a sum,
+only, no failing, no timers, the grown-ups' gear with a sum,
 profiles and the cloud save, the voice pipeline (ElevenLabs at the end),
 offline play, and GitHub Pages.
 
@@ -286,8 +286,11 @@ ceiling). Its 8 problems are:
   chapter's range (early chapters of a land have a low ceiling; later ones
   open it up),
 - **2 recent problems** from the land's earlier chapters,
-- **1 spaced review problem** from the most overdue mastered skill
-  (before he has any mastered skills, this is another focus problem).
+- **1 review problem**: a mastered skill that is due for review, or else
+  a skill from an earlier land that he has played but not mastered (the
+  one practised longest ago), or else the mastered skill practised longest
+  ago. So a skill he found hard comes back after its land has gone. (If
+  there's nothing to review yet, this is another focus problem.)
 
 Problems are mixed so two of the same skill never come one after another,
 except in the first chapter of a land, where the new idea is introduced
@@ -360,7 +363,7 @@ with a paper wipe. Every story is a script in its own file.
 - **Complete:** the keepsake (and card or seal), then back to the map.
 - **Grown-ups' corner** (gear + sum, as in Wizard Words): profiles, cloud
   status, progress by skill (tier and score), levels (unlock, lock), new
-  chapters per day, volume, calm mode, idle hint, the player's name, start
+  chapters per day, volume, idle hint, the player's name, start
   again.
 
 ## 10. Visual style
@@ -424,8 +427,8 @@ The rules from Wizard Words, unchanged:
 - No movement in the background while he's thinking.
 - One obvious next step (a single glowing stop on the map).
 - Big targets (72 pt or more) and soft sounds with a capped volume.
-- No flashing. Calm mode follows the iPad's Reduce Motion setting and has
-  its own switch.
+- No flashing, and nothing moves while he's answering. (An earlier calm
+  mode was removed: it isn't needed for him.)
 - Predictable rituals: every chapter is intro, 8 problems, story, keepsake.
   Every land is 7 chapters, then the finale.
 - The scary parts are **only in cutscenes and finales, never during

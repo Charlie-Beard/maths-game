@@ -130,7 +130,7 @@ export function cageLantern(name: string): string {
 
 /**
  * A ruler-shaped shadow slides slowly across the ground and the wall, then
- * is gone. Pure atmosphere: it never reaches anyone. Calm mode still shows it.
+ * is gone. Pure atmosphere: it never reaches anyone.
  */
 export async function shadowPasses(k: Kit, y: number, name: string, seconds = 2.6): Promise<void> {
   const sh = k.add(rulerShadow(name), { x: 1220, y, w: 560, z: 30, still: true });

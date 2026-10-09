@@ -63,7 +63,7 @@ export default defineStory({
     six: { who: 'moonface', text: 'Six o’clock! The land is moving on. Hold on tight!' },
     away: { who: 'narrator', text: 'And away went the Land of Music, playing one last, sad little tune.' },
     noboom: { who: 'oomboom', text: 'No drum, no boom. Oh dear, oh dear.' },
-    prize: { who: 'narrator', text: '{name} won the seal of the Land of Music, and a picture of the big drum.' },
+    prize: { who: 'narrator', text: '{name} won the seal of the Land of Music. And a picture of the big drum!' },
     promise: { who: 'hero', text: 'Don’t be sad, Mr Oom Boom Boom. We’ll find your drum. I promise.' },
     fair: { who: 'hero', text: 'Look! A new land, all lights and music. Is it a fair?' },
     bear: { who: 'saucepan', text: 'EH? A BEAR? Oh, a FAIR! The Land of Roundabouts! I love a fair!' },

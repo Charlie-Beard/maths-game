@@ -38,11 +38,19 @@ export function count10(tier: number, r: Rand): Problem {
   };
 }
 
+/** Every pair of whole numbers from 1 up whose total is at most `max`. */
+function pairsUpTo(max: number): [number, number][] {
+  const out: [number, number][] = [];
+  for (let a = 1; a < max; a++) for (let b = 1; a + b <= max; b++) out.push([a, b]);
+  return out;
+}
+
 /** add-5 and add-10 share one generator: totals up to `max`. */
 function addWithin(skill: 'add-5' | 'add-10', max: number, tier: number, r: Rand): Problem {
-  const total = r.int(2, max);
-  const a = r.int(1, total - 1);
-  const b = total - a;
+  // Every pair equally likely (picking the total first made 1 + 1 a
+  // quarter of all add-5 problems).
+  const [a, b] = r.pick(pairsUpTo(max));
+  const total = a + b;
   const prop = r.pick(COUNTING_PROPS);
   const who = r.pick(FOLK);
   const say = {
@@ -83,9 +91,8 @@ export function add10(tier: number, r: Rand): Problem {
 
 export function sub10(tier: number, r: Rand): Problem {
   const max = tier === 1 ? 5 : 10;
-  const a = r.int(2, max);
-  const b = r.int(1, a - 1);
-  const c = a - b;
+  const [b, c] = r.pick(pairsUpTo(max));
+  const a = b + c;
   const prop = r.pick(COUNTING_PROPS);
   const who = r.pick(FOLK);
   const say = { text: `${capital(who)} has {a} ${propWord(prop, a)}. {b} ${plural(b, 'rolls', 'roll')} away. How many are left?`, vals: { a, b } };
@@ -111,7 +118,9 @@ export function sub10(tier: number, r: Rand): Problem {
 }
 
 export function bonds10(tier: number, r: Rand): Problem {
-  const a = r.int(0, 10);
+  // 0 and 10 are bonds too, but now and then: "how many more to fill it?"
+  // with a full tin (answer 0) was nearly one problem in five.
+  const a = r.chance(0.06) ? r.pick([0, 10]) : r.int(1, 9);
   const b = 10 - a;
   const explain = { text: '{a} and {b} make 10!', vals: { a, b } };
   const choices = choicesFor(b, r, { min: 0, max: 10, likely: [a, b + 1, b - 1] });

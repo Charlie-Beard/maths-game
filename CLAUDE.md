@@ -32,8 +32,8 @@ Look at screenshots of anything visual you change, using Playwright at
   everything (drags are optional extras).
 - **No failing:** no lives, no timers, no buzzers, no "game over". Wrong
   answers wobble and help steps up (PLAN.md §5).
-- **No flashing**, and no background motion while he's answering. Calm
-  mode (`isCalm()`, `k.calm`) cuts motion to a minimum.
+- **No flashing**, and no background motion while he's answering. (There
+  is no calm mode: the parent decided it isn't needed.)
 - **Scary is fine, cruel isn't** (PLAN.md §2). Dame Snap looms, shrieks,
   stomps and snaps rulers, but she never hits, slaps or hurts anyone.
   Nobody is lost for good. Scary scenes appear only in stories and

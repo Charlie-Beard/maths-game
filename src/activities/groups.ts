@@ -74,7 +74,7 @@ export function groups(p: Problem, ctx: ActivityContext): Activity {
     const it = place(h('div', { class: 'b-obj', html: prop(v.prop) }), x, y, hd.size, hd.size);
     hd.items.push(it);
     hd.el.append(it);
-    if (animate && !ctx.calm) void smFrom(it, 0.25, { scale: 0.3, y: -30, ease: 'back.out(2)' });
+    if (animate) void smFrom(it, 0.25, { scale: 0.3, y: -30, ease: 'back.out(2)' });
   };
   const fill = (hd: Holder) => {
     if (asBundle) {
@@ -105,7 +105,7 @@ export function groups(p: Problem, ctx: ActivityContext): Activity {
     backSeal(k, 32, 196, () => {
       const hd = placedOrder.pop();
       const it = hd?.items.pop();
-      if (it) liftOff(it, ctx);
+      if (it) liftOff(it);
     });
   }
 
@@ -138,7 +138,7 @@ export function groups(p: Problem, ctx: ActivityContext): Activity {
     scoop.forEach((s) => s.remove());
     if (!pileItems.length) pile.classList.add('is-empty');
     fill(hd);
-    await flyIn(hd.el, fx - parseFloat(hd.el.style.left), 396 - parseFloat(hd.el.style.top), ctx, 0.4);
+    await flyIn(hd.el, fx - parseFloat(hd.el.style.left), 396 - parseFloat(hd.el.style.top), 0.4);
   };
   if (pile) {
     const p0 = pile;
@@ -163,7 +163,7 @@ export function groups(p: Problem, ctx: ActivityContext): Activity {
       finishing = true;
       while (made < holders.length) {
         void makeGroup(true);
-        await new Promise((r) => setTimeout(r, ctx.calm ? 20 : 150));
+        await new Promise((r) => setTimeout(r, 150));
       }
     }
   };
@@ -182,7 +182,7 @@ export function groups(p: Problem, ctx: ActivityContext): Activity {
   return {
     el,
     show() {
-      cardsIn(cards.values(), ctx);
+      cardsIn(cards.values());
     },
     wrong: (value: Answer) => wobbleValue(k, value),
     async right() {

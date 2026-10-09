@@ -48,7 +48,7 @@ function build(kind: 'tally' | 'change', p: Problem, ctx: ActivityContext): Acti
   return {
     el: kit.el,
     show() {
-      enter([...cards.values()], ctx.calm);
+      enter([...cards.values()]);
     },
     wrong(value: Answer) {
       void wobble(cards.get(String(value)) ?? picture);
@@ -72,7 +72,7 @@ function build(kind: 'tally' | 'change', p: Problem, ctx: ActivityContext): Acti
           kit.el.append(place(h('div', { class: 'sum-text c-sum', style: `color:${C.ink}` }, `${moneyText(v.coins[0])} − ${moneyText(v.target)} = ?`), 160, 476, 860, 90));
         }
         const wrong = wrongCards();
-        if (wrong.length > 1) removeCard(wrong[0][1], ctx.calm);
+        if (wrong.length > 1) removeCard(wrong[0][1]);
         return;
       }
       cards.get(String(p.answer))?.classList.add('hint-answer');

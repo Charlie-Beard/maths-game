@@ -159,11 +159,11 @@ function followPath(r: Rand): Problem {
     skill: 'turns',
     tier: 4,
     activity: 'turn',
-    say: { text: 'Start at the arrow. Follow the picture cards, one at a time. Which flag do you land on?' },
+    say: { text: 'Start at the arrow. Follow the cards, one at a time. Left and right mean turn, then step. Which flag do you land on?' },
     answer,
     choices: r.shuffle(flags.map((f) => f.id as Answer)),
     visual: { type: 'turn', facing: angleOf(facing), moves, grid: { cols: COLS, rows: ROWS, col: start.col, row: start.row, flags } },
-    explain: { text: `Forwards is one step. Left and right are turns, not steps. You land on the ${answer} flag!` },
+    explain: { text: `Forwards is one step. Left and right mean turn, then one step. You land on the ${answer} flag!` },
     key: `turns:path:${facing}:${start.col}${start.row}:${route}`,
   };
 }
