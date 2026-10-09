@@ -16,24 +16,31 @@ let online = true;
 
 interface Device {
   store: Map<string, string>;
+  /** Keys whose writes fail, as when storage is full ('*': every write, as in Safari's old private mode). */
+  full: Set<string>;
   api: Api;
   profiles: Profiles;
   /** Runs `fn` on this device (its storage is the one in use until it finishes). */
   on<T>(fn: () => T | Promise<T>): Promise<T>;
 }
 
-async function device(seed: Record<string, unknown> = {}): Promise<Device> {
+async function device(seed: Record<string, unknown> = {}, shared?: Device): Promise<Device> {
   vi.resetModules();
   const api = await import('../../src/cloud/api');
   const profiles = await import('../../src/cloud/profile');
-  const store = new Map(Object.entries(seed).map(([k, v]) => [k, JSON.stringify(v)]));
+  const store = shared?.store ?? new Map(Object.entries(seed).map(([k, v]) => [k, JSON.stringify(v)]));
+  const full = shared?.full ?? new Set<string>();
   const storage = {
     getItem: (k: string) => store.get(k) ?? null,
-    setItem: (k: string, v: string) => void store.set(k, String(v)),
+    setItem: (k: string, v: string) => {
+      if (full.has(k) || full.has('*')) throw new DOMException('Full', 'QuotaExceededError');
+      store.set(k, String(v));
+    },
     removeItem: (k: string) => void store.delete(k),
   };
   return {
     store,
+    full,
     api,
     profiles,
     async on(fn) {
@@ -42,6 +49,9 @@ async function device(seed: Record<string, unknown> = {}): Promise<Device> {
     },
   };
 }
+
+/** A second tab of the game on the same device: its own copy of the code, the same storage. */
+const tab = (d: Device): Promise<Device> => device({}, d);
 
 let clock = Date.parse('2026-10-06T09:00:00Z');
 
@@ -307,6 +317,115 @@ describe('cloud sync', () => {
     await ipad.on(() => ipad.profiles.CloudProfile.forget('grandma-jo'));
     expect(ipad.store.has('faraway-maths:v1:grandma-jo')).toBe(false);
     expect(env.DB.rows.has('grandma-jo')).toBe(false);
+  });
+
+  it('never thinks it is up to date with a copy it couldn’t write (storage full)', async () => {
+    const ipad = await device();
+    await ipad.on(() => ipad.api.signIn('owl'));
+    const p = await ipad.on(() => ipad.profiles.CloudProfile.for('jasper'));
+    await ipad.on(() => {
+      playChapter(p.progress, 0);
+      p.save();
+      return p.sync();
+    });
+    // The iPad's storage fills up: the big save no longer fits, small records still do.
+    ipad.full.add('faraway-maths:v1:jasper');
+    ipad.full.add('faraway-maths:base:jasper');
+    await ipad.on(() => {
+      playChapter(p.progress, 1);
+      p.save();
+      return p.sync();
+    });
+    // Nothing is lost while the app stays open, and the cloud has it.
+    expect(p.progress.chapters[ALL_CHAPTERS[1].id]?.done).toBe(true);
+    expect(JSON.parse(env.DB.rows.get('jasper')!.data).chapters[ALL_CHAPTERS[1].id]?.done).toBe(true);
+
+    // Room again, and the app is reopened: it must fetch chapter 2 back, not
+    // trust the older copy on the iPad and later save over the cloud with it.
+    ipad.full.clear();
+    vi.resetModules();
+    const profiles: Profiles = await import('../../src/cloud/profile');
+    const again = await ipad.on(() => profiles.CloudProfile.for('jasper'));
+    await ipad.on(() => again.sync());
+    expect(again.progress.chapters[ALL_CHAPTERS[1].id]?.done).toBe(true);
+    await ipad.on(() => {
+      playChapter(again.progress, 0);
+      again.save();
+      return again.sync();
+    });
+    expect(JSON.parse(env.DB.rows.get('jasper')!.data).chapters[ALL_CHAPTERS[1].id]?.done).toBe(true);
+  });
+
+  it('plays and saves to the cloud when nothing can be written on the device', async () => {
+    const ipad = await device({ 'faraway-maths:v1:jasper': { v: 1, cards: ['moonface'] } });
+    await ipad.on(() => ipad.api.signIn('owl'));
+    ipad.full.add('*');
+    const p = await ipad.on(() => ipad.profiles.CloudProfile.for('jasper'));
+    await ipad.on(() => {
+      playChapter(p.progress, 0);
+      p.save();
+      return p.sync();
+    });
+    expect(p.state).toBe('synced');
+    expect(JSON.parse(env.DB.rows.get('jasper')!.data)).toMatchObject({ cards: expect.arrayContaining(['moonface', ALL_CHAPTERS[0].host]) });
+  });
+
+  it('keeps play from two tabs on one device, even offline', async () => {
+    const ipad = await device();
+    await ipad.on(() => ipad.api.signIn('owl'));
+    const a = await ipad.on(() => ipad.profiles.CloudProfile.for('jasper'));
+    const second = await tab(ipad);
+    const b = await second.on(() => second.profiles.CloudProfile.for('jasper'));
+    online = false;
+    await ipad.on(() => {
+      playChapter(a.progress, 0);
+      a.save();
+    });
+    // The browser tells each tab when the other saves.
+    await second.on(() => b.fromOtherTab());
+    await second.on(() => {
+      playChapter(b.progress, 1);
+      b.save();
+    });
+    await ipad.on(() => a.fromOtherTab());
+    // Tab B is closed. Both chapters are on the device and in tab A.
+    const stored = JSON.parse(ipad.store.get('faraway-maths:v1:jasper')!);
+    for (const p of [stored, a.progress]) {
+      expect(p.chapters[ALL_CHAPTERS[0].id]?.done).toBe(true);
+      expect(p.chapters[ALL_CHAPTERS[1].id]?.done).toBe(true);
+    }
+    online = true;
+    await ipad.on(() => a.sync());
+    const cloud = JSON.parse(env.DB.rows.get('jasper')!.data);
+    expect(cloud.chapters[ALL_CHAPTERS[0].id]?.done && cloud.chapters[ALL_CHAPTERS[1].id]?.done).toBe(true);
+  });
+
+  it('lets Start again in one tab clear the other tab too', async () => {
+    const ipad = await device();
+    await ipad.on(() => ipad.api.signIn('owl'));
+    const a = await ipad.on(() => ipad.profiles.CloudProfile.for('jasper'));
+    const second = await tab(ipad);
+    const b = await second.on(() => second.profiles.CloudProfile.for('jasper'));
+    await ipad.on(() => {
+      playChapter(a.progress, 0);
+      a.save();
+    });
+    await second.on(() => b.fromOtherTab());
+    expect(b.progress.chapters[ALL_CHAPTERS[0].id]?.done).toBe(true);
+    await ipad.on(() => a.reset());
+    await second.on(() => b.fromOtherTab());
+    expect(b.progress).toMatchObject({ chapters: {}, cards: [], toffees: 0 });
+    expect(JSON.parse(ipad.store.get('faraway-maths:v1:jasper')!)).toMatchObject({ chapters: {}, toffees: 0 });
+  });
+
+  it('forgets a chapter left part way when the game starts again or the profile is deleted', async () => {
+    const ipad = await device({ 'faraway-maths:resume:jasper': { chapter: 'l1c1' }, 'faraway-maths:resume:gran': { chapter: 'l1c1' } });
+    await ipad.on(() => ipad.api.signIn('owl'));
+    const p = await ipad.on(() => ipad.profiles.CloudProfile.for('jasper'));
+    await ipad.on(() => p.reset());
+    expect(ipad.store.has('faraway-maths:resume:jasper')).toBe(false);
+    await ipad.on(() => ipad.profiles.CloudProfile.forget('gran'));
+    expect(ipad.store.has('faraway-maths:resume:gran')).toBe(false);
   });
 
   it('remembers which profile this device plays as', async () => {
