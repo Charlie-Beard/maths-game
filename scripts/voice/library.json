@@ -1,0 +1,97 @@
+{
+  "_comment": "Who owns each chosen Voice Library voice, so add-voices.py can add them all to the account (it needs voices_write). pick-voice.py keeps this up to date.",
+  "speakers": {
+    "narrator": {
+      "voice_id": "jv41DhCf464zw0TI7I1w",
+      "owner": "c93052724e2cf4ab0ebd353cc7b03213d6f29474822369d076613bac8c0fe775"
+    },
+    "moonface": {
+      "voice_id": "58SnLsdWOv994RNKXLhV",
+      "owner": "906607a32fe2ca6a408e996efaa58319ba8625ec72b932c5fc74005adb5d0de8"
+    },
+    "silky": {
+      "voice_id": "XXphLKNRxvJ1Qa95KBhX",
+      "owner": "cb8f12185b25573a68a3439afa2019305119eb88d1afc3c61493a44dc3c7d609"
+    },
+    "saucepan": {
+      "voice_id": "yZ3w1DL4ZAxIdOscv2t8",
+      "owner": "300b35287e8acc21dd12bd610b831e19b47dc75e8b8c15c2bca80cdcb776ef2d"
+    },
+    "dameSnap": {
+      "voice_id": "fgDJOgmENIR82PueQrVs",
+      "owner": "e21da34db31d58704b7b2776dcf7db1c31b464e5bffd71727d5f1c4abafafa87"
+    },
+    "beth": {
+      "voice_id": "rCmVtv8cYU60uhlsOo1M",
+      "owner": "76c9cb1aa5bde66e61587de2b16dd92ca167852393360a9c1f7e567f229a31b4"
+    },
+    "joe": {
+      "voice_id": "kmSVBPu7loj4ayNinwWM",
+      "owner": "89befade7c13aab22ca8c36dfb1892f659fd750058462eeed6b05ab238204d74"
+    },
+    "fran": {
+      "voice_id": "HIQo7B1lN83MPTdsvvSM",
+      "owner": "4e149d42e3555b0c668cfa0b3a6ece638907ac775c5a4dcc44a3f7cfaa686f62"
+    },
+    "mum": {
+      "voice_id": "ymZ2m14IsFBURjROEE2J",
+      "owner": "058ff1d1f23abe55a66b633b19fb130577b65a88761759e91c2efd5a97a2ffe4"
+    },
+    "dad": {
+      "voice_id": "37i69iUK8H0KcGuz48hE",
+      "owner": "8e17985bb16219037ec82ae6e816a3b1b999b5cd1fd5451ebbbef5ef58116a15"
+    },
+    "washalot": {
+      "voice_id": "aAsWcN5jdLdiYG7Hq0YL",
+      "owner": "3f2ca29fd2019c4a0516b646c73c6f21140f676ac6d45236a2b5ef291bf8d8e1"
+    },
+    "watzisname": {
+      "voice_id": "BBfN7Spa3cqLPH1xAS22",
+      "owner": "696809093ba242d93e9beadc478b43ed0fe788b4839250870434d35decf13a53"
+    },
+    "pixie": {
+      "voice_id": "ouL9IsyrSnUkCmfnD02u",
+      "owner": "9d48e632126e47fa24331617611c4fab3fbb61beadec42067817c28ade5f332f"
+    },
+    "oomboom": {
+      "voice_id": "fjnwTZkKtQOJaYzGLa6n",
+      "owner": "b447c213554f8b4a4b3791e0c36ffd9677e7ead6d1a04fe90a7556ac70007892"
+    },
+    "topsy": {
+      "voice_id": "jcm0A25XPeyOWvAQUhFK",
+      "owner": "038f993a58435004ca57d0d3e3e33813bd65e2b3c1f9c6b47000020addce9d50"
+    },
+    "jellyGoblin": {
+      "voice_id": "fGIZlgPQ75MMlvQ6WxgY",
+      "owner": "981267fcf71e91a066005ad65239898716b85010a5fbf21aada9b4d5aca9f0e1"
+    },
+    "giant": {
+      "voice_id": "htZQqY7WtacRNV7s62Iy",
+      "owner": "397f6e5b26cb1a88607f90099883087353fba26ec45768706222eca2327d87fc"
+    },
+    "enchanter": {
+      "voice_id": "LvmvHEBEmMJBJw9UuhwO",
+      "owner": "88db64dbc62c0a75483d4055338f31540e451a9db5c46621f63ceb23bb3a296c"
+    },
+    "toySoldier": {
+      "voice_id": "g9J8YZkhgkKB45MOSaDU",
+      "owner": "b26c5241fcdc8d3fabbec8c14eb4f4463bfd123418a45badf3683da1eb3e284a"
+    },
+    "snowman": {
+      "voice_id": "1wg2wOjdEWKA7yQD8Kca",
+      "owner": "34c483aaa9f266050bb548d8a3495b18c266f138401947fae23df13770cb6f7b"
+    },
+    "oldWoman": {
+      "voice_id": "kkPJzQOWz2Oz9cUaEaQd",
+      "owner": "e21da557bd3d3d214ca0cd46cb06720331c223a478ee711c3b62b8965330ec9d"
+    },
+    "whirligig": {
+      "voice_id": "BgdB8LkxV25DmnTgabLx",
+      "owner": "f484636c583720e47697edb449c97c3d592c83bc79d50cf7e9f56610e10f97da"
+    },
+    "redGoblin": {
+      "voice_id": "zauh4pbY6h1ZRErsRiAJ",
+      "owner": "66a58693387f713d0654057cf90581801dbe46ab3ad0e6c954b87c87a2400142"
+    }
+  }
+}

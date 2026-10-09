@@ -6,6 +6,8 @@ your account, and sets it in elevenlabs.json.
     python scripts/voice/pick-voice.py moonface                # best match
     python scripts/voice/pick-voice.py moonface --pick 2       # the 2nd on the list
     python scripts/voice/pick-voice.py moonface --name Arthur  # the one whose name starts "Arthur"
+    python scripts/voice/pick-voice.py moonface --id <id>      # exactly this voice (names repeat)
+    python scripts/voice/pick-voice.py moonface --id <id> --no-add   # choose now, add later (add-voices.py)
 
 Searching costs nothing. Each candidate has a preview link to listen to
 first; then hear the character's own lines with
@@ -15,7 +17,7 @@ first; then hear the character's own lines with
 Never pick a voice that imitates an actor from a film or TV version.
 Needs ELEVENLABS_API_KEY.
 """
-import argparse, json, os, re, sys, urllib.error, urllib.parse, urllib.request
+import argparse, json, os, re, sys, time, urllib.error, urllib.parse, urllib.request
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 API = "https://api.elevenlabs.io/v1"
@@ -60,6 +62,12 @@ WANTED = {
     "enchanter": want("male", "old", ["mysterious british wizard"], ["wizard", "mysterious", "wise", "magical"]),
     "toySoldier": want("male", "middle_aged", ["british toy soldier captain"], ["crisp", "brisk", "military", "proper", "comic"]),
     "snowman": want("male", "middle_aged", ["friendly snowman character"], ["friendly", "jolly", "soft", "gentle", "cheerful"]),
+    "oldWoman": want("female", "old", ["busy british grandmother", "kind bustling old british lady"],
+                     ["busy", "bustling", "kind", "motherly", "granny", "warm", "fussy"], ["villain", "sinister"]),
+    "whirligig": want("male", "middle_aged", ["cheerful dizzy british showman", "jolly british fairground man"],
+                      ["cheerful", "jolly", "showman", "lively", "playful", "funny", "comic"], ["sinister"]),
+    "redGoblin": want("male", "middle_aged", ["sneaky goblin character voice", "mischievous british goblin"],
+                      ["goblin", "sneaky", "mischievous", "gruff", "comic", "raspy", "cheeky"], ["horror", "scary", "demon"]),
 }
 
 
@@ -81,12 +89,20 @@ def search(key, terms, w):
         {"search": terms, "gender": w["gender"], "page_size": 50},
         {"search": terms, "page_size": 50},
     ):
-        try:
-            found = request("GET", "/shared-voices?" + urllib.parse.urlencode(params), key).get("voices", [])
-            if found:
-                return found
-        except urllib.error.HTTPError:
-            continue
+        for attempt in range(4):
+            try:
+                found = request("GET", "/shared-voices?" + urllib.parse.urlencode(params), key).get("voices", [])
+                if found:
+                    return found
+                break
+            except urllib.error.HTTPError as e:
+                # Too many searches in a row: wait and ask again, rather than
+                # reporting an empty library.
+                if e.code == 429 or e.code >= 500:
+                    time.sleep(2 * (attempt + 1))
+                    continue
+                print(f"  ({terms}: ElevenLabs {e.code})", file=sys.stderr)
+                break
     return []
 
 
@@ -111,6 +127,8 @@ def main():
     ap.add_argument("character", choices=sorted(WANTED))
     ap.add_argument("--pick", type=int, default=1, help="which of the listed voices to use (1 = best)")
     ap.add_argument("--name", help="use the listed voice whose name starts with this")
+    ap.add_argument("--id", help="use the listed voice with this voice id")
+    ap.add_argument("--no-add", action="store_true", help="set it in elevenlabs.json without adding it to your account")
     ap.add_argument("--list", action="store_true", help="only list the candidates")
     ap.add_argument("--top", type=int, default=8, help="how many candidates to list")
     args = ap.parse_args()
@@ -123,6 +141,13 @@ def main():
     for terms in w["searches"]:
         for v in search(key, terms, w):
             found.setdefault(v["voice_id"], v)
+    # The library matches a search phrase almost word for word, so a phrase
+    # like "warm british dad" can find nothing. Fall back to single words.
+    for word in w["good"][:4]:
+        if len(found) >= args.top * 2:
+            break
+        for v in search(key, word, w):
+            found.setdefault(v["voice_id"], v)
     if not found:
         sys.exit("No voices found in the library.")
     everyone = sorted(found.values(), key=lambda v: score(v, w), reverse=True)
@@ -131,22 +156,38 @@ def main():
     print(f"Best voices for {args.character}:\n")
     for i, v in enumerate(ranked, 1):
         desc = (v.get("description") or v.get("descriptive") or "").strip().replace("\n", " ")
-        print(f"{i}. {v.get('name')}  ({v.get('gender')}, {v.get('age')}, {v.get('accent')})")
+        print(f"{i}. {v.get('name')}  ({v.get('gender')}, {v.get('age')}, {v.get('accent')})  id {v['voice_id']}")
         print(f"   {desc[:140]}")
         print(f"   listen: {v.get('preview_url')}\n")
     if args.list:
         return
 
-    if args.name:
+    if args.id:
+        # Names repeat across the library (there are many Claires): the id never does.
+        chosen = found.get(args.id)
+        # A voice found some other way (the website, a wider search): look
+        # it up by its name, given with --name.
+        for terms in [args.name] if args.name and not chosen else []:
+            req = "/shared-voices?" + urllib.parse.urlencode({"search": terms, "page_size": 100})
+            chosen = next((v for v in request("GET", req, key).get("voices", []) if v["voice_id"] == args.id), None)
+        if not chosen:
+            sys.exit(f'Voice {args.id} isn\'t in the results. Try --list.')
+    elif args.name:
         named = [v for v in everyone if (v.get("name") or "").lower().startswith(args.name.lower())]
         if not named:
             sys.exit(f'No voice named "{args.name}" in the results. Try --list.')
         chosen = named[0]
     else:
         chosen = ranked[args.pick - 1]
-    added = request("POST", f"/voices/add/{chosen['public_owner_id']}/{chosen['voice_id']}", key,
-                    {"new_name": f"{chosen.get('name')} ({args.character})"})
-    voice_id = added.get("voice_id", chosen["voice_id"])
+    if args.no_add:
+        # Choosing can happen before the key may add voices (voices_write);
+        # the owner id is what adding it later needs.
+        voice_id = chosen["voice_id"]
+        print(f"owner {chosen['public_owner_id']}")
+    else:
+        added = request("POST", f"/voices/add/{chosen['public_owner_id']}/{chosen['voice_id']}", key,
+                        {"new_name": f"{chosen.get('name')} ({args.character})"})
+        voice_id = added.get("voice_id", chosen["voice_id"])
 
     # Swap just this character's voice_id, keeping the file's layout.
     path = os.path.join(HERE, "elevenlabs.json")
@@ -155,7 +196,14 @@ def main():
     if not pattern.search(text):
         sys.exit(f'No "{args.character}" entry in elevenlabs.json.')
     open(path, "w", encoding="utf-8", newline="").write(pattern.sub(lambda m: m.group(1) + voice_id + m.group(2), text, count=1))
-    print(f"Chose {chosen.get('name')}. Added to your account, and set as {args.character}'s voice "
+
+    # Remember whose voice it is, for add-voices.py.
+    lib_path = os.path.join(HERE, "library.json")
+    lib = json.load(open(lib_path, encoding="utf-8"))
+    lib["speakers"][args.character] = {"voice_id": voice_id, "owner": chosen["public_owner_id"]}
+    open(lib_path, "w", encoding="utf-8", newline="\n").write(json.dumps(lib, indent=2) + "\n")
+    added_text = "Not added to your account yet" if args.no_add else "Added to your account"
+    print(f"Chose {chosen.get('name')}. {added_text}, and set as {args.character}'s voice "
           f"in elevenlabs.json ({voice_id}).")
 
 
