@@ -29,7 +29,7 @@ import { picturesReady, rasterHtml } from '../art/raster';
 import { tree, TREE_HOOKS, TREE_PLACES, TREE_SPOTS } from '../art/scenery';
 import { waxSeal } from '../art/ui';
 import { ALL_CHAPTERS, LANDS, type Chapter } from '../core/curriculum';
-import { landLine, PHRASES } from '../core/phrases';
+import { landLine } from '../core/phrases';
 import { currentIndex, isOpen, type Progress } from '../core/progress';
 import { breathe, pop, sm, stepped, wobble } from '../ui/anim';
 import { banner, portraitButton, sealButton } from '../ui/components';
@@ -90,9 +90,6 @@ function markLandSeen(id: string, n: number): void {
   }
 }
 
-/** "Come back tomorrow" is said once a day, not on every visit to the map. */
-let toldTomorrow = '';
-
 export class MapScene extends Scene {
   private landN: number;
   private arriving = false;
@@ -100,7 +97,6 @@ export class MapScene extends Scene {
   private bannerEl!: HTMLElement;
   private nextStop: HTMLElement | null = null;
   private practiceBtn!: HTMLElement;
-  private limited = false;
   private puffs: HTMLElement[] = [];
 
   constructor(app: App, landN?: number) {
@@ -112,7 +108,6 @@ export class MapScene extends Scene {
     const r = this.root;
     const p = this.app.progress;
     const land = LANDS[this.landN - 1];
-    const now = Date.now();
     const next = currentIndex(p);
     const here = this.landN === currentLand(p);
     this.arriving = here && landSeen(this.app.profile.id) < this.landN;
@@ -135,7 +130,7 @@ export class MapScene extends Scene {
     // The 8 stops.
     land.chapters.forEach((c, i) => {
       const index = ALL_CHAPTERS.indexOf(c);
-      r.append(this.stop(c, i, index, next, now));
+      r.append(this.stop(c, i, index, next));
     });
 
     // The land's name, top right: off the land in the cloud.
@@ -161,7 +156,6 @@ export class MapScene extends Scene {
       this.app.nav.album();
     });
     r.append(this.practiceBtn, treasure);
-    if (this.limited) this.onCleanup(breathe(this.practiceBtn, 0.05, 1.8));
 
     // Other lands: down the slippery-slip to the one before, up the ladder to the next.
     if (this.landN > 1) {
@@ -185,17 +179,6 @@ export class MapScene extends Scene {
       await this.arrive();
       await voice.say(landLine(land.title));
     }
-    if (this.limited && this.landN === currentLand(this.app.progress)) {
-      const today = new Date().toDateString();
-      if (toldTomorrow !== today) {
-        toldTomorrow = today;
-        // A breath after the story (which may have ended on a cliffhanger),
-        // then the promise that it carries on tomorrow.
-        await this.sleep(1200);
-        if (!this.alive) return;
-        void voice.say(PHRASES.comeBackTomorrow);
-      }
-    }
   }
 
   leave(): void {
@@ -204,11 +187,11 @@ export class MapScene extends Scene {
 
   // ---------------------------------------------------------------------------
 
-  private stop(c: Chapter, i: number, index: number, next: number, now: number): HTMLElement {
+  private stop(c: Chapter, i: number, index: number, next: number): HTMLElement {
     const p = this.app.progress;
     const placeAt = TREE_PLACES[i];
     const done = !!p.chapters[c.id]?.done;
-    const open = isOpen(p, index, now);
+    const open = isOpen(p, index);
     const isNext = index === next && !done;
     const [w, hh] = HIT[placeAt.id] ?? [120, 120];
     const label = `${c.title}${open ? '' : ' (locked)'}`;
@@ -241,23 +224,13 @@ export class MapScene extends Scene {
       this.nextStop = el;
       this.onCleanup(breathe(tag, 0.08, 1.8));
     }
-    // Today's new chapters are used up: say so on the stop he'd play next.
-    const limited = index === next && !open && !done && !p.unlockAll;
-    if (limited) {
-      this.limited = true;
-      el.classList.add('tomorrow');
-      const note = h('div', { class: 'tomorrow-tag' }, [h('span', { class: 'moon', 'aria-hidden': 'true' }), h('span', {}, 'Come back tomorrow')]);
-      place(note, w / 2 - 110, hh + 2, 220);
-      el.append(note);
-    }
 
     this.tap(el, () => {
       if (!open) {
         sfx.wrong();
         void wobble(el);
-        if (this.limited) void voice.say(PHRASES.comeBackTomorrow);
         // Point at the one to play instead.
-        else if (this.nextStop) void pop(this.nextStop, 1.08);
+        if (this.nextStop) void pop(this.nextStop, 1.08);
         return;
       }
       sfx.tap();

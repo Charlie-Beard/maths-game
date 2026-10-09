@@ -217,13 +217,13 @@ test('20 chapters in one page: memory stays flat', async ({ page }) => {
     const cou = URL.createObjectURL.bind(URL);
     URL.createObjectURL = (o: any) => (live.blobs++, cou(o));
   });
-  // A save with no daily limit and the opening already seen.
+  // A save with the opening already seen.
   await page.addInitScript(() => {
     const key = 'faraway-maths:v1:jasper';
     if (localStorage.getItem(key)) return;
     localStorage.setItem(
       key,
-      JSON.stringify({ v: 1, name: 'Jasper', avatar: 'joe', seenOpening: true, settings: { volume: 0.8, idleHintSeconds: 12, newPerDay: 0 } }),
+      JSON.stringify({ v: 1, name: 'Jasper', avatar: 'joe', seenOpening: true, settings: { volume: 0.8, idleHintSeconds: 12 } }),
     );
   });
   const cdp = await page.context().newCDPSession(page);

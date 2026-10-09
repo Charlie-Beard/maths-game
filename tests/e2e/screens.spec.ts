@@ -107,23 +107,19 @@ test('down the slippery-slip to earlier lands, and back up the ladder', async ({
   await expect(page.locator('.map-stop.is-next')).toHaveAttribute('data-chapter', 'l4c4');
 });
 
-test('when today’s new chapters are used up, the next stop says come back tomorrow', async ({ page }) => {
+test('there is no daily limit: after lots of new chapters today, the next one is still open', async ({ page }) => {
   await seed(
     page,
     progressed(27, (p) => {
-      p.chapters.l4c2.firstDone = Date.now();
-      p.chapters.l4c3.firstDone = Date.now();
+      for (const id of ['l4c1', 'l4c2', 'l4c3']) p.chapters[id].firstDone = Date.now();
     }),
   );
   await page.goto('/?scene=map');
   const stop = page.locator('.map-stop[data-chapter="l4c4"]');
-  await expect(stop).toHaveClass(/locked/);
-  await expect(stop).toHaveClass(/tomorrow/);
-  await expect(stop.locator('.tomorrow-tag')).toHaveText('Come back tomorrow');
-  await expect(page.locator('.map-stop.is-next')).toHaveCount(0);
-  // Old chapters still open.
-  await settled(page.locator('.map-stop[data-chapter="l4c1"]'));
-  await page.locator('.map-stop[data-chapter="l4c1"]').click({ force: true });
+  await expect(stop).not.toHaveClass(/locked/);
+  await expect(page.locator('.map-stop.is-next')).toHaveAttribute('data-chapter', 'l4c4');
+  await settled(stop);
+  await stop.click({ force: true });
   await expect(page.locator('.scene.intro')).toBeVisible();
 });
 
@@ -239,11 +235,11 @@ test('the corner shows every skill, by land or by strand, and changes settings',
   await expect(page.locator('.skill-table .p-group').first()).toHaveText('Number and place value');
 
   await page.locator('.p-tab[data-tab="settings"]').click();
-  await page.getByRole('combobox', { name: 'New chapters per day' }).selectOption('0');
   await page.getByRole('combobox', { name: 'Idle hint' }).selectOption('20');
   await page.getByRole('textbox', { name: 'Player’s name' }).fill('Sam');
   const s = await saved(page);
-  expect(s.settings).toMatchObject({ newPerDay: 0, idleHintSeconds: 20 });
+  expect(s.settings).toMatchObject({ idleHintSeconds: 20 });
+  expect(s.settings).not.toHaveProperty('newPerDay');
   expect(s.name).toBe('Sam');
 
   await page.getByRole('button', { name: 'Back to the game' }).click();

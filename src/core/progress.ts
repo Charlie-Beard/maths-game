@@ -15,8 +15,6 @@ export interface Settings {
   volume: number;
   /** Seconds of no activity before the question is said again. */
   idleHintSeconds: number;
-  /** New chapters allowed per day (0 = no limit). Replays are always allowed. */
-  newPerDay: number;
 }
 
 export interface ChapterRecord {
@@ -64,7 +62,7 @@ export function defaultProgress(name = DEFAULT_NAME): Progress {
     unlockAll: false,
     unlockedTo: -1,
     lastPlayed: 0,
-    settings: { volume: 0.8, idleHintSeconds: 12, newPerDay: 2 },
+    settings: { volume: 0.8, idleHintSeconds: 12 },
   };
 }
 
@@ -110,7 +108,8 @@ function restoreSkill(id: SkillId, x: Loose): SkillState {
 /**
  * Loads anything that looks like a save, filling gaps with defaults and
  * putting each value back in range. Never throws. Things the game doesn't
- * know (old settings like calm mode, fields from a newer game) are left out.
+ * know (old settings like calm mode and the daily limit, fields from a
+ * newer game) are left out.
  */
 export function restore(raw: unknown): Progress {
   const d = defaultProgress();
@@ -143,7 +142,6 @@ export function restore(raw: unknown): Progress {
     settings: {
       volume: num(s.volume, 0, 1, d.settings.volume),
       idleHintSeconds: num(s.idleHintSeconds, 0, 60, d.settings.idleHintSeconds),
-      newPerDay: int(s.newPerDay, 0, 1000, d.settings.newPerDay),
     },
   };
 }
@@ -154,20 +152,14 @@ export function currentIndex(p: Progress): number {
   return i < 0 ? ALL_CHAPTERS.length - 1 : i;
 }
 
-const sameDay = (a: number, b: number) => new Date(a).toDateString() === new Date(b).toDateString();
-
-/** New chapters first finished today. */
-export function newToday(p: Progress, now: number): number {
-  return Object.values(p.chapters).filter((c) => c.firstDone && sameDay(c.firstDone, now)).length;
-}
-
-/** Whether a chapter can be opened now: done before, unlocked, or the next one (within today's limit). */
-export function isOpen(p: Progress, chapterIndex: number, now: number): boolean {
+/**
+ * Whether a chapter can be opened: done before, unlocked, or the next one.
+ * There is no daily limit: however much he plays, the next chapter is open.
+ */
+export function isOpen(p: Progress, chapterIndex: number): boolean {
   const c = ALL_CHAPTERS[chapterIndex];
   if (!c) return false;
-  if (p.chapters[c.id]?.done || p.unlockAll || chapterIndex <= p.unlockedTo) return true;
-  if (chapterIndex !== currentIndex(p)) return false;
-  return !p.settings.newPerDay || newToday(p, now) < p.settings.newPerDay;
+  return !!p.chapters[c.id]?.done || p.unlockAll || chapterIndex <= p.unlockedTo || chapterIndex === currentIndex(p);
 }
 
 /** Applies one problem's outcome to the skill it practised. */

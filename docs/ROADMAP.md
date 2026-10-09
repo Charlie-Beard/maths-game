@@ -383,5 +383,3 @@ These can be answered any time before the session that needs them:
 2. **Cloud save** (session 2): run `wrangler login` and set the password
    secret when W7 is ready.
 3. **Name and icon:** "Up the Faraway Tree" is a working title.
-4. **New chapters per day:** the default is 2. Change it in the grown-ups'
-   corner.
