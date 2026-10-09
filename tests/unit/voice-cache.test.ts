@@ -16,8 +16,10 @@ describe('voice clip cache', () => {
   let fetched: string[];
   beforeEach(() => {
     fetched = [];
-    vi.stubGlobal('document', { baseURI: 'http://game.test/' });
-    vi.stubGlobal('window', {});
+    // The voice also loads ui/pause.ts, which listens for the app going out of sight.
+    const listen = { addEventListener: () => {}, removeEventListener: () => {} };
+    vi.stubGlobal('document', { baseURI: 'http://game.test/', hidden: false, ...listen });
+    vi.stubGlobal('window', { ...listen });
     vi.stubGlobal('fetch', async (url: string) => {
       if (url.endsWith('manifest.json')) return { ok: true, json: async () => ({ lines: ids, pieces: [], numbers: [] }) };
       fetched.push(url);
