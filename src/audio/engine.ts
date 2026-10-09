@@ -90,26 +90,26 @@ export function setVolumes(v: { master?: number; sfx?: number; voice?: number; m
   if (v.music !== undefined) musicBus.gain.setTargetAtTime(v.music, t, 0.3);
 }
 
-// iOS suspends audio when the app is backgrounded; resume on return.
-if (typeof document !== 'undefined') {
-  document.addEventListener('visibilitychange', () => {
-    if (!document.hidden && ctx && ctx.state !== 'running' && !document.body.classList.contains('is-portrait')) void ctx.resume().catch(() => {});
-  });
-}
-
-/** Pauses all sound (portrait mode) or resumes it. */
+/**
+ * Pauses all sound or resumes it (ui/pause.ts: portrait, or the app out of
+ * sight). iOS suspends audio itself when the app is backgrounded; this
+ * resumes it on return.
+ */
 export function setPaused(paused: boolean): void {
   if (!ctx) return;
   if (paused) void ctx.suspend().catch(() => {});
   else void ctx.resume().catch(() => {});
 }
 
-/** iOS can leave audio "interrupted" after a call or backgrounding; any tap revives it. */
+/**
+ * iOS can leave audio "interrupted" after a call or backgrounding, and a
+ * resume outside a tap may not take; any tap revives it.
+ */
 if (typeof window !== 'undefined') {
   window.addEventListener(
     'pointerdown',
     () => {
-      if (ctx && ctx.state !== 'running' && !document.body.classList.contains('is-portrait')) void ctx.resume().catch(() => {});
+      if (ctx && ctx.state !== 'running' && !document.body.classList.contains('is-paused')) void ctx.resume().catch(() => {});
     },
     { capture: true },
   );

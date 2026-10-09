@@ -1,14 +1,12 @@
 /**
  * Portrait is not supported: iPadOS ignores orientation locks for web
  * apps, so we show a calm paper-cut screen asking to turn the iPad, with
- * Moon-Face beside a little iPad that rotates. Animation and sound pause
- * and the game carries on exactly where it was when turned back.
+ * Moon-Face beside a little iPad that rotates. The game pauses (ui/pause.ts)
+ * and carries on exactly where it was when turned back.
  */
-import { gsap } from 'gsap';
 import { characterArt } from '../art/characters';
-import { setPaused } from '../audio/engine';
-import { voice } from '../audio/voice';
 import type { Stage } from '../stage';
+import { setPortrait } from './pause';
 
 export function installRotateScreen(stage: Stage, el: HTMLElement): void {
   el.innerHTML = `
@@ -20,17 +18,9 @@ export function installRotateScreen(stage: Stage, el: HTMLElement): void {
   const update = (portrait: boolean) => {
     el.hidden = !portrait;
     document.body.classList.toggle('is-portrait', portrait);
-    // Pause: freeze animation and sound until the iPad is turned back.
-    if (portrait) {
-      // Cancel the iPad's own voice too, so nothing is spoken behind the
-      // "turn the iPad" screen; scenes hold their hint timers while it shows.
-      voice.stop();
-      window.speechSynthesis?.cancel();
-      gsap.globalTimeline.pause();
-    } else {
-      gsap.globalTimeline.resume();
-    }
-    setPaused(portrait);
+    // Pause: freeze animation, sound and the scenes' timers until the iPad
+    // is turned back. Nothing is spoken behind the "turn the iPad" screen.
+    setPortrait(portrait);
   };
   stage.onOrientation(update);
   update(stage.isPortrait);
