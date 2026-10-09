@@ -4,6 +4,7 @@ import type { Progress } from '../core/progress';
 import type { Profile } from '../save/local';
 import type { Stage } from '../stage';
 import { h, onTap } from './dom';
+import { playTimer } from './pause';
 
 /** Where scenes can go next. */
 export interface Nav {
@@ -43,7 +44,8 @@ export abstract class Scene {
   readonly root: HTMLElement;
   protected readonly app: App;
   private cleanups: (() => void)[] = [];
-  private timers = new Set<ReturnType<typeof setTimeout>>();
+  /** Cancels for the pending `later` timers. */
+  private timers = new Set<() => void>();
   protected alive = true;
   /** Set the moment the director starts moving away; taps are ignored from then on. */
   private leaving = false;
@@ -91,7 +93,7 @@ export abstract class Scene {
     this.alive = false;
     this.cleanups.forEach((fn) => fn());
     this.cleanups = [];
-    this.timers.forEach(clearTimeout);
+    this.timers.forEach((cancel) => cancel());
     this.timers.clear();
     gsap.killTweensOf(this.root.querySelectorAll('*'));
     this.root.remove();
@@ -110,16 +112,20 @@ export abstract class Scene {
     this.cleanups.push(fn);
   }
 
+  /**
+   * Runs `fn` after `ms` of play: the clock stops while the game is paused
+   * (ui/pause.ts), so nothing fires in a burst when he comes back.
+   */
   protected later(ms: number, fn: () => void): void {
-    const t = setTimeout(() => {
-      this.timers.delete(t);
+    const cancel = playTimer(ms, () => {
+      this.timers.delete(cancel);
       if (this.alive) fn();
-    }, ms);
-    this.timers.add(t);
+    });
+    this.timers.add(cancel);
   }
 
   protected clearTimers(): void {
-    this.timers.forEach(clearTimeout);
+    this.timers.forEach((cancel) => cancel());
     this.timers.clear();
   }
 

@@ -13,6 +13,7 @@
  */
 import { generic, lineId, personalise, voiceId } from '../core/phrases';
 import { speechParts, speechText, type Speech } from '../core/problem';
+import { onPause, paused, whenPlaying } from '../ui/pause';
 import { audio, buses } from './engine';
 
 interface Manifest {
@@ -177,6 +178,23 @@ function stopClip(): void {
   c?.stop();
 }
 
+/**
+ * Plays a line for `token`, holding it while the game is paused (ui/pause.ts).
+ * The pause cuts off the clip playing; once he's back the line is said
+ * again from its start, so he never misses one and the caller just waits.
+ */
+async function held(token: object, play: () => Promise<boolean>): Promise<boolean> {
+  for (;;) {
+    await whenPlaying();
+    if (speaking !== token) return false;
+    const finished = await play();
+    if (finished || speaking !== token || !paused()) return finished;
+  }
+}
+
+// Nothing is said while the game is paused: cut off what's playing (`held` says it again).
+onPause((p) => p && stopClip());
+
 /** Stops all speech. */
 export function stop(): void {
   speaking = null;
@@ -213,12 +231,12 @@ export const voice = {
       if (manifest.lines.includes(id)) {
         const buf = await fetchBuffer(lineUrl(id));
         if (speaking !== token) return false;
-        if (buf) return playBuffer(buf);
+        if (buf) return held(token, () => playBuffer(buf));
       }
     }
     if (speaking !== token) return false;
     unrecorded(`${who}: “${generic(template)}”`);
-    return speak(personal, 0.9);
+    return held(token, () => speak(personal, 0.9));
   },
 
   /**
@@ -237,19 +255,22 @@ export const voice = {
       'piece' in p ? manifest.pieces.includes(pieceId(p.piece)) : typeof p.value === 'number' && manifest.numbers.includes(p.value),
     );
     stopClip();
+    const token = early;
     if (!recorded) {
       unrecorded(`question: “${s.text}” with ${JSON.stringify(s.vals ?? {})}`);
-      return speak(personalise(speechText(s), playerName), 0.85);
+      return held(token, () => speak(personalise(speechText(s), playerName), 0.85));
     }
-    const token = early;
-    for (const p of parts) {
-      if (speaking !== token) return false;
-      const url = 'piece' in p ? pieceUrl(pieceId(p.piece)) : numberUrl(p.value as number, p.end);
-      const buf = await fetchBuffer(url);
-      if (speaking !== token) return false;
-      if (buf && !(await playBuffer(buf))) return false;
-    }
-    return speaking === token;
+    // Cut off by a pause, the whole question is said again from its start.
+    return held(token, async () => {
+      for (const p of parts) {
+        if (speaking !== token) return false;
+        const url = 'piece' in p ? pieceUrl(pieceId(p.piece)) : numberUrl(p.value as number, p.end);
+        const buf = await fetchBuffer(url);
+        if (speaking !== token) return false;
+        if (buf && !(await playBuffer(buf))) return false;
+      }
+      return speaking === token;
+    });
   },
 
   /** Warms the cache so the first tap answers instantly. Lines are the narrator's unless they say who. */
