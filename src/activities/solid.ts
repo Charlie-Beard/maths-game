@@ -75,7 +75,10 @@ export function solid(p: Problem, ctx: ActivityContext): Activity {
   } else {
     picture = place(h('div', { class: 'visual l13-solid-pic', 'data-kind': 'solid' }), 160, 110, PW, PH);
     el.append(picture);
-    draw();
+    // Edges and corners round the back can't be counted from a solid picture,
+    // so those questions show the hidden edges dashed from the start.
+    const counting = sv?.ask === 'edges' || sv?.ask === 'corners';
+    draw({ seeThrough: counting });
     if (p.text) el.append(place(h('div', { class: 'sum-text c-sum' }, p.text), 160, 476, 860, 90));
     if (mode === 'count') {
       const w = 150;
