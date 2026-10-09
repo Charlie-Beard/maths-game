@@ -45,7 +45,7 @@ export const PHRASES = {
 export type PhraseKey = keyof typeof PHRASES;
 
 /** Announced when a new land arrives at the top of the tree. */
-export const landLine = (title: string): string => `A new land has come to the top of the tree: ${title}!`;
+export const landLine = (title: string): string => `${title} has come to the top of the tree!`;
 
 /** The player's name. Lines may contain {name}. */
 export const DEFAULT_NAME = 'Jasper';

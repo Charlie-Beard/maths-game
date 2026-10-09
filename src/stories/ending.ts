@@ -209,7 +209,7 @@ export default defineStory({
     wisha: { who: 'hero', text: 'Listen! The trees are whispering again. Wisha-wisha-wisha!' },
     invite: { who: 'mum', text: 'A card, on a balloon! “Come to a party at the top of the Faraway Tree.”' },
     dad: { who: 'dad', text: 'A party? Up a tree? Well, I never! Come on, then!' },
-    climb: { who: 'narrator', text: 'Up they all went: past Dame Washalot’s tub, past the Pixie’s window, and into the cloud.' },
+    climb: { who: 'narrator', text: 'Up they all went! Past Dame Washalot’s tub, past the Pixie’s window, and into the cloud.' },
     pixie: { who: 'pixie', text: 'Hello, hello! Peep in my window all you like today. Hee hee!' },
     waiting: { who: 'narrator', text: 'And there, in the Land of Birthdays, everyone they had ever met was waiting.' },
     giant: { who: 'giant', text: 'HAPPY PARTY, little ones! Oops. Was that too loud?' },

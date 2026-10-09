@@ -324,7 +324,7 @@ export default defineStory({
     globe: { who: 'snowman', text: 'Take this snow globe. Then you’ll always have a little snow with you.' },
     bye: { who: 'snowman', text: 'Don’t worry about me. I’ll be back next winter! Now run!' },
     down: { who: 'moonface', text: 'The sledge got us here, quick as a wink! Now down the ladder, before it melts!' },
-    prize: { who: 'narrator', text: 'Home, safe and warm, with a snow globe and the seal of the Land of Snow.' },
+    prize: { who: 'narrator', text: 'Home, safe and warm! With a snow globe, and the seal of the Land of Snow.' },
     cocoa: { who: 'saucepan', text: 'Hot cocoa for everyone! Clank, clank!' },
     dark: { who: 'hero', text: 'Moon-Face… why has it gone so dark? And so cold?' },
     bars: { who: 'moonface', text: 'Look. A bell tower, with bars on it. It’s her prison.' },

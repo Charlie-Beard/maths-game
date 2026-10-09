@@ -159,6 +159,12 @@ export class PlayScene extends Scene {
     });
     this.desk.insertBefore(this.activity.el, this.silky);
     stackFractions(this.activity.el);
+    // Any touch on the activity (counting, filling a frame, adding a coin)
+    // means he's working: hold the idle hint, so Silky never re-reads the
+    // question in the middle of a slow count.
+    this.activity.el.addEventListener('pointerdown', () => {
+      if (this.idle) this.restartIdle();
+    });
     this.drawDots();
     const activity = this.activity;
     activity.lock(true);

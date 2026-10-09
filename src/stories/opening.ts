@@ -529,7 +529,7 @@ export default defineStory({
     biscuits: { who: 'silky', text: 'Hello, I’m Silky. Have a pop biscuit! They go pop in your mouth.' },
     pixie: { who: 'pixie', text: 'Who’s that peeping in my window? Go away! Hmph!' },
     moon: { who: 'moonface', text: 'Hello down there! I’m Moon-Face. I live right at the top!' },
-    lands: { who: 'moonface', text: 'Every so often, a new land comes to the cloud at the top of our tree.' },
+    lands: { who: 'moonface', text: 'Every so often, a new land comes to the top of our tree.' },
     danger: { who: 'moonface', text: 'Some lands are lovely. Some are dangerous. Never be up there when a land moves on!' },
     what: { who: 'hero', text: 'What was that noise?' },
     wind: { who: 'moonface', text: 'Oh, only the wind, I expect. Ho ho ho!' },

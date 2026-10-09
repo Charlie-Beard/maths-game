@@ -141,7 +141,7 @@ export class ParentScene extends Scene {
     head.append(h('div', { class: 'p-account' }, [h('div', { class: 'p-signed' }, [h('label', {}, ['Playing as ', picker]), status]), signOut, close]));
     r.append(head);
 
-    const tabs = place(h('div', { class: 'p-tabs' }), 50, 104, 1080, 56);
+    const tabs = place(h('div', { class: 'p-tabs' }), 50, 104, 1080, 72);
     (Object.keys(TAB_NAMES) as Tab[]).forEach((t) => {
       const b = h('button', { class: 'p-tab', 'data-tab': t }, TAB_NAMES[t]) as HTMLButtonElement;
       b.addEventListener('click', () => this.show(t));
@@ -150,7 +150,7 @@ export class ParentScene extends Scene {
     });
     r.append(tabs);
 
-    this.body = place(h('div', { class: 'p-body' }), 50, 170, 1080, 610);
+    this.body = place(h('div', { class: 'p-body' }), 50, 186, 1080, 594);
     r.append(this.body);
     this.show('progress');
   }

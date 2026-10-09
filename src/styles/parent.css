@@ -443,3 +443,15 @@
   display: block;
   pointer-events: none;
 }
+
+/* Grown-ups tap with fingers too: every control is at least 72 px tall, as
+   everywhere else in the game (CLAUDE.md). */
+.p-tab,
+.p-btn,
+.p-seg,
+.parent select,
+.parent input[type='text'] {
+  min-height: 72px;
+  min-width: 72px;
+  box-sizing: border-box;
+}
