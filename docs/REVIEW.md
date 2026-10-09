@@ -7,7 +7,8 @@ A review of the finished game (all 14 lands) against the rules in
 - **Phase 1:** the rules that never bend.
 - **Phase 2:** the maths. That covers the generators, the curriculum, mastery and Silky's help.
 - **Phase 3:** a play-through: every screen, and the pacing.
-- **Still to do:** audio, and robustness.
+- **Phase 5:** robustness. That covers the save, leaving and coming back, memory, and speed.
+- **Still to do:** audio.
 
 Each finding says what was done about it: **fixed**, **left** (with the
 reason), or **open** (a choice still to make).
@@ -166,12 +167,69 @@ These are design choices backed by the simulation, not bugs:
 - **The daily limit line ran straight on from a cliffhanger story.** Now it waits a moment, and it says "The story goes on tomorrow!"
 - **Leaving mid-chapter started it again with new numbers.** Now his place is kept on that iPad, and picking the chapter again carries on from the same problem. Finishing the chapter clears it. Finales start again, since their set piece builds step by step.
 
+## Phase 5: robustness
+
+**How it was checked:**
+- **The save:** unit tests fed `restore()` 13 kinds of damaged save, and the game was played on from each one. Two devices synced through the real Worker code, including a full iPad and two tabs. Merges were checked both ways round and twice over. A new `save.spec.ts` covers a damaged save, a save just before the iPad sleeps, and two tabs; all three failed on the old code.
+- **Leaving and coming back:** Playwright sent the app out of sight at every point (problem, help, working, story, finale, reward), reloaded it, and turned it to portrait. `page.clock` played the time away and the burst of late timers iPad Safari fires on return. A stand-in voice logged every line. A new `return.spec.ts` (9 tests): 7 of the first 8 failed on the old code.
+- **Memory:** one page played 22 new chapters (two finales, a whole story), Practice and the Treasure Room every fifth chapter, then 8 replays. After each one, a forced garbage collection, then a count of heap, DOM nodes, listeners, tweens and timers. `memory.spec.ts`, run with `MEMORY=1`.
+- **Speed:** a production build, with the CPU slowed 4× and 6× (roughly an older iPad), on fast and slow 4G. Medians of 3. `speed.spec.ts`, run with `SPEED=1`.
+
+### Fixed
+
+**The save** (`src/core/progress.ts`, `src/core/merge.ts`, `src/cloud/profile.ts`)
+- **A damaged save could stop the game.** "Unlocked up to chapter 2.5" crashed the map. A volume that wasn't a number crashed the sound on his first tap. A skill with no recent answers crashed his next right answer. Now `restore()` checks every value, puts it back in range and never throws.
+- **A full iPad could lose a chapter.** The small sync record fitted when the big save didn't, so an older copy was marked up to date. Now the record is written only after the copy it describes.
+- **A save made just before the home button** waited 1.5 s to go to the cloud, and the iPad stops timers almost at once. Now it's sent when the app goes to the background.
+- **Two tabs on one iPad wrote over each other.** Now each tab merges the other's saves.
+- **Start again left a chapter part way,** and the lands didn't arrive again. Now Start again (and deleting a profile) forgets both.
+- **A skill mastered on one device could be un-mastered** by a merge. Now mastered on either side stays mastered.
+
+**Leaving and coming back** (`src/scenes/play.ts`, `src/save/resume.ts`, `src/game.ts`, new `src/ui/pause.ts`)
+- **Closing the app mid-chapter lost his place.** It was kept only through "Back to the tree". The home button, a locked screen or a dropped tab started again with new numbers. Now his place is kept after every right answer, and nothing is counted twice.
+- **Closing the app after the last answer** made him do all 8 problems again. Now it goes straight to the story and reward.
+- **Out of sight, the game carried on without him.** The idle hint read the question to an empty room, a story spoke 5 lines in 20 s, and the next question was asked unseen. Now everything pauses while out of sight, as in portrait: animation, sound, scene timers and the hint. Their clocks stop too, so nothing fires in a burst on return.
+- **A line cut off by leaving was lost.** Now it's said again from the start. Back on a question, Silky reads it again once.
+- **An old kept place could be used.** A place from another build of the game, or for a chapter finished since (on another device), is dropped.
+
+**Memory** (`src/audio/voice.ts`)
+- **Voice clips were kept for the whole session.** A decoded clip is about 190 kB per second of speech, so 20 chapters of recorded voice could reach hundreds of MB, enough for the iPad to close the tab. Now it keeps the most recently used 2 minutes of audio (about 23 MB). A clip used again stays.
+
+**Speed** (`src/scenes/album.ts`, `src/art/paper.ts`)
+- **The Treasure Room drew all 112 keepsakes before showing.** At 4× it took 1.9 s from the tap. Now the shelves nearest his land come first, and the rest follow: 1.1 s.
+- **The map, lands, characters and keepsakes were drawn again on every visit.** Now the last few drawings are kept (`cached()`). The worst pause on the map during a chapter fell from 850 to 267 ms at 4×.
+
+### Measured
+
+| | Result |
+|---|---|
+| Memory, chapter 1 → 10 → 22 | heap 4.6 → 8.0 → 9.1 MB; DOM nodes 2137 → 2157 → 2439 |
+| Memory, 8 replays after that | +0.13 MB, no new nodes, listeners, tweens or timers |
+| Right answer, tap to the frame showing it (6×) | under 40 ms |
+| Cold start to title, slow 4G (4×) | 2.1 s, mostly downloading `main.js` |
+| Second start, offline cache (4×) | about 0.5 s |
+| Scene change, before the wipe starts (4×) | 280–430 ms |
+
+### Left, with the reason
+
+- **Wrong answers before the app closes are forgotten.** That problem starts again at help 0: a fresh try, nothing counted twice.
+- **Finales and Practice start again after a reload,** as before. A finale's set piece builds step by step.
+- **Toffees take the larger count when two devices merge,** not the sum. Adding them would count a save twice when its reply was lost.
+- **Start again on one iPad is undone** by another that played offline. Merges are kind: what he's earned only grows.
+- **A wrong device clock** makes the daily limit and review dates a little odd, but nothing breaks.
+- **The voice cache can't be measured yet:** there are no recordings. 2 minutes is a guess. If a line seems slow to start, raise it.
+- **Scene changes pause for 280–430 ms at 4× before the wipe,** while the next scene is built. Building it under the wipe changes the Director's timing. Warming the next scene's art during the intro could help.
+- **Lazy-loading the grown-ups' corner, album and finales** would save only about 25 kB gzipped of `main.js`, so it wasn't done.
+- **Real iPad sound after coming back** can't be tested here. If iOS needs a tap first, the next tap brings it back (that was already there).
+
+**Found by the full run** (`src/scenes/finale.ts`)
+- **Balloons were still rising when the next question came up** (land 5's finale). Since Phase 3's brisker desk, a beat's balloons (2.7 s) and drips could outlast the gap, so something moved while he answered. This was already failing on `main`. Now anything still flying fades as the desk slides back.
+
+### e2e speed
+
+`finale.spec.ts` is now five files (`finale-1` … `finale-5`, with helpers in `finale-helpers.ts`), so they run in parallel. It is the same 176 tests. The whole suite now takes **16 minutes** with 3 workers (it was 25).
+
 ## Still to do
 
 - **Phase 4, audio and voice:** check every spoken line is exported, and check pronunciation of numbers.
-- **Phase 5, robustness:**
-  - the save
-  - leaving and coming back mid-problem
-  - memory over 20 chapters
-  - speed on an older iPad
-- **e2e speed:** split `finale.spec.ts` (22 of the suite's 25 minutes) into several files so they run in parallel.
+- **Before recording voices:** play a few chapters with real clips, and check the 2-minute voice cache doesn't fetch a line twice.

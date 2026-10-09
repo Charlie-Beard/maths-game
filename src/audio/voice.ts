@@ -13,6 +13,7 @@
  */
 import { generic, lineId, personalise, voiceId } from '../core/phrases';
 import { speechParts, speechText, type Speech } from '../core/problem';
+import { onPause, paused, whenPlaying } from '../ui/pause';
 import { audio, buses } from './engine';
 
 interface Manifest {
@@ -56,15 +57,48 @@ export function loadManifest(): Promise<void> {
   return manifestLoaded;
 }
 
+/**
+ * Decoded clips are big (about 190 KB for every second of speech), and a
+ * long session says thousands of different lines, so the cache keeps only
+ * the most recently used couple of minutes. The pieces and numbers that
+ * every question uses stay warm; a story line he heard ten chapters ago
+ * is fetched again from the browser's own cache if it is ever needed.
+ */
+const MAX_CACHED_SECONDS = 120;
+const cachedSeconds = new Map<string, number>();
+let cachedTotal = 0;
+
+function remember(url: string, buf: AudioBuffer): void {
+  cachedSeconds.set(url, buf.duration);
+  cachedTotal += buf.duration;
+  // Oldest first (a Map keeps the order they were last used in); never the one just decoded.
+  for (const old of buffers.keys()) {
+    if (cachedTotal <= MAX_CACHED_SECONDS) break;
+    const secs = cachedSeconds.get(old);
+    if (old === url || secs === undefined) continue;
+    cachedTotal -= secs;
+    cachedSeconds.delete(old);
+    buffers.delete(old);
+  }
+}
+
 function fetchBuffer(url: string): Promise<AudioBuffer | null> {
   let p = buffers.get(url);
-  if (!p) {
-    p = fetchSoon(url)
-      .then((r) => (r.ok ? r.arrayBuffer() : Promise.reject(new Error(String(r.status)))))
-      .then((data) => audio().decodeAudioData(data))
-      .catch(() => null);
+  if (p) {
+    // Used again: move it to the back of the queue for going.
+    buffers.delete(url);
     buffers.set(url, p);
+    return p;
   }
+  p = fetchSoon(url)
+    .then((r) => (r.ok ? r.arrayBuffer() : Promise.reject(new Error(String(r.status)))))
+    .then((data) => audio().decodeAudioData(data))
+    .then((buf) => {
+      if (buffers.get(url) === p) remember(url, buf);
+      return buf;
+    })
+    .catch(() => null);
+  buffers.set(url, p);
   return p;
 }
 
@@ -177,6 +211,23 @@ function stopClip(): void {
   c?.stop();
 }
 
+/**
+ * Plays a line for `token`, holding it while the game is paused (ui/pause.ts).
+ * The pause cuts off the clip playing; once he's back the line is said
+ * again from its start, so he never misses one and the caller just waits.
+ */
+async function held(token: object, play: () => Promise<boolean>): Promise<boolean> {
+  for (;;) {
+    await whenPlaying();
+    if (speaking !== token) return false;
+    const finished = await play();
+    if (finished || speaking !== token || !paused()) return finished;
+  }
+}
+
+// Nothing is said while the game is paused: cut off what's playing (`held` says it again).
+onPause((p) => p && stopClip());
+
 /** Stops all speech. */
 export function stop(): void {
   speaking = null;
@@ -213,12 +264,12 @@ export const voice = {
       if (manifest.lines.includes(id)) {
         const buf = await fetchBuffer(lineUrl(id));
         if (speaking !== token) return false;
-        if (buf) return playBuffer(buf);
+        if (buf) return held(token, () => playBuffer(buf));
       }
     }
     if (speaking !== token) return false;
     unrecorded(`${who}: “${generic(template)}”`);
-    return speak(personal, 0.9);
+    return held(token, () => speak(personal, 0.9));
   },
 
   /**
@@ -237,19 +288,22 @@ export const voice = {
       'piece' in p ? manifest.pieces.includes(pieceId(p.piece)) : typeof p.value === 'number' && manifest.numbers.includes(p.value),
     );
     stopClip();
+    const token = early;
     if (!recorded) {
       unrecorded(`question: “${s.text}” with ${JSON.stringify(s.vals ?? {})}`);
-      return speak(personalise(speechText(s), playerName), 0.85);
+      return held(token, () => speak(personalise(speechText(s), playerName), 0.85));
     }
-    const token = early;
-    for (const p of parts) {
-      if (speaking !== token) return false;
-      const url = 'piece' in p ? pieceUrl(pieceId(p.piece)) : numberUrl(p.value as number, p.end);
-      const buf = await fetchBuffer(url);
-      if (speaking !== token) return false;
-      if (buf && !(await playBuffer(buf))) return false;
-    }
-    return speaking === token;
+    // Cut off by a pause, the whole question is said again from its start.
+    return held(token, async () => {
+      for (const p of parts) {
+        if (speaking !== token) return false;
+        const url = 'piece' in p ? pieceUrl(pieceId(p.piece)) : numberUrl(p.value as number, p.end);
+        const buf = await fetchBuffer(url);
+        if (speaking !== token) return false;
+        if (buf && !(await playBuffer(buf))) return false;
+      }
+      return speaking === token;
+    });
   },
 
   /** Warms the cache so the first tap answers instantly. Lines are the narrator's unless they say who. */

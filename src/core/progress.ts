@@ -5,10 +5,10 @@
  * (workstream W7). `restore` accepts anything and fills in defaults, so
  * old or partial saves always load.
  */
-import { ALL_CHAPTERS, AVATARS, type Avatar, type Chapter } from './curriculum';
-import { newSkillState, record, type Outcome, type SkillState } from './mastery';
+import { ALL_CHAPTERS, AVATARS, LANDS, type Avatar, type Chapter } from './curriculum';
+import { BOX_DAYS, newSkillState, record, type Outcome, type SkillState } from './mastery';
 import { DEFAULT_NAME } from './phrases';
-import { SKILL_IDS, type SkillId } from './skills';
+import { SKILL_IDS, tierCount, type SkillId } from './skills';
 
 export interface Settings {
   /** Master volume 0..1. */
@@ -68,33 +68,83 @@ export function defaultProgress(name = DEFAULT_NAME): Progress {
   };
 }
 
-/** Loads anything that looks like a save, filling gaps with defaults. */
-/** Older saves carry a calm-mode setting, which the game no longer has. */
-function withoutCalm(s: Settings & { calm?: unknown }): Settings {
-  const { calm: _calm, ...rest } = s;
-  return rest;
+// A save can come back damaged: half-written, from an older game, or from
+// a newer one. Each value is checked on the way in, because one bad number
+// can stop a scene (a volume that isn't a number throws in Web Audio; a
+// skill with no `recent` list throws on his next answer).
+
+type Loose = Record<string, unknown>;
+const isObj = (x: unknown): x is Loose => !!x && typeof x === 'object' && !Array.isArray(x);
+/** A number in lo..hi, or `fallback` if it isn't a number at all. */
+const num = (x: unknown, lo: number, hi: number, fallback: number): number =>
+  typeof x === 'number' && Number.isFinite(x) ? Math.min(hi, Math.max(lo, x)) : fallback;
+const int = (x: unknown, lo: number, hi: number, fallback: number): number => Math.floor(num(x, lo, hi, fallback));
+/** Each string once. */
+const strings = (x: unknown): string[] => (Array.isArray(x) ? [...new Set(x.filter((s): s is string => typeof s === 'string'))] : []);
+
+function restoreChapter(x: unknown): ChapterRecord | null {
+  if (!isObj(x)) return null;
+  const done = x.done === true;
+  // A finished chapter was played at least once.
+  const rec: ChapterRecord = { plays: Math.max(done ? 1 : 0, int(x.plays, 0, 1e6, 0)), done };
+  if (typeof x.firstDone === 'number' && Number.isFinite(x.firstDone)) rec.firstDone = x.firstDone;
+  return rec;
 }
 
+function restoreSkill(id: SkillId, x: Loose): SkillState {
+  const d = newSkillState();
+  const mastered = x.mastered === true;
+  return {
+    tier: int(x.tier, 1, tierCount(id), 1),
+    score: num(x.score, 0, 1, d.score),
+    seen: int(x.seen, 0, 1e6, 0),
+    streak: int(x.streak, 0, 1e6, 0),
+    recent: Array.isArray(x.recent) ? x.recent.filter((w): w is number => typeof w === 'number' && Number.isFinite(w)).map((w) => Math.min(3, Math.max(0, Math.floor(w)))).slice(-4) : [],
+    mastered,
+    box: mastered ? int(x.box, 1, BOX_DAYS.length, 1) : 0,
+    last: num(x.last, 0, Infinity, 0),
+    due: mastered ? num(x.due, 0, Infinity, 0) : 0,
+  };
+}
+
+/**
+ * Loads anything that looks like a save, filling gaps with defaults and
+ * putting each value back in range. Never throws. Things the game doesn't
+ * know (old settings like calm mode, fields from a newer game) are left out.
+ */
 export function restore(raw: unknown): Progress {
   const d = defaultProgress();
-  if (!raw || typeof raw !== 'object') return d;
-  const r = raw as Partial<Progress>;
-  const skills: Progress['skills'] = {};
-  for (const [id, st] of Object.entries(r.skills ?? {})) {
-    if ((SKILL_IDS as readonly string[]).includes(id) && st && typeof st === 'object') skills[id as SkillId] = { ...newSkillState(), ...st };
+  if (!isObj(raw)) return d;
+  const chapters: Progress['chapters'] = {};
+  // Ids the game doesn't know are kept: they may be from a newer game, and harm nothing.
+  for (const [id, c] of Object.entries(isObj(raw.chapters) ? raw.chapters : {})) {
+    const rec = restoreChapter(c);
+    if (rec) chapters[id] = rec;
   }
+  const skills: Progress['skills'] = {};
+  for (const [id, st] of Object.entries(isObj(raw.skills) ? raw.skills : {})) {
+    if ((SKILL_IDS as readonly string[]).includes(id) && isObj(st)) skills[id as SkillId] = restoreSkill(id as SkillId, st);
+  }
+  const s = isObj(raw.settings) ? raw.settings : {};
   return {
-    ...d,
-    ...r,
     v: 1,
-    name: typeof r.name === 'string' ? r.name : d.name,
-    avatar: r.avatar && AVATARS.includes(r.avatar) ? r.avatar : null,
-    chapters: { ...(r.chapters ?? {}) },
+    name: typeof raw.name === 'string' ? raw.name : d.name,
+    avatar: AVATARS.includes(raw.avatar as Avatar) ? (raw.avatar as Avatar) : null,
+    seenOpening: raw.seenOpening === true,
+    chapters,
     skills,
-    keepsakes: Array.isArray(r.keepsakes) ? r.keepsakes : [],
-    cards: Array.isArray(r.cards) ? r.cards : [],
-    seals: Array.isArray(r.seals) ? r.seals : [],
-    settings: withoutCalm({ ...d.settings, ...(r.settings ?? {}) }),
+    keepsakes: strings(raw.keepsakes),
+    cards: strings(raw.cards),
+    seals: Array.isArray(raw.seals) ? [...new Set(raw.seals.filter((n): n is number => Number.isInteger(n) && n >= 1 && n <= LANDS.length))] : [],
+    toffees: int(raw.toffees, 0, 1e9, 0),
+    unlockAll: raw.unlockAll === true,
+    unlockedTo: int(raw.unlockedTo, -1, ALL_CHAPTERS.length - 1, -1),
+    lastPlayed: num(raw.lastPlayed, 0, Infinity, 0),
+    settings: {
+      volume: num(s.volume, 0, 1, d.settings.volume),
+      idleHintSeconds: num(s.idleHintSeconds, 0, 60, d.settings.idleHintSeconds),
+      newPerDay: int(s.newPerDay, 0, 1000, d.settings.newPerDay),
+    },
   };
 }
 

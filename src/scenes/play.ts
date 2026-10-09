@@ -28,6 +28,7 @@ import { Round } from '../core/round';
 import { pop, sm } from '../ui/anim';
 import { sealButton } from '../ui/components';
 import { h, place } from '../ui/dom';
+import { onPause, paused, playTimer } from '../ui/pause';
 import { Scene, type App } from '../ui/scene';
 
 export interface PlayOptions {
@@ -49,7 +50,6 @@ export interface PlayOptions {
   base?: number;
 }
 
-const portrait = (): boolean => document.body.classList.contains('is-portrait');
 /** After a wrong answer, how long other answers wait (see `settleUntil`). */
 const SETTLE_MS = 1000;
 /** Most times the idle hint re-reads one question. */
@@ -70,7 +70,8 @@ export class PlayScene extends Scene {
   private silky!: HTMLElement;
   private hero!: HTMLElement;
   private busy = false;
-  private idle: ReturnType<typeof setTimeout> | null = null;
+  /** Cancels the idle hint's timer. */
+  private idle: (() => void) | null = null;
   /** Silky is out helping: more taps on her wait until she's done. */
   private helping = false;
   /** The "back to the tree?" card is open. */
@@ -131,6 +132,14 @@ export class PlayScene extends Scene {
 
     this.hero = place(h('div', { class: 'play-hero', html: characterArt(this.app.progress.avatar ?? 'joe') }), 10, 560, 150, 170);
     r.append(this.hero);
+
+    // Back from the home screen, a locked screen or portrait: if he's on a
+    // question, Silky reads it again (he may have been away a while).
+    this.onCleanup(
+      onPause((p) => {
+        if (!p && this.alive && !this.busy && !this.helping && !this.confirming && !this.round.done) this.sayQuestion();
+      }),
+    );
   }
 
   enter(): void | Promise<void> {
@@ -212,8 +221,8 @@ export class PlayScene extends Scene {
 
   private sayQuestion(): void {
     this.restartIdle();
-    // Nothing is said behind the "turn the iPad" screen.
-    if (portrait()) return;
+    // Nothing is said while paused (portrait, or the app out of sight).
+    if (paused()) return;
     void voice.speech(this.round.current.say);
   }
 
@@ -221,21 +230,22 @@ export class PlayScene extends Scene {
     this.stopIdle();
     const secs = this.app.progress.settings.idleHintSeconds;
     if (!secs) return;
-    this.idle = setTimeout(() => {
+    // Its clock stops while the game is paused, so it never fires the
+    // moment he comes back (Silky reads the question then anyway).
+    this.idle = playTimer(secs * 1000, () => {
+      this.idle = null;
       if (!this.alive || this.busy || this.confirming) return;
-      // Portrait pauses the game: hold the hint and try again later.
-      if (portrait()) return this.restartIdle();
       // Twice is enough: if he has wandered off, the question doesn't
       // repeat to an empty room every few seconds.
       if (this.idleHints >= MAX_IDLE_HINTS) return;
       this.idleHints += 1;
       sfx.rustle();
       this.sayQuestion();
-    }, secs * 1000);
+    });
   }
 
   private stopIdle(): void {
-    if (this.idle) clearTimeout(this.idle);
+    this.idle?.();
     this.idle = null;
   }
 
@@ -263,6 +273,9 @@ export class PlayScene extends Scene {
     const ceiling = this.o.chapter && this.o.chapter.skills.includes(p.skill) ? this.o.chapter.tiers[1] : undefined;
     recordOutcome(this.app.progress, outcome, ceiling);
     this.app.save();
+    // At once, with the answer: if the iPad closes the app from here on, he
+    // carries on from the next problem, and this one is never counted twice.
+    this.keepPlace(this.round.index + 1);
     sfx.success();
     this.jar.textContent = String(this.app.progress.toffees);
     void pop(this.jar, 1.2);
@@ -368,14 +381,8 @@ export class PlayScene extends Scene {
     this.tap(yes, () => {
       sfx.tap();
       voice.stop();
-      // Keep his place, so picking this chapter again carries on from here.
-      // (Not in a finale, whose set piece is built up step by step.)
-      const c = this.o.chapter;
-      if (c && c.kind !== 'finale') {
-        // Mid-celebration, the problem on screen is already done.
-        const index = this.round.index + (this.busy ? 1 : 0);
-        if (index > 0 && index < this.round.total) saveResume(this.app.profile.id, { chapter: c.id, problems: this.round.problems, index, base: this.baseDots });
-      }
+      // His place is already kept (after each right answer), so picking
+      // this chapter again carries on from here.
       this.app.nav.map();
     });
     this.tap(keep, () => {
@@ -383,6 +390,23 @@ export class PlayScene extends Scene {
       close();
     });
     void voice.say(PHRASES.leaveAsk);
+  }
+
+  /**
+   * Keeps his place on this iPad: the next problem to play, `index`. It is
+   * saved after every right answer, not only when he taps the way out, as
+   * the iPad may close the app at any moment (the home button, a locked
+   * screen, the tab dropped to save memory). `index` equal to the total
+   * means every problem is answered: only the story and reward are left.
+   * Not in a finale, whose set piece is built up step by step, nor in a
+   * replay of a done chapter: that place would never be used (game.ts), and
+   * there is one place per profile, so it would wipe the one he left in a
+   * new chapter.
+   */
+  private keepPlace(index: number): void {
+    const c = this.o.chapter;
+    if (!c || c.kind === 'finale' || index <= 0 || this.app.progress.chapters[c.id]?.done) return;
+    saveResume(this.app.profile.id, { chapter: c.id, problems: this.round.problems, index, base: this.baseDots });
   }
 
   /** Practice ends with Silky's well done and the toffees earned, then one big button. */

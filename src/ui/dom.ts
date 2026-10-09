@@ -1,4 +1,5 @@
 /** Tiny DOM helpers. */
+import { playTimer } from './pause';
 
 type Attrs = Record<string, string | number | boolean | undefined>;
 
@@ -30,7 +31,12 @@ export function place(el: HTMLElement, x: number, y: number, w?: number, h?: num
   return el;
 }
 
-export const wait = (ms: number): Promise<void> => new Promise((r) => setTimeout(r, ms));
+/**
+ * Resolves after `ms` of play: the clock stops while the game is paused
+ * (ui/pause.ts), so a story or a finale waits for him instead of running on
+ * while he's away.
+ */
+export const wait = (ms: number): Promise<void> => new Promise((r) => playTimer(ms, r));
 
 /**
  * Fast, reliable tap handling for iPad: fires on pointerup inside the

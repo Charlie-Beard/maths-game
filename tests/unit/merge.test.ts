@@ -135,4 +135,37 @@ describe('mergeProgress', () => {
       canonical({ ...mergeProgress(base, b, a), keepsakes: [], cards: [], seals: [] }),
     );
   });
+
+  it('never loses a skill he mastered, even when the other side has seen more of it', () => {
+    // The iPad mastered add-10; a laptop, offline, saw more add-10 problems without mastering it.
+    const base = defaultProgress();
+    const ipad = copy(base);
+    const laptop = copy(base);
+    ipad.skills['add-10'] = { ...newSkillState(3), seen: 9, mastered: true, box: 2, last: 900, due: 5000 };
+    laptop.skills['add-10'] = { ...newSkillState(4), seen: 12, last: 800 };
+    for (const m of [mergeProgress(base, ipad, laptop), mergeProgress(base, laptop, ipad)]) {
+      // The newer tier and count, and still mastered, with its review box.
+      expect(m.skills['add-10']).toMatchObject({ tier: 4, seen: 12, mastered: true, box: 2, due: 5000 });
+    }
+  });
+
+  it('gives the same skill record whichever way round, even on a tie', () => {
+    const base = defaultProgress();
+    const a = copy(base);
+    const b = copy(base);
+    a.skills['add-10'] = { ...newSkillState(2), seen: 4, last: 50, score: 0.7 };
+    b.skills['add-10'] = { ...newSkillState(3), seen: 4, last: 50, score: 0.6 };
+    expect(mergeProgress(base, a, b).skills).toEqual(mergeProgress(base, b, a).skills);
+  });
+
+  it('counts nothing twice when a save reached the cloud but its answer was lost', () => {
+    // The iPad sent `sent`, the cloud kept it, but the reply never came: so
+    // the iPad still merges against the older base. Toffees and plays must
+    // not be added up twice (which is why they take the larger, not the sum).
+    const base = play(defaultProgress(), 0);
+    const sent = play(copy(base), 1);
+    const local = play(copy(sent), 2);
+    expect(same(mergeProgress(base, local, sent), local)).toBe(true);
+    expect(same(mergeProgress(base, sent, sent), sent)).toBe(true);
+  });
 });

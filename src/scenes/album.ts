@@ -137,23 +137,43 @@ export class AlbumScene extends Scene {
 
   // ---------------------------------------------------------------------------
 
-  /** One shelf per land, 8 keepsakes on each. Opens at the land he's in. */
+  /**
+   * One shelf per land, 8 keepsakes on each. Opens at the land he's in.
+   *
+   * There are 112 pictures, and drawing and decoding them all before the
+   * room shows took seconds on an older iPad. So the shelves he can see
+   * (the land he's in, and the ones beside it) are filled in at once, and
+   * the rest a shelf at a time just after. The buttons are all there from
+   * the start, so nothing moves when a picture arrives.
+   */
   private keepsakes(): void {
     const p = this.app.progress;
+    const here = currentLand(p);
+    const fills: { n: number; items: [HTMLElement, string][] }[] = [];
     for (const land of LANDS) {
       const shelf = h('div', { class: 'shelf-row', 'data-land': String(land.n) });
       shelf.append(h('div', { class: 'shelf-name' }, land.title));
       const items = h('div', { class: 'shelf-items' });
+      const mine: [HTMLElement, string][] = [];
       for (const c of land.chapters) {
         const have = p.keepsakes.includes(c.keepsake);
         const name = keepsakeName(c.keepsake);
-        const b = h('button', { class: `keepsake-item${have ? '' : ' missing'}`, 'aria-label': have ? name : 'Not found yet', 'data-id': c.keepsake, html: rasterHtml(keepsakeArt(c.keepsake), PAD) });
+        const b = h('button', { class: `keepsake-item${have ? '' : ' missing'}`, 'aria-label': have ? name : 'Not found yet', 'data-id': c.keepsake });
         this.tap(b, () => (have ? this.hold(name, keepsakeArt(c.keepsake), 'keepsake', c) : this.notYet(b)));
         items.append(b);
+        mine.push([b, c.keepsake]);
       }
+      fills.push({ n: land.n, items: mine });
       shelf.append(items, h('div', { class: 'shelf-plank' }));
       this.body.append(shelf);
     }
+    // Nearest shelves first; the first three before the room shows.
+    fills.sort((a, b) => Math.abs(a.n - here) - Math.abs(b.n - here) || a.n - b.n);
+    fills.forEach((f, i) => {
+      const fill = () => f.items.forEach(([b, id]) => this.body.contains(b) && (b.innerHTML = rasterHtml(keepsakeArt(id), PAD)));
+      if (i < 3) fill();
+      else this.later(60 * (i - 2), fill);
+    });
     // Once on screen (layout is only known then), open at the shelf of the land he's in.
     const scroll = () => {
       const here = this.body.querySelector<HTMLElement>(`.shelf-row[data-land="${currentLand(p)}"]`);
