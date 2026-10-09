@@ -39,9 +39,9 @@ export default defineStory({
     // ---- A whole ice-pie… cut right down the middle.
     const [rightHalf, leftHalf] = pieWedges(2, 'l9c4-pie').map((art) => k.add(art, { x: 440, y: 150, w: 300, z: 15 }));
     [rightHalf, leftHalf].forEach((h) => k.set(h, { opacity: 0 }));
-    void k.say('pie', sp);
+    const said = k.say('pie', sp);
     await k.all(k.appear(rightHalf, 0.4), k.appear(leftHalf, 0.4));
-    await k.wait(1500);
+    await k.all(said, k.wait(1500));
 
     const line = k.add(cutLine(), { x: 570, y: 120, w: 40, z: 16 });
     k.set(line, { opacity: 0, scaleY: 0, transformOrigin: '50% 0%' });

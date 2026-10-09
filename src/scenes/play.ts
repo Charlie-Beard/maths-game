@@ -47,6 +47,8 @@ export interface PlayOptions {
 const portrait = (): boolean => document.body.classList.contains('is-portrait');
 /** After a wrong answer, how long other answers wait (see `settleUntil`). */
 const SETTLE_MS = 1000;
+/** Most times the idle hint re-reads one question. */
+const MAX_IDLE_HINTS = 2;
 
 export class PlayScene extends Scene {
   protected o: PlayOptions;
@@ -72,6 +74,10 @@ export class PlayScene extends Scene {
    * card don't race up the help to Silky showing the answer.
    */
   private settleUntil = 0;
+  /** The problem whose working Silky has just said, so it isn't said twice. */
+  private explained: Problem | null = null;
+  /** Times the idle hint has re-read this problem's question. */
+  private idleHints = 0;
   private backBtn!: HTMLElement;
   /** His toffees when the screen opened, so Practice can say how many it earned. */
   private toffeesAtStart: number;
@@ -180,6 +186,7 @@ export class PlayScene extends Scene {
     this.busy = false;
     if (!this.confirming) activity.lock(false);
     activity.show();
+    this.idleHints = 0;
     this.sayQuestion();
   }
 
@@ -198,6 +205,10 @@ export class PlayScene extends Scene {
       if (!this.alive || this.busy || this.confirming) return;
       // Portrait pauses the game: hold the hint and try again later.
       if (portrait()) return this.restartIdle();
+      // Twice is enough: if he has wandered off, the question doesn't
+      // repeat to an empty room every few seconds.
+      if (this.idleHints >= MAX_IDLE_HINTS) return;
+      this.idleHints += 1;
       sfx.rustle();
       this.sayQuestion();
     }, secs * 1000);
@@ -240,7 +251,7 @@ export class PlayScene extends Scene {
     // resolves: whatever an activity does, the next problem must still come.
     await Promise.race([this.activity?.right(), this.sleep(8000)]);
     if (!this.alive) return;
-    await voice.speech(p.explain);
+    if (this.explained !== p) await voice.speech(p.explain);
     // Leaving stops the voice, which ends these lines early: don't go on to the next one.
     if (!this.alive) return;
     if (outcome.wrong === 0 && this.rand.chance(0.35)) await voice.say(this.rand.pick(PRAISE));
@@ -293,7 +304,8 @@ export class PlayScene extends Scene {
       // Skip the working if something interrupted her opening line.
       if (await voice.say(PHRASES.silkyHere)) {
         if (!this.alive) return;
-        await voice.speech(this.round.current.explain);
+        const p = this.round.current;
+        if (await voice.speech(p.explain)) this.explained = p;
       }
     } finally {
       this.helping = false;

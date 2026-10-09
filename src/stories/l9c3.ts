@@ -60,9 +60,9 @@ export default defineStory({
       k.set(r, { opacity: 0 });
       return r;
     });
-    void k.say(`ask_${host}`, hostEl);
+    const said = k.say(`ask_${host}`, hostEl);
     await k.all(...sleds.map((s, i) => k.wait(i * 120).then(() => k.appear(s, 0.3))), ...riders.map((r, i) => k.wait(i * 80).then(() => k.appear(r, 0.3))));
-    await k.wait(1800);
+    await k.all(said, k.wait(1800));
 
     // ---- Two hop on each sledge, and the sledges are counted.
     const tags = SX.map((x, n) => {

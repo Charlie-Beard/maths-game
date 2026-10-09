@@ -44,12 +44,12 @@ export default defineStory({
       k.set(b, { opacity: 0 });
       return b;
     });
-    void k.say(`rule_${host}`, hostEl);
+    const said = k.say(`rule_${host}`, hostEl);
     for (const b of balls) {
       await k.appear(b, 0.18);
       await k.wait(60);
     }
-    await k.wait(900);
+    await k.all(said, k.wait(900));
 
     // ---- Dealt out one at a time: host, hero, Mr Snowman. Four each.
     // A pile is a square of four under each of them.
