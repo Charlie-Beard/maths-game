@@ -303,6 +303,10 @@ screen.
 
 ## Session 6: the second adventure (lands 11–14)
 
+**Done.** The maths, the art, the 32 stories (with helpers `shoe.ts`,
+`music.ts`, `fair.ts` and `goblinCave.ts`) and the four finales are in,
+and every test passes. Only the voices remain (W8 above).
+
 Jasper asked for more lands. Four new ones come **after** Dame Snap is
 beaten and the ending film plays (`ENDING_AFTER = 'l10c8'` in
 `curriculum.ts`), so no existing chapter id or save moves. They finish off
