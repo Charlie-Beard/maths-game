@@ -57,15 +57,48 @@ export function loadManifest(): Promise<void> {
   return manifestLoaded;
 }
 
+/**
+ * Decoded clips are big (about 190 KB for every second of speech), and a
+ * long session says thousands of different lines, so the cache keeps only
+ * the most recently used couple of minutes. The pieces and numbers that
+ * every question uses stay warm; a story line he heard ten chapters ago
+ * is fetched again from the browser's own cache if it is ever needed.
+ */
+const MAX_CACHED_SECONDS = 120;
+const cachedSeconds = new Map<string, number>();
+let cachedTotal = 0;
+
+function remember(url: string, buf: AudioBuffer): void {
+  cachedSeconds.set(url, buf.duration);
+  cachedTotal += buf.duration;
+  // Oldest first (a Map keeps the order they were last used in); never the one just decoded.
+  for (const old of buffers.keys()) {
+    if (cachedTotal <= MAX_CACHED_SECONDS) break;
+    const secs = cachedSeconds.get(old);
+    if (old === url || secs === undefined) continue;
+    cachedTotal -= secs;
+    cachedSeconds.delete(old);
+    buffers.delete(old);
+  }
+}
+
 function fetchBuffer(url: string): Promise<AudioBuffer | null> {
   let p = buffers.get(url);
-  if (!p) {
-    p = fetchSoon(url)
-      .then((r) => (r.ok ? r.arrayBuffer() : Promise.reject(new Error(String(r.status)))))
-      .then((data) => audio().decodeAudioData(data))
-      .catch(() => null);
+  if (p) {
+    // Used again: move it to the back of the queue for going.
+    buffers.delete(url);
     buffers.set(url, p);
+    return p;
   }
+  p = fetchSoon(url)
+    .then((r) => (r.ok ? r.arrayBuffer() : Promise.reject(new Error(String(r.status)))))
+    .then((data) => audio().decodeAudioData(data))
+    .then((buf) => {
+      if (buffers.get(url) === p) remember(url, buf);
+      return buf;
+    })
+    .catch(() => null);
+  buffers.set(url, p);
   return p;
 }
 
