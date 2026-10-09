@@ -21,7 +21,7 @@ import { LANDS } from '../core/curriculum';
 import { LAND_ART } from './lands';
 import { cloudBank, stars } from './lands/common';
 import { C } from './palette';
-import { band, circle, curve, dot, ellipse, group, ink, piece, poly, rect, rng, svg, type Node, type Pt } from './paper';
+import { band, cached, circle, curve, dot, ellipse, group, ink, piece, poly, rect, rng, svg, type Node, type Pt } from './paper';
 
 export interface TreePlace {
   id: string;
@@ -343,7 +343,7 @@ export interface TreeOpts {
 }
 
 /** The Faraway Tree at dusk, with a land (or none) in the cloud at the top. */
-export function tree(name: string, o: TreeOpts = {}): string {
+export const tree = cached((name: string, o: TreeOpts = {}): string => {
   const art = o.landN ? LAND_ART[o.landN] : undefined;
   const land: Node[] = art ? art.farNodes() : o.landColor ? plainLand(o.landColor) : [];
   const sl = slide();
@@ -427,7 +427,7 @@ export function tree(name: string, o: TreeOpts = {}): string {
     ...grass,
   ];
   return svg({ w: 1180, h: 820, name, boil: false, className: 'backdrop' }, nodes);
-}
+});
 
 /**
  * The Faraway Tree at dusk (the title and the map). A `landColor` that

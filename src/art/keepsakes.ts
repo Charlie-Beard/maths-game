@@ -16,7 +16,7 @@
  */
 import { LANDS } from '../core/curriculum';
 import { C } from './palette';
-import { band, circle, curve, dot, ellipse, group, ink, piece, poly, rect, svg, type Node, type Pt } from './paper';
+import { band, cached, circle, curve, dot, ellipse, group, ink, piece, poly, rect, svg, type Node, type Pt } from './paper';
 import { flat, glint, ground, propNodes, scallop, shine, starPts } from './props';
 import { at, big, bigKey, cut, cutFlat, grass, mix, snowLip, text, type Draw } from './keepsake-kit';
 import { EMBLEM_L11, KEEPSAKES_L11, NAMES_L11 } from './keepsakes-l11';
@@ -985,10 +985,10 @@ export const KEEPSAKE_NAMES: Record<string, string> = {
 export const KEEPSAKE_IDS: string[] = Object.keys(DRAW);
 
 /** A keepsake's picture, 200 × 200. Unknown ids get a plain gold star. */
-export function keepsakeArt(id: string): string {
+export const keepsakeArt = cached((id: string): string => {
   const draw = DRAW[id] ?? L10.goldStar;
   return svg({ w: 200, h: 200, name: 'ks-' + id, label: KEEPSAKE_NAMES[id] ?? id, className: 'keepsake' }, draw());
-}
+}, 120);
 
 // ---------------------------------------------------------------------------
 // Land seals

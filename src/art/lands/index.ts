@@ -6,7 +6,7 @@
  *   farNodes()   the far view as paper nodes, so the tree can compose it
  *                straight into its own picture (art/scenery.ts)
  */
-import type { Node } from '../paper';
+import { cached, type Node } from '../paper';
 import * as l1 from './l1';
 import * as l2 from './l2';
 import * as l3 from './l3';
@@ -29,8 +29,9 @@ export interface LandArt {
 }
 
 const art = (m: { landFar: LandArt['far']; landScene: LandArt['scene']; farNodes: LandArt['farNodes'] }): LandArt => ({
-  far: m.landFar,
-  scene: m.landScene,
+  // Drawn once and kept: a land's reward screen is the same picture eight times over.
+  far: cached(m.landFar, 4),
+  scene: cached(m.landScene, 4),
   farNodes: m.farNodes,
 });
 

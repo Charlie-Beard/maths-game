@@ -414,6 +414,28 @@ export function svg(o: SvgOpts, children: Node[]): string {
     .join('')}</svg>`;
 }
 
+/**
+ * Remembers the art a function drew, by its arguments. Paper art is seeded
+ * by its name, so the same call always draws the same picture, and drawing
+ * it is the slow part of showing a scene (tearing every outline, writing
+ * every path). Coming back to the map after each chapter, or to the same
+ * land's reward screen eight times, then costs nothing the second time.
+ * The strings are big, so only the last `keep` are held.
+ */
+export function cached<A extends unknown[]>(draw: (...args: A) => string, keep = 6): (...args: A) => string {
+  const made = new Map<string, string>();
+  return (...args) => {
+    const key = JSON.stringify(args);
+    let art = made.get(key);
+    if (art === undefined) {
+      art = draw(...args);
+      if (made.size >= keep) made.delete(made.keys().next().value!);
+      made.set(key, art);
+    }
+    return art;
+  };
+}
+
 /** Torn rectangle background for HTML elements (tiles, cards, panels). */
 export function tornRectPath(w: number, h: number, seed: number, rough = 1, inset = 4): string {
   return toPath(
