@@ -228,3 +228,19 @@ test('a place kept by an older build is dropped: the chapter starts again', asyn
   await expect(page.locator('.pdot')).toHaveCount(8);
   await expect(page.locator('.pdot.done')).toHaveCount(0);
 });
+
+test('a place kept for a chapter that is done since (on another device, say) is not used', async ({ page }) => {
+  await openChapter(page);
+  await answerRight(page, 2);
+  expect(await page.evaluate(() => localStorage.getItem('faraway-maths:resume:jasper'))).toContain('"chapter":"l1c1"');
+  // The chapter is finished elsewhere and the save comes down to this iPad.
+  await page.evaluate(() => {
+    const k = 'faraway-maths:v1:jasper';
+    const s = JSON.parse(localStorage.getItem(k)!);
+    s.chapters.l1c1 = { plays: 1, done: true, firstDone: Date.now() };
+    localStorage.setItem(k, JSON.stringify(s));
+  });
+  await openChapter(page, '/?scene=chapter&id=l1c1&seed=99');
+  await expect(page.locator('.pdot.done')).toHaveCount(0);
+  expect(await page.evaluate(() => localStorage.getItem('faraway-maths:resume:jasper'))).toBeNull();
+});

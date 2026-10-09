@@ -398,11 +398,14 @@ export class PlayScene extends Scene {
    * the iPad may close the app at any moment (the home button, a locked
    * screen, the tab dropped to save memory). `index` equal to the total
    * means every problem is answered: only the story and reward are left.
-   * Not in a finale, whose set piece is built up step by step.
+   * Not in a finale, whose set piece is built up step by step, nor in a
+   * replay of a done chapter: that place would never be used (game.ts), and
+   * there is one place per profile, so it would wipe the one he left in a
+   * new chapter.
    */
   private keepPlace(index: number): void {
     const c = this.o.chapter;
-    if (!c || c.kind === 'finale' || index <= 0) return;
+    if (!c || c.kind === 'finale' || index <= 0 || this.app.progress.chapters[c.id]?.done) return;
     saveResume(this.app.profile.id, { chapter: c.id, problems: this.round.problems, index, base: this.baseDots });
   }
 

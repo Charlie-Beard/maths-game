@@ -105,8 +105,12 @@ export class Game implements Nav {
 
   private play(land: Land, chapter: Chapter): void {
     const rand = makeRand(seedParam());
-    // A chapter he left part way carries on where he was.
-    const resume = chapter.kind === 'finale' ? null : takeResume(this.app.profile.id, chapter.id);
+    // A chapter he left part way carries on where he was. Not if the
+    // chapter is done already (finished on another device, say, while this
+    // iPad still held his old place): it plays afresh as a replay. Taking
+    // the place forgets it, and only if it is this chapter's.
+    const kept = chapter.kind === 'finale' ? null : takeResume(this.app.profile.id, chapter.id);
+    const resume = this.app.progress.chapters[chapter.id]?.done ? null : kept;
     // Every problem was answered before the app closed: on to the story and reward.
     if (resume && resume.index >= resume.problems.length) return this.finish(land, chapter);
     const problems = resume?.problems ?? buildRound(chapter, this.app.progress, rand, Date.now());
