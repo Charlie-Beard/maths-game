@@ -31,7 +31,6 @@ export interface Kit {
 
 export function kit(kind: string, ctx: ActivityContext): Kit {
   const el = h('div', { class: `activity activity-${kind} b-activity` });
-  if (ctx.calm) el.classList.add('is-calm');
   const cleanups: (() => void)[] = [];
   let locked = false;
   return {
@@ -128,8 +127,7 @@ export function removeOneWrong(cards: Map<string, HTMLElement>, answer: Answer):
 }
 
 /** The cards rise into place, a frame at a time. */
-export function cardsIn(cards: Iterable<HTMLElement>, ctx: ActivityContext): void {
-  if (ctx.calm) return;
+export function cardsIn(cards: Iterable<HTMLElement>): void {
   [...cards].forEach((c, i) => void smFrom(c, 0.35, { y: 60, opacity: 0, delay: 0.1 + i * 0.06 }));
 }
 
@@ -197,12 +195,8 @@ export function sumText(k: Kit, text: string | undefined, y = 470): HTMLElement 
  * Moves an element (already in its final place) in from a point, smoothly:
  * dx, dy is where it starts relative to where it ends.
  */
-export function flyIn(el: HTMLElement, dx: number, dy: number, ctx: ActivityContext, duration = 0.4): Promise<void> {
+export function flyIn(el: HTMLElement, dx: number, dy: number, duration = 0.4): Promise<void> {
   return new Promise((resolve) => {
-    if (ctx.calm) {
-      void smFrom(el, 0.15, { opacity: 0, onComplete: () => resolve() });
-      return;
-    }
     void sm(el, duration, {
       startAt: { x: dx, y: dy, rotation: dx > 0 ? 12 : -12, scale: 0.9 },
       x: 0,
@@ -216,11 +210,7 @@ export function flyIn(el: HTMLElement, dx: number, dy: number, ctx: ActivityCont
 }
 
 /** Lifts an element off and removes it. */
-export function liftOff(el: HTMLElement, ctx: ActivityContext): void {
-  if (ctx.calm) {
-    el.remove();
-    return;
-  }
+export function liftOff(el: HTMLElement): void {
   void sm(el, 0.25, { y: -30, opacity: 0, scale: 0.8, ease: 'power2.in', onComplete: () => el.remove() });
 }
 

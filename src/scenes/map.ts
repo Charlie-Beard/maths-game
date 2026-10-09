@@ -15,7 +15,7 @@
  * previous land and the ladder up to the next.
  *
  * The first time a land arrives, the cloud parts and the new land settles
- * into it (not in calm mode, where it is simply there).
+ * into it.
  */
 import { gsap } from 'gsap';
 import { sfx } from '../audio/sfx';
@@ -31,7 +31,7 @@ import { waxSeal } from '../art/ui';
 import { ALL_CHAPTERS, LANDS, type Chapter } from '../core/curriculum';
 import { landLine, PHRASES } from '../core/phrases';
 import { currentIndex, isOpen, type Progress } from '../core/progress';
-import { breathe, isCalm, pop, sm, stepped, wobble } from '../ui/anim';
+import { breathe, pop, sm, stepped, wobble } from '../ui/anim';
 import { banner, portraitButton, sealButton } from '../ui/components';
 import { h, place } from '../ui/dom';
 import { Scene, type App } from '../ui/scene';
@@ -117,7 +117,7 @@ export class MapScene extends Scene {
     const here = this.landN === currentLand(p);
     this.arriving = here && landSeen(this.app.profile.id) < this.landN;
     if (this.arriving) markLandSeen(this.app.profile.id, this.landN);
-    const animate = this.arriving && !isCalm();
+    const animate = this.arriving;
 
     // The tree, with the land in its cloud (or an empty cloud, for the land to arrive into).
     // Nothing in it moves, so it is one picture. Only when a land is arriving does the
@@ -182,7 +182,7 @@ export class MapScene extends Scene {
     await picturesReady(this.root);
     const land = LANDS[this.landN - 1];
     if (this.arriving) {
-      if (!isCalm()) await this.arrive();
+      await this.arrive();
       await voice.say(landLine(land.title));
     }
     if (this.limited && this.landN === currentLand(this.app.progress)) {

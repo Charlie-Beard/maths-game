@@ -73,7 +73,6 @@ export function choose(p: Problem, ctx: ActivityContext): Activity {
   return {
     el,
     show() {
-      if (ctx.calm) return;
       gsap.from([...cards.values()], { y: 60, opacity: 0, duration: 0.3, stagger: 0.06, ease: 'power2.out' });
     },
     wrong(value: Answer) {

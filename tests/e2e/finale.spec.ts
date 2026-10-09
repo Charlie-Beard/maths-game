@@ -3,8 +3,7 @@
  * and Dame Snap (land 4), each played through to the reward with right
  * answers, plus Silky's help inside a finale. Then every land's finale,
  * 1 to 10, played through with its own hazard or board: the set piece
- * must hold still while a problem is up, nothing may throw, and calm mode
- * must still reach the end.
+ * must hold still while a problem is up, and nothing may throw.
  */
 import { expect, test, type Page } from '@playwright/test';
 import { fakeCloud } from './cloud';
@@ -188,20 +187,6 @@ test.describe('every land’s finale', () => {
       } else await playThrough(page, land.count);
       const saved = await page.evaluate(() => JSON.parse(localStorage.getItem('faraway-maths:v1:jasper') ?? '{}'));
       expect(saved.chapters[`l${land.n}c8`].done).toBe(true);
-      expect(errors).toEqual([]);
-    });
-  }
-
-  for (const n of [9, 7]) {
-    const land = LANDS[n - 1];
-    test(`land ${n}: ${land.mode} in calm mode still reaches the reward`, async ({ page }) => {
-      test.setTimeout(240_000);
-      const errors = watchErrors(page);
-      // A new profile follows the iPad's Reduce Motion setting.
-      await page.emulateMedia({ reducedMotion: 'reduce' });
-      await openFinale(page, `l${n}c8`, land.mode);
-      await expect(page.locator('html')).toHaveClass(/calm/);
-      await playThrough(page, land.count);
       expect(errors).toEqual([]);
     });
   }

@@ -133,7 +133,7 @@ export default defineStory({
     const ty = 116;
     const toffees = HANGS.map(([x, y], i) => k.prop('toffee', { x: tx + x - 40, y: ty + y - 10, w: 80, z: 9 + (i % 2) }));
     // Each toffee swings a little on its string.
-    if (!k.calm) toffees.forEach((t, i) => gsap.to(t, { rotation: i % 2 ? 6 : -6, transformOrigin: '50% 0%', duration: 0.9 + (i % 3) * 0.2, yoyo: true, repeat: -1, ease: 'sine.inOut' }));
+    toffees.forEach((t, i) => gsap.to(t, { rotation: i % 2 ? 6 : -6, transformOrigin: '50% 0%', duration: 0.9 + (i % 3) * 0.2, yoyo: true, repeat: -1, ease: 'sine.inOut' }));
 
     const silky = k.character('silky', { x: 50, y: 380, z: 20 });
     const hero = k.character('hero', { x: 870, y: 384, z: 20 });

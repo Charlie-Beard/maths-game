@@ -82,7 +82,7 @@ export default defineStory({
     k.music('sneaky');
     k.fx.wind(2);
     const rocking = (async () => {
-      for (let i = 0; i < 3 && !k.calm; i++) {
+      for (let i = 0; i < 3; i++) {
         await k.to(fair, 1.2, { rotation: 2.5, ease: 'sine.inOut' });
         await k.to(fair, 1.2, { rotation: -2.5, ease: 'sine.inOut' });
       }
@@ -118,8 +118,8 @@ export default defineStory({
     k.music('adventure');
     organ();
     whirr(2);
-    // The whole land sways as it goes round (a little, and not at all in calm mode).
-    const sway = k.calm ? Promise.resolve() : k.to(k.root, 1.6, { rotation: 1.5, ease: 'sine.inOut' }).then(() => k.to(k.root, 1.6, { rotation: 0, ease: 'sine.inOut' }));
+    // The whole land sways as it goes round (a little).
+    const sway = k.to(k.root, 1.6, { rotation: 1.5, ease: 'sine.inOut' }).then(() => k.to(k.root, 1.6, { rotation: 0, ease: 'sine.inOut' }));
     await k.all(k.say('dizzy', sauce), k.shake(sauce, 8, 3), sway);
 
     // Mr Whirligig rushes in, ringing his bell.
@@ -180,7 +180,7 @@ export default defineStory({
     // Round and round, up and away into the sky.
     k.fx.rumble(3);
     whirr(3);
-    const away = k.to(land, 5.5, { rotation: k.calm ? 0 : 720, y: -260, scale: 0.4, opacity: 0, ease: 'power1.in' });
+    const away = k.to(land, 5.5, { rotation: 720, y: -260, scale: 0.4, opacity: 0, ease: 'power1.in' });
     await k.wait(1200);
     // His voice, far off, and the clanks getting fainter.
     clank(3, 0.6);

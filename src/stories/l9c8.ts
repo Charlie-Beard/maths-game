@@ -300,7 +300,6 @@ function towerFront(): string {
 
 /** Drops of meltwater fall from (x, y), one after another. */
 function dripDown(k: Kit, x: number, y: number, count: number): void {
-  if (k.calm) return;
   for (let i = 0; i < count; i++) {
     const d = k.add(drop(), { x: x + ((i * 53) % 240) - 120, y, w: 20, z: 30 });
     k.set(d, { opacity: 0 });

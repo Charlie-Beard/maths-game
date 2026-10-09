@@ -112,7 +112,7 @@ function shadeMode(p: Problem, ctx: ActivityContext): Activity {
   return {
     el,
     show() {
-      if (!ctx.calm) void pop(box, 1.04);
+      void pop(box, 1.04);
     },
     wrong() {
       void wobble(ok);
@@ -153,7 +153,7 @@ function readMode(p: Problem, ctx: ActivityContext): Activity {
   return {
     el,
     show() {
-      cardsIn(cards.values(), ctx);
+      cardsIn(cards.values());
     },
     wrong: (value: Answer) => wobbleValue(k, value),
     async right() {
@@ -199,7 +199,7 @@ function pictureMode(p: Problem, ctx: ActivityContext): Activity {
   return {
     el,
     show() {
-      cardsIn(cards.values(), ctx);
+      cardsIn(cards.values());
     },
     wrong: (value: Answer) => wobbleValue(k, value),
     async right() {

@@ -128,7 +128,7 @@ export function compare(p: Problem, ctx: ActivityContext): Activity {
   return {
     el,
     show() {
-      cardsIn(cards.values(), ctx);
+      cardsIn(cards.values());
     },
     wrong(value: Answer) {
       wobbleValue(k, value);
@@ -144,7 +144,7 @@ export function compare(p: Problem, ctx: ActivityContext): Activity {
       } else {
         await cardRight(target ?? undefined);
       }
-      await new Promise((r) => setTimeout(r, ctx.calm ? 100 : 500));
+      await new Promise((r) => setTimeout(r, 500));
     },
     help(level) {
       if (level === 1) {

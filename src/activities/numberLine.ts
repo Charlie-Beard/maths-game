@@ -127,7 +127,6 @@ export function numberLine(p: Problem, ctx: ActivityContext): Activity {
         hopper.style.left = `${tx}px`;
         resolve();
       };
-      if (ctx.calm) return finish();
       const dx = tx - parseFloat(hopper.style.left);
       gsap
         .timeline({ onComplete: finish })
@@ -184,8 +183,8 @@ export function numberLine(p: Problem, ctx: ActivityContext): Activity {
   return {
     el: shell.el,
     show() {
-      enter([ladderEl, hopper, ...tags.values()], ctx.calm);
-      if (!ctx.calm) gsap.from([back, tick, on], { y: 60, opacity: 0, duration: 0.3, stagger: 0.06, ease: 'power2.out' });
+      enter([ladderEl, hopper, ...tags.values()]);
+      gsap.from([back, tick, on], { y: 60, opacity: 0, duration: 0.3, stagger: 0.06, ease: 'power2.out' });
     },
     wrong(val: Answer) {
       const t = lastPick ?? tags.get(Number(val));
@@ -203,7 +202,7 @@ export function numberLine(p: Problem, ctx: ActivityContext): Activity {
       }
       await chain;
       if (t) await pop(t, 1.2);
-      if (!ctx.calm && alive) await pop(hopper, 1.15);
+      if (alive) await pop(hopper, 1.15);
     },
     help(level) {
       if (level === 1) {

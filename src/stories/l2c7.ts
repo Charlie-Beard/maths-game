@@ -124,7 +124,7 @@ export default defineStory({
     const cups = CUPS_X.map((x, i) => k.prop('teacup', { x, y: CUP_Y, w: CUP, z: 9 + i }));
     const hero = k.character('hero', { x: 10, y: 400, w: 250, z: 12 });
     k.set(hero, { opacity: 0 });
-    if (!k.calm) flutter(k, wings);
+    flutter(k, wings);
 
     // ---- Tea pours the wrong way: up out of two cups, into the pot.
     const pour = async () => {

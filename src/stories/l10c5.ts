@@ -52,7 +52,7 @@ export default defineStory({
     const tubPart = k.part(wash.who, 'tub');
     tubPart.forEach((p) => (p.style.opacity = '0'));
     k.part(wash.who, 'suds').forEach((p) => (p.style.opacity = '0'));
-    if (!k.calm) void k.to(k.part(watz.who, 'zzz'), 1.2, { y: -8, opacity: 0.5, yoyo: true, repeat: -1, ease: 'sine.inOut' });
+    void k.to(k.part(watz.who, 'zzz'), 1.2, { y: -8, opacity: 0.5, yoyo: true, repeat: -1, ease: 'sine.inOut' });
     const crow = k.add(crowFlying('c5'), { x: 880, y: -6, w: 120, z: 37 });
     k.set(crow, { rotation: -10 });
 

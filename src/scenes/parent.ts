@@ -7,7 +7,7 @@
  *             by strand
  *   Levels    unlock every chapter, unlock up to a chapter, or lock the
  *             ones after a chapter again
- *   Settings  the player's name, who he climbs with, volume, calm mode, the idle hint, new
+ *   Settings  the player's name, who he climbs with, volume, the idle hint, new
  *             chapters per day, start again
  *   Profiles  switch between Jasper, a demo and others; add or delete
  *             (Jasper's can never be deleted)
@@ -26,7 +26,6 @@ import { CloudProfile, freshProgress, type SyncState } from '../cloud/profile';
 import { ALL_CHAPTERS, AVATARS, LANDS, type Avatar } from '../core/curriculum';
 import { currentIndex, type Progress } from '../core/progress';
 import { SKILL_IDS, SKILLS, tierCount, type SkillId, type Strand } from '../core/skills';
-import { setCalm } from '../ui/anim';
 import { h, place } from '../ui/dom';
 import { Scene } from '../ui/scene';
 import { AVATAR_NAMES } from './choose';
@@ -291,12 +290,6 @@ export class ParentScene extends Scene {
     });
     vol.addEventListener('change', () => sfx.success());
 
-    const calm = toggle(s.calm, 'Calm mode', (v) => {
-      s.calm = v;
-      setCalm(v);
-      save();
-    });
-
     const idle = select(
       [['0', 'Off'], ['8', 'After 8 seconds'], ['12', 'After 12 seconds'], ['20', 'After 20 seconds']],
       String(s.idleHintSeconds),
@@ -352,7 +345,6 @@ export class ParentScene extends Scene {
       row('Player’s name', name, 'Shown in the game. The recorded voices say “Jasper”; with any other name they say the line without it (“You won the seal!”).'),
       h('div', { class: 'p-row' }, [h('div', {}, [h('strong', {}, 'Climbing with'), h('small', {}, 'Who goes up the tree with him. Keeps all his progress.')]), climb]),
       row('Volume', vol),
-      row('Calm mode', calm, 'Less movement: no flickering windows, shorter animations, no cloud parting when a land arrives.'),
       row('Say the question again', idle, 'If nothing is tapped for a while.'),
       row('New chapters per day', perDay, 'After that the map says “come back tomorrow”. Old chapters and practice with Silky are always open.'),
       row('Start again', resetBtn, 'Clears chapters, skills, keepsakes, cards, seals and the character choice. Keeps these settings and the levels.'),

@@ -111,7 +111,6 @@ const SPOTS: Array<[number, number]> = [
 
 /** Silky's wings flutter, softly, until the story ends. */
 function flutter(k: Kit, silky: HTMLElement): void {
-  if (k.calm) return;
   for (const [part, dir] of [['wingL', -1], ['wingR', 1]] as const) {
     const w = k.part(silky, part);
     if (w.length) void k.to(w, 0.25, { rotation: dir * 8, yoyo: true, repeat: -1, ease: 'sine.inOut' });

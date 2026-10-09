@@ -167,7 +167,7 @@ export function clock(p: Problem, ctx: ActivityContext): Activity {
   return {
     el,
     show() {
-      enter(setMode ? Object.values(buttons) : [...cards.values()], ctx.calm);
+      enter(setMode ? Object.values(buttons) : [...cards.values()]);
     },
     wrong(value: Answer) {
       const card = cards.get(String(value));
@@ -188,7 +188,7 @@ export function clock(p: Problem, ctx: ActivityContext): Activity {
         redraw();
         if (!setMode) {
           const wrong = [...cards.entries()].filter(([k, c]) => k !== String(p.answer) && c.isConnected && !c.hasAttribute('disabled'));
-          if (wrong.length > 1) removeCard(wrong[0][1], ctx.calm);
+          if (wrong.length > 1) removeCard(wrong[0][1]);
         } else if (target) {
           if (now.hour % 12 === target.hour % 12) markDone('hour');
           if (now.minute === target.minute) markDone('minute');

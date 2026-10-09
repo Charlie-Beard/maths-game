@@ -237,7 +237,7 @@ export default defineStory({
     // A red cap comes floating down.
     const cap = k.keepsake(k.chapter?.keepsake ?? 'goblinHat', { x: 420, y: -200, w: 150, z: 25 });
     void k.to(cap, 4, { y: 520, rotation: 30, ease: 'sine.inOut' });
-    if (!k.calm) void k.to(cap, 1, { x: '+=60', yoyo: true, repeat: 3, ease: 'sine.inOut' });
+    void k.to(cap, 1, { x: '+=60', yoyo: true, repeat: 3, ease: 'sine.inOut' });
     await k.wait(1500);
     await k.say('cap');
 

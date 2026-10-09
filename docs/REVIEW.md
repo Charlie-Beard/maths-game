@@ -39,8 +39,8 @@ No rule is broken on an ordinary problem screen.
 
 **Left, with the reason:**
 - **The compare count tags** (34 px, at help 2–3) are labels, not answers or buttons.
-- **Calm mode** is respected everywhere. The first audit listed a few loops as missing a calm check. Each one, checked by hand, is guarded where it's called.
-- **The finale's stage shake** happens between answers (after a right one), and calm mode skips it.
+- **The finale's stage shake** happens between answers (after a right one), never while he's answering.
+- **Calm mode** has since been removed altogether, at the parent's request.
 
 **Checked and clean:**
 - **No failing:** no lives, timers, buzzers or game over.

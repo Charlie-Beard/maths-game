@@ -147,7 +147,7 @@ the layout zones in `types.ts`. The interaction is in PLAN.md §5
   remove a wrong option), 3 show the answer for him to tap,
 - give the answer through `ctx.answer()` (the scene decides right or
   wrong),
-- respect calm mode, with no flashing and no background motion,
+- have no flashing and no background motion,
 - put `data-value` on answer targets (the e2e tests use it).
 
 Add a Playwright test per activity that plays one problem with
@@ -296,7 +296,7 @@ All of it is precached by the service worker (an estimated 30 MB at
 ### W9: polish
 
 App icons (from the game's own art), offline check, the 1180 × 760 Safari
-case, calm mode everywhere, a long simulated play-through (e.g. a script
+case, a long simulated play-through (e.g. a script
 that plays 80 chapters with a simulated child, checking tiers rise and
 review comes back), performance on an iPad, and a final pass on every
 screen.

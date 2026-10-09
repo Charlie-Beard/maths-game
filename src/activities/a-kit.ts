@@ -50,8 +50,8 @@ export function sumText(shell: Shell, p: Problem, y = 470): HTMLElement | null {
 
 export interface CardRow {
   cards: Map<string, HTMLElement>;
-  /** Slides the cards in (skipped in calm mode). */
-  show(calm: boolean): void;
+  /** Slides the cards in. */
+  show(): void;
   wrong(v: Answer): void;
   /** Help level 2: one wrong card goes. */
   dropOne(): void;
@@ -81,8 +81,7 @@ export function cardRow(shell: Shell, values: Answer[], answer: Answer, onPick: 
   const live = () => values.filter((v) => cards.get(String(v))?.isConnected && !cards.get(String(v))?.classList.contains('going'));
   return {
     cards,
-    show(calm) {
-      if (calm) return;
+    show() {
       gsap.from([...cards.values()], { y: 60, opacity: 0, duration: 0.3, stagger: 0.06, ease: 'back.out(1.4)', clearProps: 'opacity' });
     },
     wrong(v) {
@@ -117,9 +116,9 @@ export function seal(shell: Shell, icon: IconName, o: { x: number; y: number; si
   return shell.add(btn);
 }
 
-/** Entrance for the picture: drops in a few frames (nothing in calm mode). */
-export function enter(els: Element[], calm: boolean): void {
-  if (calm || !els.length) return;
+/** Entrance for the picture: drops in a few frames. */
+export function enter(els: Element[]): void {
+  if (!els.length) return;
   // clearProps: leave no inline opacity behind to override classes like .faded.
   smFrom(els, 0.35, { y: -24, opacity: 0, stagger: 0.03, clearProps: 'opacity' });
 }

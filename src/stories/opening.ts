@@ -176,7 +176,7 @@ function kids(k: Kit, hero: PlaceOpts, a: PlaceOpts, b: PlaceOpts): Kids {
 function snapCamera(k: Kit, zoom: number, x: number, y: number): void {
   const tx = Math.min(0, Math.max(1180 - 1180 * zoom, 590 - x * zoom));
   const ty = Math.min(0, Math.max(820 - 820 * zoom, 410 - y * zoom));
-  if (!k.calm) k.set(k.root, { x: tx, y: ty, scale: zoom, transformOrigin: '0 0' });
+  k.set(k.root, { x: tx, y: ty, scale: zoom, transformOrigin: '0 0' });
 }
 
 /** Rattles an actor's parts (the Saucepan Man's pots) from side to side. */
@@ -585,10 +585,10 @@ export default defineStory({
     const front = k.add(carFront(), { x: 0, y: 0, w: CAR_W * S, h: CAR_H * S, z: 10 });
     car.append(front);
     const wheels = k.part(front, 'wheel');
-    const spin = k.calm ? null : gsap.to(wheels, { rotation: '+=360', duration: 0.6, repeat: -1, ease: 'none', transformOrigin: '50% 50%' });
+    const spin = gsap.to(wheels, { rotation: '+=360', duration: 0.6, repeat: -1, ease: 'none', transformOrigin: '50% 50%' });
     k.set(car, { x: -900 });
     // A little bounce as it trundles along.
-    const bounce = k.calm ? null : gsap.to(car, { y: -5, duration: 0.4, yoyo: true, repeat: -1, ease: 'sine.inOut' });
+    const bounce = gsap.to(car, { y: -5, duration: 0.4, yoyo: true, repeat: -1, ease: 'sine.inOut' });
 
     putter(5);
     const exhaust = () => {
@@ -750,7 +750,7 @@ export default defineStory({
 
     // Silky floats down like a feather, with pop biscuits.
     const wings = [...k.part(silky, 'wingL'), ...k.part(silky, 'wingR')];
-    const flutter = k.calm ? null : gsap.to(wings, { scaleX: 0.8, duration: 0.4, yoyo: true, repeat: -1, ease: 'sine.inOut', transformOrigin: '50% 50%' });
+    const flutter = gsap.to(wings, { scaleX: 0.8, duration: 0.4, yoyo: true, repeat: -1, ease: 'sine.inOut', transformOrigin: '50% 50%' });
     k.set(silky, { y: -420, opacity: 1 });
     k.fx.twinkle();
     k.sfx.sparkle();
@@ -788,7 +788,7 @@ export default defineStory({
     await k.appear(pixie, 0.25);
     void k.to(footKids.hero, 0.25, { rotation: -6, x: '-=50' });
     const puffs = k.part(pixie, 'puff');
-    if (!k.calm) gsap.to(puffs, { scale: 1.3, duration: 0.35, yoyo: true, repeat: 3, ease: 'sine.inOut', transformOrigin: '50% 50%' });
+    gsap.to(puffs, { scale: 1.3, duration: 0.35, yoyo: true, repeat: 3, ease: 'sine.inOut', transformOrigin: '50% 50%' });
     void k.shake(pixie, 5, 2);
     await k.say('pixie', pixie);
     // SLAM!

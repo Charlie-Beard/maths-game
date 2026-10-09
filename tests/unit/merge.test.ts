@@ -104,13 +104,13 @@ describe('mergeProgress', () => {
     const remote = copy(base);
     local.settings.volume = 0.3;
     remote.settings.volume = 0.6;
-    remote.settings.calm = true;
+    remote.settings.newPerDay = 5;
     local.avatar = 'beth';
     remote.avatar = 'joe';
     remote.unlockAll = true;
     const m = mergeProgress(base, local, remote);
     expect(m.settings.volume).toBe(0.3);
-    expect(m.settings.calm).toBe(true);
+    expect(m.settings.newPerDay).toBe(5);
     expect(m.avatar).toBe('beth');
     expect(m.unlockAll).toBe(true);
   });

@@ -345,7 +345,6 @@ export function goblin(k: Kit, name: string, o: { x: number; y: number; w?: numb
 
 /** A goblin's little marching step: a bob, `times` over, `each` seconds a step. */
 export async function goblinBob(k: Kit, els: HTMLElement[], times: number, each = 0.3): Promise<void> {
-  if (k.calm) return k.wait(times * each * 1000);
   for (let i = 0; i < times; i++) {
     await k.all(...els.map((e) => k.to(e, each / 2, { y: '-=8', rotation: i % 2 ? 3 : -3, ease: 'sine.out' })));
     await k.all(...els.map((e) => k.to(e, each / 2, { y: '+=8', ease: 'sine.in' })));

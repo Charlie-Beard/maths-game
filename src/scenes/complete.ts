@@ -19,7 +19,7 @@ import { glowBlob } from '../art/ui';
 import type { Chapter, Land } from '../core/curriculum';
 import { CHARACTER_NAMES } from '../core/names';
 import { PHRASES } from '../core/phrases';
-import { breathe, isCalm, pop, sm, stepped } from '../ui/anim';
+import { breathe, pop, sm, stepped } from '../ui/anim';
 import { flipCard, sealButton } from '../ui/components';
 import { h, place } from '../ui/dom';
 import { Scene, type App } from '../ui/scene';
@@ -112,7 +112,6 @@ export class CompleteScene extends Scene {
 
   async enter(): Promise<void> {
     const { chapter: c, news } = this.o;
-    const calm = isCalm();
     if (!this.alive) return;
     sfx.fanfare();
     // Next pops in straight away, then breathes (once it has arrived, so the two never fight).
@@ -138,14 +137,9 @@ export class CompleteScene extends Scene {
     if (this.card) {
       const inner = this.card.querySelector('.card-inner')!;
       gsap.set(this.card, { opacity: 1 });
-      if (calm) {
-        gsap.set(inner, { rotationY: 0 });
-        void sm(this.card, 0.25, { startAt: { opacity: 0 }, opacity: 1 });
-      } else {
-        await sm(this.card, 0.4, { startAt: { y: -260, rotation: -8 }, y: 0, rotation: 0, ease: 'back.out(1.3)' });
-        sfx.whoosh();
-        await sm(inner, 0.8, { rotationY: 0, ease: 'power2.inOut' });
-      }
+      await sm(this.card, 0.4, { startAt: { y: -260, rotation: -8 }, y: 0, rotation: 0, ease: 'back.out(1.3)' });
+      sfx.whoosh();
+      await sm(inner, 0.8, { rotationY: 0, ease: 'power2.inOut' });
       if (!this.alive) return;
       sfx.sparkle();
       void pop(this.card, 1.05);
@@ -156,24 +150,20 @@ export class CompleteScene extends Scene {
       if (!this.alive) return;
     }
 
-    if (this.seal) await this.stamp(this.seal, calm);
+    if (this.seal) await this.stamp(this.seal);
   }
 
   /** The land seal comes down like a stamp: a thump, a little shake, a puff of dust. */
-  private async stamp(seal: HTMLElement, calm: boolean): Promise<void> {
-    if (calm) {
-      await sm(seal, 0.25, { startAt: { opacity: 0 }, opacity: 1 });
-    } else {
-      await sm(seal, 0.35, { startAt: { scale: 2.4, rotation: -18, opacity: 0 }, opacity: 1, scale: 1, rotation: 0, ease: 'power3.in' });
-      sfx.boom();
-      for (let k = 0; k < 8; k++) {
-        const a = (k / 8) * Math.PI * 2;
-        const dust = place(h('div', { class: 'stamp-dust' }), parseFloat(seal.style.left) + 130 + Math.cos(a) * 100 - 14, parseFloat(seal.style.top) + 130 + Math.sin(a) * 100 - 14, 28, 28);
-        this.root.append(dust);
-        gsap.to(dust, { x: Math.cos(a) * 50, y: Math.sin(a) * 50, opacity: 0, scale: 1.6, duration: 0.6, ease: stepped(0.6, 'power2.out'), onComplete: () => dust.remove() });
-      }
-      gsap.fromTo(this.root, { y: 6 }, { y: 0, duration: 0.3, ease: stepped(0.3, 'elastic.out(1, 0.4)') });
+  private async stamp(seal: HTMLElement): Promise<void> {
+    await sm(seal, 0.35, { startAt: { scale: 2.4, rotation: -18, opacity: 0 }, opacity: 1, scale: 1, rotation: 0, ease: 'power3.in' });
+    sfx.boom();
+    for (let k = 0; k < 8; k++) {
+      const a = (k / 8) * Math.PI * 2;
+      const dust = place(h('div', { class: 'stamp-dust' }), parseFloat(seal.style.left) + 130 + Math.cos(a) * 100 - 14, parseFloat(seal.style.top) + 130 + Math.sin(a) * 100 - 14, 28, 28);
+      this.root.append(dust);
+      gsap.to(dust, { x: Math.cos(a) * 50, y: Math.sin(a) * 50, opacity: 0, scale: 1.6, duration: 0.6, ease: stepped(0.6, 'power2.out'), onComplete: () => dust.remove() });
     }
+    gsap.fromTo(this.root, { y: 6 }, { y: 0, duration: 0.3, ease: stepped(0.3, 'elastic.out(1, 0.4)') });
     if (!this.alive) return;
     sfx.triumph();
     await voice.say(PHRASES.newSeal);

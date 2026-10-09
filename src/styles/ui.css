@@ -532,9 +532,6 @@
   opacity: 1;
   animation: halo 2s ease-in-out infinite;
 }
-.calm .stop.current .halo {
-  animation: none;
-}
 @keyframes halo {
   0%,
   100% {

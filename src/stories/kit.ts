@@ -23,8 +23,7 @@
  * recorded; until it is, the iPad's own voice reads it. `{name}` is filled in
  * with the child's name.
  *
- * Movement is smooth (see ui/anim.ts) and follows calm mode:
- * motion is shortened and particles are skipped. Nothing flashes.
+ * Movement is smooth (see ui/anim.ts). Nothing flashes.
  */
 import { gsap } from 'gsap';
 import { sfx } from '../audio/sfx';
@@ -41,7 +40,7 @@ import { CHARACTER_NAMES } from '../core/names';
 import type { Avatar, Chapter, Land } from '../core/curriculum';
 import { personalise } from '../core/phrases';
 import type { PropId } from '../core/problem';
-import { isCalm, stepped } from '../ui/anim';
+import { stepped } from '../ui/anim';
 import { h, place, wait } from '../ui/dom';
 
 export interface Line {
@@ -107,8 +106,6 @@ export class Kit<K extends string = string> {
   readonly hero: Avatar;
   /** The child's name ('' if none). */
   readonly name: string;
-  /** Calm mode is on: keep movement small and skip particles. */
-  readonly calm: boolean;
   /** Ready-made sound effects (game sounds and story sounds). */
   readonly sfx = sfx;
   readonly fx = fx;
@@ -130,7 +127,6 @@ export class Kit<K extends string = string> {
     this.name = o.name;
     this.lines = o.lines;
     this.alive = o.alive;
-    this.calm = isCalm();
     this.captionEl = place(h('div', { class: 'story-caption', 'aria-live': 'polite' }), 150, 690, 880, 110);
     const box = h('div', { class: 'story-caption-text' });
     this.tag = h('div', { class: 'story-tag', style: `background:${o.land.color}` });
@@ -299,7 +295,7 @@ export class Kit<K extends string = string> {
 
   /** Makes an actor bob gently as if talking, until the returned stopper is called. */
   talk(el: HTMLElement): () => void {
-    // The mouth opens and shuts (portraits with a `mouthOpen` part), even in calm mode.
+    // The mouth opens and shuts (portraits with a `mouthOpen` part).
     const shut = this.part(el, 'mouth');
     const open = this.part(el, 'mouthOpen');
     let flap: ReturnType<typeof setInterval> | null = null;
@@ -311,7 +307,7 @@ export class Kit<K extends string = string> {
         shut.forEach((m) => (m.style.opacity = isOpen ? '0' : '1'));
       }, 170);
     }
-    const tw = this.calm ? null : gsap.to(el, { y: '-=6', rotation: '+=2', duration: 0.4, yoyo: true, repeat: -1, ease: 'sine.inOut' });
+    const tw = gsap.to(el, { y: '-=6', rotation: '+=2', duration: 0.4, yoyo: true, repeat: -1, ease: 'sine.inOut' });
     let stopped = false;
     return () => {
       if (stopped) return;
@@ -359,11 +355,10 @@ export class Kit<K extends string = string> {
   /** A smooth eased tween. Resolves when it ends. */
   to(el: gsap.TweenTarget, seconds: number, vars: gsap.TweenVars & { ease?: string }): Promise<void> {
     if (!this.alive()) return never();
-    const d = this.calm ? Math.min(seconds, 0.3) : seconds;
     return new Promise((resolve) => {
       // Also carry on if the tween is killed early (its actor removed, or overwritten).
       const done = () => this.alive() && resolve();
-      gsap.to(el, { ...vars, duration: d, ease: stepped(d, vars.ease ?? 'power2.inOut'), onComplete: done, onInterrupt: done });
+      gsap.to(el, { ...vars, duration: seconds, ease: stepped(seconds, vars.ease ?? 'power2.inOut'), onComplete: done, onInterrupt: done });
     });
   }
 
@@ -385,7 +380,6 @@ export class Kit<K extends string = string> {
 
   /** Moves an actor (relative to where it was placed) along a little hopping path. */
   async walk(el: HTMLElement, dx: number, seconds = 1, hops = 4): Promise<void> {
-    if (this.calm) return this.to(el, seconds, { x: `+=${dx}` });
     const each = seconds / hops;
     for (let i = 0; i < hops; i++) {
       await this.all(
@@ -397,7 +391,6 @@ export class Kit<K extends string = string> {
 
   /** A happy jump (or several). */
   async hop(el: HTMLElement, height = 50, times = 1): Promise<void> {
-    if (this.calm) height = Math.min(height, 12);
     for (let i = 0; i < times; i++) {
       await this.to(el, 0.22, { y: `-=${height}`, ease: 'power2.out' });
       await this.to(el, 0.22, { y: `+=${height}`, ease: 'power2.in' });
@@ -406,7 +399,6 @@ export class Kit<K extends string = string> {
 
   /** A quick wobble from side to side (surprise, fear, laughing). */
   async shake(el: HTMLElement, amount = 10, times = 3): Promise<void> {
-    if (this.calm) amount = Math.min(amount, 3);
     for (let i = 0; i < times; i++) {
       await this.to(el, 0.1, { x: `+=${amount}`, rotation: '+=3', ease: 'sine.out' });
       await this.to(el, 0.16, { x: `-=${amount * 2}`, rotation: '-=6', ease: 'sine.inOut' });
@@ -444,13 +436,11 @@ export class Kit<K extends string = string> {
 
   /** Floats an actor gently up and down until the story ends (idle life). */
   float(el: HTMLElement, amount = 8, period = 2): void {
-    if (this.calm) return;
     gsap.to(el, { y: `-=${amount}`, duration: period / 2, yoyo: true, repeat: -1, ease: stepped(period / 2, 'sine.inOut') });
   }
 
   /** Shakes the whole stage (a big stomp or crash). Gentle and short. */
   async quake(amount = 8): Promise<void> {
-    if (this.calm) return;
     for (const dx of [amount, -amount, amount * 0.6, -amount * 0.6]) await this.to(this.root, 0.08, { x: `+=${dx}`, ease: 'sine.inOut' });
   }
 
@@ -458,7 +448,7 @@ export class Kit<K extends string = string> {
 
   /** A burst of paper stars at a point. */
   sparkle(x: number, y: number, count = 14, spread = 160): void {
-    if (this.calm || !this.alive()) return;
+    if (!this.alive()) return;
     for (let i = 0; i < count; i++) {
       const p = place(h('div', { class: 'particle', html: star(true, `story${i % 3}`) }), x, y);
       p.style.zIndex = '50';
@@ -483,13 +473,13 @@ export class Kit<K extends string = string> {
     if (!this.alive()) return;
     const el = this.add(cloud(color), { x: x - size / 2, y: y - size / 2, w: size, h: size, z: 40 });
     gsap.set(el, { scale: 0.3, opacity: 0.95 });
-    const d = this.calm ? 0.3 : 0.9;
+    const d = 0.9;
     gsap.to(el, { scale: 1.3, opacity: 0, rotation: 20, duration: d, ease: stepped(d, 'power2.out'), onComplete: () => el.remove() });
   }
 
   /** Confetti falling from the top (the big happy ending). */
   confetti(count = 30): void {
-    if (this.calm || !this.alive()) return;
+    if (!this.alive()) return;
     const colors = [C.gold, C.red, C.blue, C.green, C.goldLight, C.pink];
     for (let i = 0; i < count; i++) {
       const c = colors[i % colors.length];
@@ -517,7 +507,7 @@ export class Kit<K extends string = string> {
     const el = place(h('div', { class: 'story-wash', style: `background:${color}` }), 0, 0, 1180, 820);
     this.stage.insertBefore(el, this.captionEl);
     gsap.set(el, { opacity: 0 });
-    await this.to(el, seconds / 2, { opacity: this.calm ? strength / 2 : strength, ease: 'sine.out' });
+    await this.to(el, seconds / 2, { opacity: strength, ease: 'sine.out' });
     await this.to(el, seconds / 2, { opacity: 0, ease: 'sine.in' });
     el.remove();
   }
@@ -557,10 +547,10 @@ export class Kit<K extends string = string> {
   /**
    * Fills the scene with slow, looping atmosphere: floating dust motes,
    * fireflies, snow, rain, bubbles, rising embers or twinkling stars.
-   * In front of the actors unless `z` says otherwise. Skipped in calm mode.
+   * In front of the actors unless `z` says otherwise.
    */
   ambient(kind: 'dust' | 'fireflies' | 'snow' | 'rain' | 'bubbles' | 'embers' | 'stars', o: { count?: number; z?: number; area?: [number, number, number, number] } = {}): void {
-    if (this.calm || !this.alive()) return;
+    if (!this.alive()) return;
     const [ax, ay, aw, ah] = o.area ?? [0, 0, 1180, 690];
     const look = {
       dust: { size: [3, 6], color: C.goldLight, glow: 6, opacity: 0.55 },
@@ -627,7 +617,7 @@ export class Kit<K extends string = string> {
     el.style.zIndex = String(o.z ?? 35);
     el.style.opacity = String(strength);
     this.root.append(el);
-    if (o.flicker && !this.calm) {
+    if (o.flicker) {
       gsap.to(el, { opacity: strength * 0.7, scale: 0.96, duration: 0.9 + Math.random() * 0.6, yoyo: true, repeat: -1, ease: stepped(1, 'sine.inOut') });
     }
     return el;
@@ -657,10 +647,6 @@ export class Kit<K extends string = string> {
     const tx = Math.min(0, Math.max(1180 - 1180 * z, 590 - (o.x ?? 590) * z));
     const ty = Math.min(0, Math.max(820 - 820 * z, 410 - (o.y ?? 410) * z));
     const to = { x: tx, y: ty, scale: z, transformOrigin: '0 0' };
-    if (this.calm) {
-      this.set(this.root, to);
-      return Promise.resolve();
-    }
     // Hint the browser to keep the world as one GPU layer while it moves, so a
     // push-in slides a picture instead of redrawing every piece each frame.
     // Dropped afterwards so the still shot is redrawn sharp at its new size.

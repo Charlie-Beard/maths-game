@@ -24,7 +24,7 @@ import type { Answer, Problem } from '../core/problem';
 import { recordOutcome } from '../core/progress';
 import { makeRand, randomSeed, type Rand } from '../core/random';
 import { Round } from '../core/round';
-import { isCalm, pop, sm } from '../ui/anim';
+import { pop, sm } from '../ui/anim';
 import { sealButton } from '../ui/components';
 import { h, place } from '../ui/dom';
 import { Scene, type App } from '../ui/scene';
@@ -163,7 +163,6 @@ export class PlayScene extends Scene {
       answer: (v) => void this.onAnswer(v),
       say: (s) => void voice.speech(s),
       sfx: (name) => (name === 'place' ? sfx.place(0) : sfx[name]()),
-      calm: isCalm(),
     });
     this.desk.insertBefore(this.activity.el, this.silky);
     stackFractions(this.activity.el);
@@ -289,9 +288,7 @@ export class PlayScene extends Scene {
     this.helping = true;
     try {
       sfx.sparkle();
-      if (!isCalm()) {
-        await sm(this.silky, 0.6, { x: -440, y: -160, scale: 1.3, ease: 'power2.inOut' });
-      }
+      await sm(this.silky, 0.6, { x: -440, y: -160, scale: 1.3, ease: 'power2.inOut' });
       if (!this.alive) return;
       // Skip the working if something interrupted her opening line.
       if (await voice.say(PHRASES.silkyHere)) {
@@ -300,7 +297,7 @@ export class PlayScene extends Scene {
       }
     } finally {
       this.helping = false;
-      if (this.alive && !isCalm()) gsap.to(this.silky, { x: 0, y: 0, scale: 1, duration: 0.6, ease: 'power2.out' });
+      if (this.alive) gsap.to(this.silky, { x: 0, y: 0, scale: 1, duration: 0.6, ease: 'power2.out' });
     }
   }
 
@@ -319,7 +316,7 @@ export class PlayScene extends Scene {
     card.append(yes, keep);
     veil.append(card);
     this.root.append(veil);
-    if (!isCalm()) void sm(card, 0.25, { startAt: { scale: 0.92, opacity: 0 }, scale: 1, opacity: 1, ease: 'power2.out' });
+    void sm(card, 0.25, { startAt: { scale: 0.92, opacity: 0 }, scale: 1, opacity: 1, ease: 'power2.out' });
     const close = () => {
       veil.remove();
       this.confirming = false;
@@ -354,7 +351,7 @@ export class PlayScene extends Scene {
     card.append(on);
     veil.append(card);
     this.root.append(veil);
-    if (!isCalm()) void pop(card, 1.05);
+    void pop(card, 1.05);
     this.tap(on, () => {
       sfx.tap();
       voice.stop();
@@ -365,7 +362,6 @@ export class PlayScene extends Scene {
   }
 
   private async cheer(): Promise<void> {
-    if (isCalm()) return;
     await sm(this.hero, 0.2, { y: -40, ease: 'power2.out' });
     await sm(this.hero, 0.2, { y: 0, ease: 'power2.in' });
   }

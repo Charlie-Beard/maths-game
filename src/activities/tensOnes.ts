@@ -121,7 +121,7 @@ function readMode(p: Problem, tens: number, ones: number, ctx: ActivityContext):
         });
       }
     }
-    if (fresh && !ctx.calm) {
+    if (fresh) {
       const all = row.querySelectorAll<HTMLElement>(fresh === 'ten' ? '.b-bundle' : '.b-stick');
       const last = all[all.length - 1];
       if (last) void smFrom(last, 0.3, { y: -40, opacity: 0, ease: 'back.out(2)' });
@@ -175,7 +175,7 @@ function readMode(p: Problem, tens: number, ones: number, ctx: ActivityContext):
   return {
     el,
     show() {
-      cardsIn(cards.values(), ctx);
+      cardsIn(cards.values());
     },
     wrong: (value: Answer) => wobbleValue(k, value),
     async right() {
@@ -278,15 +278,15 @@ function buildMode(p: Problem, ctx: ActivityContext): Activity {
       ctx.say({ text: '{n}', vals: { n: value() } });
     }
     const [px, py] = stageCentre(side ? onePile : tenPile, el);
-    await flyIn(pc, px - (x + CELL.w / 2), py - (y + CELL.h / 2), ctx, 0.35);
+    await flyIn(pc, px - (x + CELL.w / 2), py - (y + CELL.h / 2), 0.35);
   };
 
   /** Ten loose sticks tie themselves into a bundle and slide over to the tens. */
   const tieBundle = async (): Promise<void> => {
     k.lock(true);
-    await new Promise((r) => setTimeout(r, ctx.calm ? 50 : 350));
+    await new Promise((r) => setTimeout(r, 350));
     const sticks = placed[1].splice(0);
-    sticks.forEach((s) => liftOff(s, ctx));
+    sticks.forEach((s) => liftOff(s));
     const i = placed[0].length;
     const pc = pieceEl(0);
     const [x, y] = cellAt(0, i);
@@ -296,7 +296,7 @@ function buildMode(p: Problem, ctx: ActivityContext): Activity {
     refresh();
     ctx.sfx('rustle');
     const [ox, oy] = cellAt(1, 2);
-    await flyIn(pc, ox - x, oy - y, ctx, 0.5);
+    await flyIn(pc, ox - x, oy - y, 0.5);
     k.lock(false);
   };
 
@@ -312,7 +312,7 @@ function buildMode(p: Problem, ctx: ActivityContext): Activity {
     if (i < 0) return;
     placed[side].splice(i, 1);
     ctx.sfx('lift');
-    liftOff(pc, ctx);
+    liftOff(pc);
     relayout(side);
     refresh();
   };
@@ -334,7 +334,7 @@ function buildMode(p: Problem, ctx: ActivityContext): Activity {
   const buildTarget = async () => {
     k.lock(true);
     for (const side of [0, 1] as const) {
-      placed[side].splice(0).forEach((pc) => liftOff(pc, ctx));
+      placed[side].splice(0).forEach((pc) => liftOff(pc));
     }
     refresh();
     for (let i = 0; i < tTens; i++) {
@@ -349,8 +349,7 @@ function buildMode(p: Problem, ctx: ActivityContext): Activity {
   return {
     el,
     show() {
-      if (ctx.calm) return;
-      [tenPile, onePile, ok].forEach((b, i) => void flyIn(b, 0, 80, ctx, 0.35 + i * 0.05));
+      [tenPile, onePile, ok].forEach((b, i) => void flyIn(b, 0, 80, 0.35 + i * 0.05));
     },
     wrong() {
       void wobble(ok);

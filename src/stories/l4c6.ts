@@ -62,7 +62,7 @@ export default defineStory({
 
     // The Pixie, furious, steaming.
     const puff = k.part(pixie, 'puff');
-    if (!k.calm) void k.to(puff, 0.35, { scale: 1.25, yoyo: true, repeat: 6, ease: 'sine.inOut' });
+    void k.to(puff, 0.35, { scale: 1.25, yoyo: true, repeat: 6, ease: 'sine.inOut' });
     await k.wait(300);
     await k.all(k.say('furious'), k.shake(pixie, 5, 3));
 

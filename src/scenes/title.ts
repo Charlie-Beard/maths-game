@@ -1,7 +1,7 @@
 /**
  * Title: the Faraway Tree at dusk with whichever land is visiting in the
  * cloud, its little windows lit and gently flickering (candles, not
- * flashes; still in calm mode), Moon-Face leaning out over his branch to
+ * flashes), Moon-Face leaning out over his branch to
  * wave, and one big wax-seal Play button.
  */
 import { gsap } from 'gsap';
@@ -14,7 +14,7 @@ import { circle, ellipse, piece, rng, svg } from '../art/paper';
 import { tree } from '../art/scenery';
 import { PHRASES } from '../core/phrases';
 import { requestPersistence } from '../save/local';
-import { breathe, isCalm, sm, stepped } from '../ui/anim';
+import { breathe, sm, stepped } from '../ui/anim';
 import { sealButton } from '../ui/components';
 import { h, place } from '../ui/dom';
 import { Scene } from '../ui/scene';
@@ -47,7 +47,7 @@ export class TitleScene extends Scene {
     for (const [x, y, rad] of WINDOWS) {
       const glow = place(h('div', { class: 'window-glow' }), x - rad * 1.6, y - rad * 1.6, rad * 3.2, rad * 3.2);
       r.append(glow);
-      if (!isCalm()) this.flicker(glow);
+      this.flicker(glow);
     }
 
     // Moon-Face, leaning out of the cloud by his round room, waving.
@@ -69,19 +69,18 @@ export class TitleScene extends Scene {
     this.wave();
   }
 
-  /** Moon-Face waves now and then (once, and only a little, in calm mode). */
+  /** Moon-Face waves now and then. */
   private wave(): void {
     const arm = this.moon.querySelector('[data-part="armR"]');
     if (!arm || !this.alive) return;
-    const swings = isCalm() ? 1 : 3;
     const tl = gsap.timeline();
-    for (let i = 0; i < swings; i++) {
+    for (let i = 0; i < 3; i++) {
       tl.to(arm, { rotation: -16, duration: 0.25, ease: stepped(0.25, 'sine.inOut') });
       tl.to(arm, { rotation: 8, duration: 0.25, ease: stepped(0.25, 'sine.inOut') });
     }
     tl.to(arm, { rotation: 0, duration: 0.2, ease: stepped(0.2, 'sine.out') });
     this.onCleanup(() => tl.kill());
-    if (!isCalm()) this.later(7000, () => this.wave());
+    this.later(7000, () => this.wave());
   }
 
   /** A candle's slow, small flicker: brightness drifts, never blinks. */

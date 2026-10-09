@@ -94,7 +94,7 @@ function dealing(p: Problem, ctx: ActivityContext, withFolk: boolean): Activity 
     el.append(it);
     if (!quiet) ctx.sfx('place');
     if (!pileItems.length) pile.classList.add('is-empty');
-    await flyIn(it, fx + pileSize / 2 - (x + size / 2), fy + pileSize / 2 - (y + size / 2), ctx, 0.35);
+    await flyIn(it, fx + pileSize / 2 - (x + size / 2), fy + pileSize / 2 - (y + size / 2), 0.35);
   };
 
   k.tap(pile, () => {
@@ -110,7 +110,7 @@ function dealing(p: Problem, ctx: ActivityContext, withFolk: boolean): Activity 
     dealing = true;
     while (pileItems.length) {
       void dealOne(true);
-      await new Promise((r) => setTimeout(r, ctx.calm ? 20 : 120));
+      await new Promise((r) => setTimeout(r, 120));
     }
     dealing = false;
   };
@@ -127,7 +127,7 @@ function dealing(p: Problem, ctx: ActivityContext, withFolk: boolean): Activity 
   return {
     el,
     show() {
-      cardsIn(cards.values(), ctx);
+      cardsIn(cards.values());
     },
     wrong: (value: Answer) => wobbleValue(k, value),
     async right() {

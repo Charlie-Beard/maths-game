@@ -95,11 +95,8 @@ export function count(p: Problem, ctx: ActivityContext): Activity {
   return {
     el: shell.el,
     show() {
-      enter(
-        objs.map((o) => o.el),
-        ctx.calm,
-      );
-      cards.show(ctx.calm);
+      enter(objs.map((o) => o.el));
+      cards.show();
     },
     wrong(val: Answer) {
       cards.wrong(val);
@@ -127,8 +124,7 @@ export function count(p: Problem, ctx: ActivityContext): Activity {
               gsap.set(o.el, { x: 0, y: 0, scale: 1 });
               place1(o.el, s, tidy.size);
             };
-            if (ctx.calm) done();
-            else sm(o.el, 0.5, { x: dx, y: dy, scale: tidy.size / cur, rotation: 0, onComplete: done });
+            sm(o.el, 0.5, { x: dx, y: dy, scale: tidy.size / cur, rotation: 0, onComplete: done });
           }),
         );
         cards.dropOne();
@@ -136,8 +132,7 @@ export function count(p: Problem, ctx: ActivityContext): Activity {
       }
       // Silky counts the rest, one by one.
       todo().forEach((o, i) => {
-        if (ctx.calm) mark(o);
-        else timers.push(gsap.delayedCall(i * 0.25, () => !o.n && mark(o)));
+        timers.push(gsap.delayedCall(i * 0.25, () => !o.n && mark(o)));
       });
       cards.showAnswer();
     },

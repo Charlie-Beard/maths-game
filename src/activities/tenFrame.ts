@@ -51,8 +51,7 @@ export function tenFrame(p: Problem, ctx: ActivityContext): Activity {
   const shell = new Shell('tenFrame');
   const timers: gsap.core.Tween[] = [];
   const later = (s: number, fn: () => void) => {
-    if (ctx.calm) fn();
-    else timers.push(gsap.delayedCall(s, fn));
+    timers.push(gsap.delayedCall(s, fn));
   };
 
   // ---- Geometry (stage coordinates) ----
@@ -152,7 +151,6 @@ export function tenFrame(p: Problem, ctx: ActivityContext): Activity {
       place(c.el, tx, ty);
       done?.();
     };
-    if (ctx.calm) return finish();
     const dx = tx - parseFloat(c.el.style.left);
     const dy = ty - parseFloat(c.el.style.top);
     gsap
@@ -204,7 +202,7 @@ export function tenFrame(p: Problem, ctx: ActivityContext): Activity {
       c.el.classList.remove('hint-glow');
       cells[i].classList.remove('ghost');
       ctx.sfx('place');
-      if (!ctx.calm) smFrom(c.el, 0.25, { scale: 0.4, y: -20 });
+      smFrom(c.el, 0.25, { scale: 0.4, y: -20 });
       afterFill(quiet);
     } else if (mode === 'add') addFromTray();
   }
@@ -221,8 +219,7 @@ export function tenFrame(p: Problem, ctx: ActivityContext): Activity {
       ctx.sfx('lift');
       if (numberAll) cells[i].classList.add('ghost');
       const el = c.el;
-      if (ctx.calm) el.remove();
-      else gsap.to(el, { scale: 0.4, opacity: 0, duration: 0.2, ease: 'power2.in', onComplete: () => el.remove() });
+      gsap.to(el, { scale: 0.4, opacity: 0, duration: 0.2, ease: 'power2.in', onComplete: () => el.remove() });
       afterFill();
       return;
     }
@@ -269,8 +266,8 @@ export function tenFrame(p: Problem, ctx: ActivityContext): Activity {
   return {
     el: shell.el,
     show() {
-      enter([...frames, ...shell.el.querySelectorAll('.tf-counter')], ctx.calm);
-      cards?.show(ctx.calm);
+      enter([...frames, ...shell.el.querySelectorAll('.tf-counter')]);
+      cards?.show();
     },
     wrong(val: Answer) {
       if (cards) cards.wrong(val);

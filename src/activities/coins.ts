@@ -219,7 +219,7 @@ export function coins(p: Problem, ctx: ActivityContext): Activity {
         drawCounter();
         const placed = counterBox?.querySelectorAll<HTMLElement>('.c-counter-coin');
         const last = placed?.[placed.length - 1];
-        if (last && !ctx.calm) void pop(last, 1.15);
+        if (last) void pop(last, 1.15);
       });
       purseBtns.push(btn);
       el.append(btn);
@@ -244,7 +244,7 @@ export function coins(p: Problem, ctx: ActivityContext): Activity {
   return {
     el,
     show() {
-      enter(enterEls, ctx.calm);
+      enter(enterEls);
     },
     wrong(value: Answer) {
       const card = cards.get(String(value));
@@ -267,7 +267,7 @@ export function coins(p: Problem, ctx: ActivityContext): Activity {
           counterBox.append(totalTag);
         }
         const wrong = wrongCards();
-        if (wrong.length > 1) removeCard(wrong[0][1], ctx.calm);
+        if (wrong.length > 1) removeCard(wrong[0][1]);
         return;
       }
       if (mode !== 'pay') {

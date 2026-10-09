@@ -115,7 +115,7 @@ export function solid(p: Problem, ctx: ActivityContext): Activity {
   return {
     el,
     show() {
-      enter([...cards.values()], ctx.calm);
+      enter([...cards.values()]);
     },
     wrong(value: Answer) {
       const card = cards.get(String(value));
@@ -137,7 +137,7 @@ export function solid(p: Problem, ctx: ActivityContext): Activity {
           draw({ seeThrough: true, marks });
         }
         const wrong = wrongCards();
-        if (wrong.length > 1) removeCard(wrong[0][1], ctx.calm);
+        if (wrong.length > 1) removeCard(wrong[0][1]);
         return;
       }
       cards.get(String(p.answer))?.classList.add('hint-answer');

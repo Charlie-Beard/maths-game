@@ -124,7 +124,6 @@ export function goblin(k: Kit, name: string, x: number, y: number, o: GoblinFigu
 
 /** Makes a goblin's arms and legs swing while it runs or creeps. Returns a stopper. */
 export function scurry(k: Kit, el: HTMLElement, fast = true): () => void {
-  if (k.calm) return () => {};
   const legs = k.pivot(k.part(el, 'legL').concat(k.part(el, 'legR')));
   const arms = k.pivot(k.part(el, 'armL').concat(k.part(el, 'armR')));
   const d = fast ? 0.14 : 0.3;

@@ -57,3 +57,12 @@ describe('progress', () => {
     expect(p.toffees).toBe(1);
   });
 });
+
+describe('older saves', () => {
+  it('drop the calm-mode setting the game no longer has', () => {
+    const old = { ...defaultProgress(), settings: { volume: 0.5, calm: true, idleHintSeconds: 12, newPerDay: 2 } };
+    const p = restore(JSON.parse(JSON.stringify(old)));
+    expect(p.settings).not.toHaveProperty('calm');
+    expect(p.settings.volume).toBe(0.5);
+  });
+});

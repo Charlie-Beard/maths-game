@@ -81,18 +81,14 @@ export function okButton(x: number, y: number, size = 120): HTMLButtonElement {
 }
 
 /** Fades a card away (help level 2 takes away one wrong choice). */
-export function removeCard(card: HTMLElement, calm: boolean): void {
+export function removeCard(card: HTMLElement): void {
   card.setAttribute('disabled', '');
-  if (calm) {
-    card.remove();
-    return;
-  }
   gsap.to(card, { opacity: 0, scale: 0.6, duration: 0.25, ease: 'power2.in', onComplete: () => card.remove() });
 }
 
 /** Cards slide up into place when the problem appears. */
-export function enter(els: Element[], calm: boolean): void {
-  if (calm || !els.length) return;
+export function enter(els: Element[]): void {
+  if (!els.length) return;
   gsap.from(els, { y: 60, opacity: 0, duration: 0.3, stagger: 0.06, ease: 'power2.out' });
 }
 

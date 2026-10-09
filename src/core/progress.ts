@@ -13,8 +13,6 @@ import { SKILL_IDS, type SkillId } from './skills';
 export interface Settings {
   /** Master volume 0..1. */
   volume: number;
-  /** Calm mode: no boil, minimal motion. Defaults to the iPad setting. */
-  calm: boolean;
   /** Seconds of no activity before the question is said again. */
   idleHintSeconds: number;
   /** New chapters allowed per day (0 = no limit). Replays are always allowed. */
@@ -51,7 +49,7 @@ export interface Progress {
   settings: Settings;
 }
 
-export function defaultProgress(prefersReducedMotion = false, name = DEFAULT_NAME): Progress {
+export function defaultProgress(name = DEFAULT_NAME): Progress {
   return {
     v: 1,
     name,
@@ -66,13 +64,19 @@ export function defaultProgress(prefersReducedMotion = false, name = DEFAULT_NAM
     unlockAll: false,
     unlockedTo: -1,
     lastPlayed: 0,
-    settings: { volume: 0.8, calm: prefersReducedMotion, idleHintSeconds: 12, newPerDay: 2 },
+    settings: { volume: 0.8, idleHintSeconds: 12, newPerDay: 2 },
   };
 }
 
 /** Loads anything that looks like a save, filling gaps with defaults. */
-export function restore(raw: unknown, prefersReducedMotion = false): Progress {
-  const d = defaultProgress(prefersReducedMotion);
+/** Older saves carry a calm-mode setting, which the game no longer has. */
+function withoutCalm(s: Settings & { calm?: unknown }): Settings {
+  const { calm: _calm, ...rest } = s;
+  return rest;
+}
+
+export function restore(raw: unknown): Progress {
+  const d = defaultProgress();
   if (!raw || typeof raw !== 'object') return d;
   const r = raw as Partial<Progress>;
   const skills: Progress['skills'] = {};
@@ -90,7 +94,7 @@ export function restore(raw: unknown, prefersReducedMotion = false): Progress {
     keepsakes: Array.isArray(r.keepsakes) ? r.keepsakes : [],
     cards: Array.isArray(r.cards) ? r.cards : [],
     seals: Array.isArray(r.seals) ? r.seals : [],
-    settings: { ...d.settings, ...(r.settings ?? {}) },
+    settings: withoutCalm({ ...d.settings, ...(r.settings ?? {}) }),
   };
 }
 
