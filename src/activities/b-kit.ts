@@ -91,10 +91,17 @@ export interface CardOpts {
 /** A row of big torn-paper answer cards along the bottom. Returns them by value. */
 export function answerCards(k: Kit, choices: Answer[], o: CardOpts = {}): Map<string, HTMLElement> {
   const size = o.size ?? 150;
-  const widths = choices.map((c) => (o.width ? o.width(c) : cardWidth(c)) * (size / 150));
-  const gap = 40;
-  const total = widths.reduce((s, w) => s + w, 0) + gap * (choices.length - 1);
-  let x = 590 - total / 2;
+  let widths = choices.map((c) => (o.width ? o.width(c) : cardWidth(c)) * (size / 150));
+  // The row stays between the child's portrait (x 150) and the finale's
+  // desk edge (x 1035): closer gaps first, then narrower cards.
+  const [left, right] = [160, 1030];
+  const sum = () => widths.reduce((s, w) => s + w, 0);
+  let gap = 40;
+  if (sum() + gap * (choices.length - 1) > right - left) gap = 16;
+  const room = right - left - gap * (choices.length - 1);
+  if (sum() > room) widths = widths.map((w) => (w * room) / sum());
+  const total = sum() + gap * (choices.length - 1);
+  let x = Math.min(right - total, Math.max(left, 590 - total / 2));
   const cards = new Map<string, HTMLElement>();
   choices.forEach((c, i) => {
     const w = widths[i];

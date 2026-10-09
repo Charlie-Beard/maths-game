@@ -621,6 +621,9 @@
   border-radius: 30px;
   pointer-events: none;
 }
+.chapter-kicker.on-dark {
+  color: var(--parchment-300);
+}
 .chapter-kicker {
   position: absolute;
   text-align: center;
@@ -660,7 +663,9 @@
   font-weight: 700;
   font-size: 40px;
   color: var(--gold-300);
-  text-shadow: 0 3px 0 rgba(0, 0, 0, 0.5);
+  /* A dark halo as well as the drop shadow: the name sits on the keepsake's
+     pale gold glow and the busy land behind it. */
+  text-shadow: 0 3px 0 rgba(0, 0, 0, 0.5), 0 0 10px rgba(40, 24, 8, 0.95), 0 0 3px rgba(40, 24, 8, 0.95);
   z-index: 12;
 }
 .cheer {

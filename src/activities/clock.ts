@@ -76,8 +76,10 @@ export function clock(p: Problem, ctx: ActivityContext): Activity {
   const cards = new Map<string, HTMLElement>();
   if (!setMode) {
     const choices = p.choices ?? [];
-    const w = choices.length > 3 ? 226 : 230;
-    const xs = choices.length > 3 ? rowX(choices.length, w, 6, 622) : rowX(choices.length, w, 24);
+    // Four cards fit between the child's portrait (x 150) and the finale's
+    // desk edge (x 1035), which is also clear of Silky.
+    const w = choices.length > 3 ? 212 : 230;
+    const xs = choices.length > 3 ? rowX(choices.length, w, 6, 595) : rowX(choices.length, w, 24);
     choices.forEach((c, i) => {
       const card = answerCard(String(c), c, xs[i], choices.length > 3 ? 585 : 600, w, choices.length > 3 ? 190 : 150);
       kit.tap(card, () => {

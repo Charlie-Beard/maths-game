@@ -34,7 +34,7 @@ export class IntroScene extends Scene {
     r.append(place(h('div', { html: parchment(1100, 560, 'intro-stage-' + c.id, dark ? C.snapInk : C.cream, 1.8) }), 40, 150, 1100, 560));
     r.append(place(h('div', { class: 'intro-tint', style: `background:${this.land.color}` }), 70, 180, 1040, 500));
     r.append(banner(c.title, { x: 240, y: 34, w: 700, h: 100, size: 44 }));
-    r.append(place(h('div', { class: 'chapter-kicker' }, `${this.land.title} · ${c.kind === 'finale' ? 'The finale' : `Chapter ${c.n}`}`), 0, 196, 1180));
+    r.append(place(h('div', { class: dark ? 'chapter-kicker on-dark' : 'chapter-kicker' }, `${this.land.title} · ${c.kind === 'finale' ? 'The finale' : `Chapter ${c.n}`}`), 0, 196, 1180));
 
     this.host = place(h('button', { class: 'intro-host', 'aria-label': 'Hear again', html: characterArt(c.host) }), 110, 230, 400, 453);
     this.tap(this.host, () => void this.speak());

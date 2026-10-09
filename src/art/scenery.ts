@@ -45,17 +45,17 @@ export const TREE_PLACES: TreePlace[] = [
 /** A branch tip for each land's seal (the map hangs land n on hook n-1). */
 export const TREE_HOOKS: { x: number; y: number }[] = [
   { x: 180, y: 600 },
-  { x: 1000, y: 650 },
+  { x: 925, y: 640 },
   { x: 150, y: 470 },
   { x: 1010, y: 480 },
-  { x: 205, y: 360 },
-  { x: 990, y: 300 },
+  { x: 335, y: 505 },
+  { x: 862, y: 372 },
   { x: 280, y: 270 },
   { x: 930, y: 220 },
   { x: 140, y: 250 },
   { x: 1060, y: 380 },
   // The second adventure (lands 11–14).
-  { x: 1080, y: 560 },
+  { x: 1110, y: 520 },
   { x: 100, y: 360 },
   { x: 1090, y: 250 },
   { x: 240, y: 180 },
