@@ -45,6 +45,8 @@ export interface PlayOptions {
 }
 
 const portrait = (): boolean => document.body.classList.contains('is-portrait');
+/** After a wrong answer, how long other answers wait (see `settleUntil`). */
+const SETTLE_MS = 1000;
 
 export class PlayScene extends Scene {
   protected o: PlayOptions;
@@ -64,6 +66,12 @@ export class PlayScene extends Scene {
   private helping = false;
   /** The "back to the tree?" card is open. */
   private confirming = false;
+  /**
+   * Until when (ms) answers are let through again after a wrong one: a
+   * moment to see the wobble and hear the help, so quick taps on card after
+   * card don't race up the help to Silky showing the answer.
+   */
+  private settleUntil = 0;
   private backBtn!: HTMLElement;
   /** His toffees when the screen opened, so Practice can say how many it earned. */
   private toffeesAtStart: number;
@@ -203,10 +211,14 @@ export class PlayScene extends Scene {
 
   private async onAnswer(value: Answer): Promise<void> {
     if (this.busy || this.confirming || this.round.done) return;
+    if (performance.now() < this.settleUntil) return;
     this.restartIdle();
     const p = this.round.current;
     const verdict = this.round.answer(value);
     if (verdict === 'wrong') {
+      this.settleUntil = performance.now() + SETTLE_MS;
+      this.root.dataset.settling = '';
+      this.later(SETTLE_MS, () => delete this.root.dataset.settling);
       sfx.wrong();
       this.activity?.wrong(value);
       this.stepHelp();

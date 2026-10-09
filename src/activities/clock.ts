@@ -115,6 +115,12 @@ export function clock(p: Problem, ctx: ActivityContext): Activity {
     setClockHands(face, now.hour, now.minute, SIZE);
     face.dataset.time = `${now.hour}:${String(now.minute).padStart(2, '0')}`;
     for (const k of [`${hand}-`, `${hand}+`, `${hand}Icon`]) buttons[k]?.classList.remove('c-done');
+    // Silky's faint hands are showing: a "+" glows only while its hand
+    // still has a way to go.
+    if (ghost && target) {
+      buttons['hour+']?.classList.toggle('hint-answer', now.hour % 12 !== target.hour % 12);
+      buttons['minute+']?.classList.toggle('hint-answer', now.minute !== target.minute);
+    }
     ctx.sfx('tap');
   };
 

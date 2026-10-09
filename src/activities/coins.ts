@@ -275,11 +275,12 @@ export function coins(p: Problem, ctx: ActivityContext): Activity {
         return;
       }
       // Faint coins on the counter show what to pay with; he taps them in.
+      // Asked again: they're already there, so leave what he has put down.
+      if (ghostBox) return;
       const amount = typeof p.answer === 'number' ? p.answer : target;
       const plan = payWith(amount, unlimited ? purse : [...new Set(purse)], unlimited ? undefined : purse);
       onCounter.length = 0;
       drawCounter();
-      ghostBox?.remove();
       ghostBox = h('div', { class: 'c-ghosts' });
       const used = new Set<number>();
       plan.forEach((c, k) => {

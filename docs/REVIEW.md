@@ -1,13 +1,15 @@
-# Review: phases 0 and 1
+# Review
 
 A review of the finished game (all 14 lands) against the rules in
-[CLAUDE.md](../CLAUDE.md) and the design in [PLAN.md](PLAN.md). Phase 0 is
-the baseline; phase 1 checks the rules that never bend. Later phases (the
-maths, a play-through, audio, robustness) come next.
+[CLAUDE.md](../CLAUDE.md) and the design in [PLAN.md](PLAN.md).
 
-Findings are ranked **must fix** (breaks a rule where he plays), **should
-fix**, **nice to have**, and **for the parent** (a choice about tone, not a
-bug).
+- **Phase 0:** the baseline.
+- **Phase 1:** the rules that never bend.
+- **Phase 2:** the maths. That covers the generators, the curriculum, mastery and Silky's help.
+- **Still to do:** a play-through, audio, and robustness.
+
+Each finding says what was done about it: **fixed**, **left** (with the
+reason), or **open** (a choice still to make).
 
 ## Phase 0: baseline (2026-10-09, `main` at 8eeec19)
 
@@ -15,128 +17,108 @@ bug).
 |---|---|
 | `npm run typecheck` | Pass (7 s) |
 | `npm test` | 424 / 424 pass, 24 files (11 s) |
-| `npm run build` | Pass. `dist` is 1.7 MB. `main.js` is 685 kB (233 kB gzipped), over Vite's 500 kB warning; each story is already its own chunk |
-| `npm run test:e2e` | 160 pass, 16 skipped on purpose (finales run at 1180 × 820 only). **26 minutes**, 22 of them in `finale.spec.ts` |
+| `npm run build` | Pass. `dist` is 1.7 MB. `main.js` is 685 kB (233 kB gzipped), over Vite's 500 kB warning. Each story is already its own chunk. |
+| `npm run test:e2e` | 160 pass, 16 skipped on purpose (finales run at 1180 × 820 only). **25 minutes**, 22 of them in `finale.spec.ts`. |
 
 ## Phase 1: the rules that never bend
 
-How it was checked: a Playwright walk of 833 screen states at 1180 × 820
-(every scene, every fixture of all 19 activity kinds at every help level,
-eight chapters across the lands), a code search for each motion and touch
-rule, a script over all 1,635 lines and 2,118 pieces in
-`scripts/voice/lines.json`, and a read of every story and finale.
+**How it was checked:**
+- A Playwright walk of 833 screen states at 1180 × 820: every scene, every fixture of all 19 activity kinds at every help level, and eight chapters across the lands.
+- A code search for each motion and touch rule.
+- A script over every spoken line in `scripts/voice/lines.json`.
+- A read of every story and finale.
 
-### Must fix
+No rule is broken on an ordinary problem screen.
 
-None. No rule is broken on an ordinary problem screen.
+**Fixed:**
+- **The idle hint talked over a slow count.** Taps inside an activity didn't restart the 12 s timer, so Silky re-read the question in the middle of counting. Now any touch on the activity holds the hint (`src/scenes/play.ts`).
+- **The grown-ups' gear** is now a 72 px tap area round its small 60 px seal. **The grown-ups' corner's** tabs, buttons, choices and select are 72 px tall.
+- **Coin labels** are as big as the coin face allows (about 20% bigger). Coins keep their real relative sizes, which is how he learns to tell them apart. So a small coin's label can't reach the 64 px of an answer number; the amount he answers with is on the price tag or the cards.
+- **Unused letter-tile CSS** from Wizard Words, with endless glow and bounce loops, has been removed.
+- **The longest spoken sentences** have been split. The voice script is re-exported.
 
-### Should fix
+**Left, with the reason:**
+- **The compare count tags** (34 px, at help 2–3) are labels, not answers or buttons.
+- **Calm mode** is respected everywhere. The first audit listed a few loops as missing a calm check. Each one, checked by hand, is guarded where it's called.
+- **The finale's stage shake** happens between answers (after a right one), and calm mode skips it.
 
-1. **The idle hint can talk over him while he counts.** `restartIdle()`
-   (`src/scenes/play.ts:180`) is only restarted by a new question, an answer
-   or closing the leave card. Taps inside an activity (counting dots,
-   filling a ten frame, adding coins) don't restart it, so after 12 s Silky
-   re-reads the question in the middle of a slow, careful count. Any touch
-   on the activity should restart the timer.
-2. **The 64 px answer rule fails on the coins activity.** The value on each
-   coin (`drawCoin`, `src/activities/visual.ts:39`) is 26–57 px: the choice
-   coins (`coins.ts:122`) are 37–57 px and the purse coins (`coins.ts:210`)
-   are 26–40 px. The coins themselves are big enough to tap, and real coins
-   *should* differ in size, so the fix is a bigger label (or a smallest coin
-   size), not equal coins.
+**Checked and clean:**
+- **No failing:** no lives, timers, buzzers or game over.
+- **No flashing**, and no endless motion on problem screens.
+- **No `steps()` eases** or boil frames.
+- **Touch:** no hover, and no drag-only actions.
+- **Layout:** no `vw`, `vh` or `@media`.
+- **Text:** Andika everywhere, and UK English throughout.
+- **Randomness:** `Rand`, not `Math.random`, in `src/core`.
+- **Stories:** no hitting or hurting. Scary scenes never reach a problem screen.
 
-### Nice to have
+**Tone:** the parent has reviewed the scary moments flagged in the stories (cliffhanger endings, "NO child has EVER finished my sums", Dame Snap's intros) and is happy with them as they are.
 
-3. **Two small calm-mode gaps.** Silky's wing flutter in `l2c7` (`flutter`,
-   `src/stories/l2c7.ts:217`, 0.3 s × 40) has no `k.calm` check, unlike the
-   same helper in `l1c7`. The reward screen's bump
-   (`src/scenes/complete.ts:175`) also runs in calm mode. Everything else
-   checked (the scene change, finale effects, goblin scurry, other story
-   loops) already respects calm mode.
-4. **The grown-ups' gear is 60 × 60** (`src/ui/gear.ts:14`), under 72. Being
-   small and in a corner may be deliberate, to keep him away from it. If so,
-   say so in a comment; if not, grow the hit area to 72 and keep the 60 px
-   seal.
-5. **The grown-ups' corner** has tabs, buttons and a select at 47–56 px high
-   (`src/styles/parent.css:59, 77, 365`). It's for adults, but the rule says
-   everything.
-6. **The compare count tags** at help 2–3 are 34 px (`compare.ts:121`). They
-   are labels, not his answer, so this is borderline.
-7. **Dead CSS** from Wizard Words: `.tile.glowing` with endless
-   `glow-pulse` / `hint-bounce` (`src/styles/ui.css:109, 119`). Nothing uses
-   it; deleting it stops it coming back by accident.
-8. **24 spoken sentences are over 14 words**, out of about 8,600. Most are
-   "A new land has come to the top of the tree: The Land of X!" (split it:
-   "…the top of the tree. It is the Land of X!"). Others: "Up they all went:
-   past Dame Washalot's tub…", and "won the seal of the Land of Music, and a
-   picture of the big drum" (in `lines.json` and in `src`). Changing a line
-   means re-exporting the voice script before anything is recorded.
-9. **Small wording:** "Who's got the pennies?" (`src/core/curriculum.ts:198`)
-   could say pence; "Set the clock to 20 past 5" (`fixtures-c.ts`) reads
-   better as "twenty past five".
-10. **e2e speed:** 22 of the suite's 26 minutes are `finale.spec.ts`.
-    Splitting it into several files (Playwright runs files in parallel)
-    would make every PR faster.
-11. **Bundle:** `main.js` is 685 kB. It's cached offline after the first
-    load, so this only matters for the first visit and updates.
+## Phase 2: the maths
 
-### Checked and clean
+**How it was checked:**
+- **Generators:** 2,000 problems for every tier of all 62 skills (about 240,000). Each answer was recomputed from the written sum, the spoken numbers or the picture. The choices, the tier spec, dull problems and variety were also checked.
+- **Curriculum and mastery:** every chapter checked against its skills' `needs`. Then five simulated children (strong, typical, struggling, erratic, quick-tapping) played the whole game through the real round and mastery code.
+- **Silky's help:** each activity driven in the browser, wrong three times, then the final hint followed.
 
-- **No failing:** no lives, timers, countdowns or game over. The "wrong"
-  sound is a soft two-note hum (`src/audio/sfx.ts:93`) and wrong answers
-  wobble (`src/ui/anim.ts:40`).
-- **No flashing:** the title candle (0.5–1.4 s drifts, skipped in calm mode)
-  and the parent REC dot are the only flickers, and neither is on a problem
-  screen.
-- **No background motion while he answers:** the play scene and the
-  activities start no endless loops. The finale's shake runs between
-  answers, after a right one, and calm mode skips it.
-- **No `steps()` eases or boil frames.** (`stepped()` in `ui/anim.ts` is now
-  just a plain ease; only its name is left over.)
-- **Touch only:** no hover, no `pointermove`, no drag-only actions; every
-  tap goes through `ui/dom.ts`, which ignores drags and repeated taps.
-- **Fixed stage:** no `vw`, `vh` or `@media`; only `src/stage.ts` scales.
-- **Andika** everywhere.
-- **`Rand`, not `Math.random`,** in `src/core` (except where it makes a
-  seed, which is what it's for).
-- **UK English:** no American spellings or words in anything he hears or
-  reads. "TEN SPENCE?" is the Saucepan Man mishearing, on purpose.
-- **Tap targets of 72 px or more and answer numbers of 64 px or more** on
-  choice cards, the number pad and its answer box, and every other
-  activity. (The clock hands and shape sides look thin, but their stroke is
-  72 px.)
-- **No hitting, slapping or hurting** anywhere in the stories or finales.
-  No Dame Snap or scary art or sound ever reaches a problem screen.
+### Fixed
 
-### For the parent: tone
+**Mastery** (`src/core/mastery.ts`)
+- **A mastered skill dropped a tier on any one slip,** even one wrong answer among the five focus problems of a chapter. That was 95–100% of all tier drops in the simulation, and it made tiers swing up and down. Now only a slip on a *due* review drops the tier. Other slips still send it back to box 1, so it comes up for review again soon.
+- **One answer could drop a tier twice.** This happened when the "Silky helped twice" rule and the review-slip rule both fired.
+- **The review slot repeated one skill.** When nothing was due, the most overdue skill always came first. A right answer that wasn't due left its date alone, so the same skill was the review problem chapter after chapter (61 of 83 review slots, for one simulated child). Now it's the mastered skill he practised longest ago.
 
-The story read found nothing cruel by the rule's definition, and several
-moments it flagged are in PLAN.md on purpose ("I will SNAP you up!", Silky
-taken at the end of land 7, Dame Snap shut in her detention cupboard).
-These are worth a look by someone who knows him:
+**Generators**
+- **turns, tier 4:** the explanation said "Left and right are turns, not steps". But the path is walked turn-then-step, and the right flag depends on it. Now the question and the explanation both say "turn, then step".
+- **time, tier 5:** more than half the problems offered impossible choices like "4 past 8". That distractor is now the hands swapped, which is a real clock reading.
+- **shapes-2d, tier 2:** "This window has gone topsy-turvy!" sometimes showed a square turned 90° or 180°, which looks upright. Now the turn always shows.
+- **add-5, add-10, sub-10:** picking the total first made "1 + 1" a quarter of all add-5 problems. Now every pair is equally likely.
+- **bonds-10:** "How many more to fill it?" with a full tin (answer 0) was nearly one problem in five. 0 and 10 now come only now and then.
+- **word-problems, tier 4:** 14% of the two-step stories gave back exactly what came, so the answer was just the first number. Now it's under 1%.
+- Unit tests cover each of these.
 
-- **Chapters that end on fear.** `l1c8` ("Somebody with a ruler…", the very
-  first land), `l4c7`, `l7c8`, `l10c7`, `l11c8`, `l12c8` and `l13c8` (the
-  goblin gloats, then black). These are often the last thing before he
-  stops for the day. One option: keep the cliffhanger, then add one warm
-  last beat (Moon-Face's lamp, "Silky's dewdrop is still glowing").
-- **"You might never get home!"** (`l1c8.ts:202`) and "stuck here for
-  ever!" (`l7c8`): fear of being left behind.
-- **"No child could EVER do it!"** (`l10c6.ts:28`, `l10c8.ts:178`,
-  `curriculum.ts:186`). Dame Snap means it as a dare, but he hears "you
-  can't".
-- **Dame Snap's chapter intros** (`src/scenes/intro.ts`, for `l4c8`, `l7c8`,
-  `l10c8`) go dark with an ominous sound and "Nobody leaves my school until
-  every sum is done!" just before the problems start.
-- **Moon-Face is told off for smiling** with "One HUNDRED lines!"
-  (`l4c4.ts:44`, `l4c5.ts:22`).
-- **"Oh, only the wind"** in the opening film, when the noise is real.
-  Grown-ups saying a scary thing isn't real can cost trust.
-- **Wording for Dame Snap's fate** varies: "locked in the cupboard"
-  (`l10c8`), "beaten for good" (`finale-lands.ts:129, 220`), "gone for good"
-  (`l11c1.ts:23`). One gentle phrase used everywhere ("far, far away") would
-  be calmer and consistent.
-- **Small story threads:** the Red Goblin is named in `l13c8` before he's
-  introduced (`l12c6` would be the place). Silky is away from `l7c8` to
-  `l10c8` and the Saucepan Man is gone after `l13c8`; one line at the start
-  of each next land ("Silky is safe, and we're coming") would bridge it.
+**Silky's help** (`src/scenes/play.ts`, `src/activities/`)
+- **Quick taps raced up the ladder.** Four wrong taps on different cards a quarter of a second apart reached level 3 (Silky shows the answer) in about one second, skipping levels 1 and 2. After a wrong answer, other answers now wait 1 s, long enough to see the wobble and hear the help. There is an e2e test for this.
+- **choose, help 1, showed nothing on text-only problems.** It made the (empty) picture glow. Now the written sum sits on a gold band.
+- **choose word cards** ("odd", "even") were up to 240 px tall from y 600, so they were cut off at the bottom of the stage. They are now at most 160 tall.
+- **measure, putting things in order:**
+  - Help 2 did nothing if he had already picked one. Now it starts again from the first one, put in place for him.
+  - Help 3 could point past a wrong pick. Now wrong picks are taken back first.
+- **clock, setting the time:** after help 3 the "+" buttons kept glowing when the hands were already right. Now each glows only while its hand has a way to go.
+- **coins, paying:** asking Silky again at help 3 swept his coins off the counter. Now it leaves them.
+
+### Left, with the reason
+
+- **Curriculum order is sound.** Every skill's `needs` come first, every skill is used, and no skill starts above tier 1.
+- **Nobody got stuck.** Every simulated child finished all 112 chapters. The final help level always makes the answer reachable. There's no dead end, and nothing locks.
+- **Low-value cases kept as real maths:** ×1 in the times tables, "5 ÷ 5", and "just before 1 is 0".
+
+### Open: design choices for the parent
+
+These are design choices backed by the simulation, not bugs:
+
+1. **Unmastered skills never come back after their land.** Review only uses mastered skills. A struggling child could leave 13–20 skills unmastered, and they never return. Typical children leave 7–9. One option: let the review slot (and Practice with Silky) also use skills from earlier lands that he's seen but not mastered, weakest first.
+2. **Few skills reach "mastered".** Mastery needs at least 8 problems on a skill, and most skills get about 20 in the whole game. Typical children master about 25–36 of 56. The bar could be lower (6 problems), or Practice could lean on skills that are nearly mastered.
+3. **"Mastered" can mean a low tier.** The bar is the current chapter's ceiling, so `add-10` can be mastered at tier 3 of 5. 24 skills never have a chapter whose ceiling reaches their top tier.
+4. **Chapter floors override a struggling child's tier.** A chapter with floor 3 plays tier 3 even when his tier for that skill is 1. PLAN.md says "a skill he finds hard simply stays concrete for longer", and floors cut against that. The simulated struggling child played above his own tier on 140–173 problems.
+5. **Help 2 gives the answer away in a few activities:**
+   - `compare`: the scales tip.
+   - `share`: counts under the plates.
+   - `groups`: the running totals.
+   - `tensOnes` read mode: the sum is finished.
+   - `measure` with two things: the wrong one is washed out.
+
+   In these, help 3 adds nothing new. Gentler versions: show the counts without the total, or tip the scales only partway.
+6. **With only two choices** (odd/even, two cards), help 2 has no wrong card to take away, so it adds nothing.
+7. **Asking Silky first** gets "Hmm, have another look", although he hasn't answered yet.
+
+## Still to do
+
+- **Phase 3, play-through:** screenshot every scene and the first problem of each land, and time the gaps between problems.
+- **Phase 4, audio and voice:** check every spoken line is exported, and check pronunciation of numbers.
+- **Phase 5, robustness:**
+  - the save
+  - leaving and coming back mid-problem
+  - memory over 20 chapters
+  - speed on an older iPad
+- **e2e speed:** split `finale.spec.ts` (22 of the suite's 25 minutes) into several files so they run in parallel.
