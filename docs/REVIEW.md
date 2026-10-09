@@ -87,6 +87,8 @@ No rule is broken on an ordinary problem screen.
 - **clock, setting the time:** after help 3 the "+" buttons kept glowing when the hands were already right. Now each glows only while its hand has a way to go.
 - **coins, paying:** asking Silky again at help 3 swept his coins off the counter. Now it leaves them.
 
+- **Skills he hasn't mastered never came back after their land.** Review used only mastered skills, so a struggling child could leave 13–20 skills behind for good (typical children 7–9). Now the review slot and Practice with Silky take mastered skills that are due first. Next come skills he has played but not mastered (least recently practised first, so they take turns), then the other mastered skills. In the simulation the skills left behind fell to 4–5 for a struggling child and 1–2 for a typical one, all from the last lands.
+
 ### Left, with the reason
 
 - **Curriculum order is sound.** Every skill's `needs` come first, every skill is used, and no skill starts above tier 1.
@@ -97,11 +99,10 @@ No rule is broken on an ordinary problem screen.
 
 These are design choices backed by the simulation, not bugs:
 
-1. **Unmastered skills never come back after their land.** Review only uses mastered skills. A struggling child could leave 13–20 skills unmastered, and they never return. Typical children leave 7–9. One option: let the review slot (and Practice with Silky) also use skills from earlier lands that he's seen but not mastered, weakest first.
-2. **Few skills reach "mastered".** Mastery needs at least 8 problems on a skill, and most skills get about 20 in the whole game. Typical children master about 25–36 of 56. The bar could be lower (6 problems), or Practice could lean on skills that are nearly mastered.
-3. **"Mastered" can mean a low tier.** The bar is the current chapter's ceiling, so `add-10` can be mastered at tier 3 of 5. 24 skills never have a chapter whose ceiling reaches their top tier.
-4. **Chapter floors override a struggling child's tier.** A chapter with floor 3 plays tier 3 even when his tier for that skill is 1. PLAN.md says "a skill he finds hard simply stays concrete for longer", and floors cut against that. The simulated struggling child played above his own tier on 140–173 problems.
-5. **Help 2 gives the answer away in a few activities:**
+1. **Few skills reach "mastered".** Mastery needs at least 8 problems on a skill, and most skills get about 20 in the whole game. Typical children master about 25–36 of 56. The bar could be lower (6 problems), or Practice could lean on skills that are nearly mastered.
+2. **"Mastered" can mean a low tier.** The bar is the current chapter's ceiling, so `add-10` can be mastered at tier 3 of 5. 24 skills never have a chapter whose ceiling reaches their top tier.
+3. **Chapter floors override a struggling child's tier.** A chapter with floor 3 plays tier 3 even when his tier for that skill is 1. PLAN.md says "a skill he finds hard simply stays concrete for longer", and floors cut against that. The simulated struggling child played above his own tier on 140–173 problems.
+4. **Help 2 gives the answer away in a few activities:**
    - `compare`: the scales tip.
    - `share`: counts under the plates.
    - `groups`: the running totals.
@@ -109,8 +110,8 @@ These are design choices backed by the simulation, not bugs:
    - `measure` with two things: the wrong one is washed out.
 
    In these, help 3 adds nothing new. Gentler versions: show the counts without the total, or tip the scales only partway.
-6. **With only two choices** (odd/even, two cards), help 2 has no wrong card to take away, so it adds nothing.
-7. **Asking Silky first** gets "Hmm, have another look", although he hasn't answered yet.
+5. **With only two choices** (odd/even, two cards), help 2 has no wrong card to take away, so it adds nothing.
+6. **Asking Silky first** gets "Hmm, have another look", although he hasn't answered yet.
 
 ## Still to do
 
