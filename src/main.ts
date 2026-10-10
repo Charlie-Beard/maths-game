@@ -139,6 +139,16 @@ else void director.go(new LoginScene(app, () => void start()));
 if (import.meta.env.PROD && 'serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('./sw.js').catch(() => {});
+    // A new deploy: once its worker takes over (it clears the old cache),
+    // reload so the iPad runs the new version straight away, not next visit.
+    if (navigator.serviceWorker.controller) {
+      let reloaded = false;
+      navigator.serviceWorker.addEventListener('controllerchange', () => {
+        if (reloaded) return;
+        reloaded = true;
+        location.reload();
+      });
+    }
     void navigator.serviceWorker.ready.then((r) => r.active?.postMessage('fill-audio'));
   });
 }

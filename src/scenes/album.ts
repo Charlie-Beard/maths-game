@@ -44,6 +44,11 @@ export const CARD_HOSTS: string[] = [...new Set(ALL_CHAPTERS.map((c) => c.host))
 /** The tab he was last on, so coming back from a story lands where he was. */
 let lastTab: Tab = 'keepsakes';
 
+/** Opens the Treasure Room on its Stories tab (the title's Stories button). */
+export function openOnStories(): void {
+  lastTab = 'stories';
+}
+
 /**
  * Keepsakes and seals on the shelves are shown as pictures, not live SVG: 80
  * of them is over a thousand paths to keep and repaint while he scrolls. A

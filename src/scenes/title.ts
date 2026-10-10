@@ -18,6 +18,7 @@ import { breathe, sm, stepped } from '../ui/anim';
 import { sealButton } from '../ui/components';
 import { h, place } from '../ui/dom';
 import { Scene } from '../ui/scene';
+import { openOnStories } from './album';
 import { currentLand } from './map';
 
 /** The tree's lit windows (art/scenery.ts), as glows that can flicker: x, y, radius. */
@@ -34,6 +35,7 @@ const WINDOWS: [number, number, number][] = [
 
 export class TitleScene extends Scene {
   private play!: HTMLButtonElement;
+  private stories!: HTMLButtonElement;
   private moon!: HTMLElement;
   private going = false;
 
@@ -60,6 +62,11 @@ export class TitleScene extends Scene {
     this.play = sealButton('play', { x: 505, y: 540, size: 170, color: C.red, aria: 'Play', name: 'title-play' });
     this.tap(this.play, () => void this.go());
     r.append(this.play);
+
+    // Straight to the stories he has unlocked, to watch again.
+    this.stories = sealButton('play', { x: 960, y: 580, size: 120, color: C.slate, label: 'Stories', aria: 'Stories', name: 'title-stories' });
+    this.tap(this.stories, () => void this.watch());
+    r.append(this.stories);
   }
 
   enter(): void {
@@ -92,6 +99,15 @@ export class TitleScene extends Scene {
     };
     gsap.set(el, { opacity: 0.8 });
     step();
+  }
+
+  private async watch(): Promise<void> {
+    if (this.going) return;
+    this.going = true;
+    await unlock();
+    sfx.tap();
+    openOnStories();
+    this.app.nav.album();
   }
 
   private async go(): Promise<void> {
