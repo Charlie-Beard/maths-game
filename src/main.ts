@@ -98,6 +98,11 @@ async function start(): Promise<void> {
   if (!profile.cached && active.id !== JASPER) await Promise.race([profile.sync(), wait(5000)]);
   // Anyone but Jasper gets a name badge, so a demo is never mistaken for his game.
   if (active.id !== JASPER) stage.el.append(place(h('div', { class: 'profile-badge' }, active.label), 12, 80));
+  // Jasper has every chapter and land open (his grown-up asked for it).
+  if (active.id === JASPER && !profile.progress.unlockAll) {
+    profile.progress.unlockAll = true;
+    profile.save();
+  }
   applySettings();
   profile.onChange(applySettings);
   keepInSync(profile);
