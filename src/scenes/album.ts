@@ -15,6 +15,7 @@ import { gsap } from 'gsap';
 import { sfx } from '../audio/sfx';
 import { voice } from '../audio/voice';
 import { characterArt } from '../art/characters';
+import { activeProfile, JASPER } from '../cloud/api';
 import { keepsakeArt, landSeal } from '../art/keepsakes';
 import { C } from '../art/palette';
 import { circle, ellipse, ink, piece, rect, svg } from '../art/paper';
@@ -217,13 +218,15 @@ export class AlbumScene extends Scene {
   /**
    * Every story he has unlocked: the opening, each finished chapter's, the
    * finales and the ending. When a grown-up has unlocked every chapter, every
-   * story is here too, so he can watch them all.
+   * story is here too, so he can watch them all. Jasper has every story
+   * open, whatever he has played (his grown-up asked for it).
    */
   private stories(): void {
     const p = this.app.progress;
-    const done = (id: string): boolean => p.unlockAll || !!p.chapters[id]?.done;
+    const all = p.unlockAll || activeProfile().id === JASPER;
+    const done = (id: string): boolean => all || !!p.chapters[id]?.done;
     let any = false;
-    if ((p.seenOpening || p.unlockAll) && hasStory('opening')) {
+    if ((p.seenOpening || all) && hasStory('opening')) {
       this.body.append(this.storyGroup('The beginning', [this.storyTile('opening', 'Up the Faraway Tree', 'moonface', LANDS[0].color)]));
       any = true;
     }
