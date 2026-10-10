@@ -209,23 +209,28 @@ export class AlbumScene extends Scene {
     this.body.append(grid);
   }
 
-  /** Every story he has unlocked: the opening, each finished chapter's, the finales and the ending. */
+  /**
+   * Every story he has unlocked: the opening, each finished chapter's, the
+   * finales and the ending. When a grown-up has unlocked every chapter, every
+   * story is here too, so he can watch them all.
+   */
   private stories(): void {
     const p = this.app.progress;
+    const done = (id: string): boolean => p.unlockAll || !!p.chapters[id]?.done;
     let any = false;
-    if (p.seenOpening && hasStory('opening')) {
+    if ((p.seenOpening || p.unlockAll) && hasStory('opening')) {
       this.body.append(this.storyGroup('The beginning', [this.storyTile('opening', 'Up the Faraway Tree', 'moonface', LANDS[0].color)]));
       any = true;
     }
     // The ending film sits after Dame Snap's Prison, before the second adventure.
     const end = findChapter(ENDING_AFTER)!;
     for (const land of LANDS) {
-      const tiles = land.chapters.filter((c) => p.chapters[c.id]?.done && hasStory(c.id)).map((c) => this.storyTile(c.id, c.title, c.host, land.color, c.kind === 'finale'));
+      const tiles = land.chapters.filter((c) => done(c.id) && hasStory(c.id)).map((c) => this.storyTile(c.id, c.title, c.host, land.color, c.kind === 'finale'));
       if (tiles.length) {
         this.body.append(this.storyGroup(land.title, tiles));
         any = true;
       }
-      if (land === end.land && p.chapters[end.chapter.id]?.done && hasStory('ending')) {
+      if (land === end.land && done(end.chapter.id) && hasStory('ending')) {
         this.body.append(this.storyGroup('The end', [this.storyTile('ending', 'The Biggest Birthday', 'moonface', land.color)]));
       }
     }
