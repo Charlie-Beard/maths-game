@@ -22,7 +22,6 @@ import { activeProfile, getAuth, JASPER, setActiveProfile, setAuth } from './clo
 import { CloudProfile, keepInSync, onSignedOut } from './cloud/profile';
 import { ALL_CHAPTERS, LANDS } from './core/curriculum';
 import { Game } from './game';
-import { LoginScene } from './scenes/login';
 import { Stage } from './stage';
 import { Director } from './ui/director';
 import { h, place, wait } from './ui/dom';
@@ -147,9 +146,9 @@ if (import.meta.env.DEV && !getAuth() && !new URLSearchParams(location.search).h
   setAuth({ token: 'dev', who: JASPER });
 }
 
-// The password is asked once per device (dev shortcuts wait until then too).
-if (getAuth()) void start();
-else void director.go(new LoginScene(app, () => void start()));
+// No password: the app opens straight away. A device already signed in
+// keeps syncing to the cloud; one that isn't plays from its own save.
+void start();
 
 // Offline support (production builds only). The worker caches the app on
 // install; the voice clips are filled in gently afterwards, carrying on
