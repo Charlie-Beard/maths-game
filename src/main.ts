@@ -20,6 +20,7 @@ import { setVolumes, unlock } from './audio/engine';
 import { loadManifest, setPlayerName } from './audio/voice';
 import { activeProfile, getAuth, JASPER, setActiveProfile, setAuth } from './cloud/api';
 import { CloudProfile, keepInSync, onSignedOut } from './cloud/profile';
+import { ALL_CHAPTERS, LANDS } from './core/curriculum';
 import { Game } from './game';
 import { LoginScene } from './scenes/login';
 import { Stage } from './stage';
@@ -98,10 +99,22 @@ async function start(): Promise<void> {
   if (!profile.cached && active.id !== JASPER) await Promise.race([profile.sync(), wait(5000)]);
   // Anyone but Jasper gets a name badge, so a demo is never mistaken for his game.
   if (active.id !== JASPER) stage.el.append(place(h('div', { class: 'profile-badge' }, active.label), 12, 80));
-  // Jasper has every chapter and land open (his grown-up asked for it).
-  if (active.id === JASPER && !profile.progress.unlockAll) {
-    profile.progress.unlockAll = true;
-    profile.save();
+  // Jasper has everything open (his grown-up asked for it): every chapter
+  // and land, and every keepsake, Folk card and seal in the Treasure Room.
+  // Saved, so it reaches the cloud too. Where he is in the maths is kept.
+  if (active.id === JASPER) {
+    const p = profile.progress;
+    const keepsakes = ALL_CHAPTERS.map((c) => c.keepsake);
+    const cards = [...new Set(ALL_CHAPTERS.map((c) => c.host))];
+    const seals = LANDS.map((l) => l.n);
+    const missing = <T,>(have: T[], all: T[]) => all.some((x) => !have.includes(x));
+    if (!p.unlockAll || missing(p.keepsakes, keepsakes) || missing(p.cards, cards) || missing(p.seals, seals)) {
+      p.unlockAll = true;
+      p.keepsakes = [...new Set([...p.keepsakes, ...keepsakes])];
+      p.cards = [...new Set([...p.cards, ...cards])];
+      p.seals = [...new Set([...p.seals, ...seals])];
+      profile.save();
+    }
   }
   applySettings();
   profile.onChange(applySettings);
